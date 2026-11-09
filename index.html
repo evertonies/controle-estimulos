@@ -168,7 +168,7 @@
         <button class="btn verde" id="criarSeq">Criar estímulos e programas da sequência</button>
         <span class="ajuda" id="seqMsg">Cria só o que ainda não existe; pode clicar de novo sem duplicar.</span>
       </div>
-      <p class="ajuda" style="margin-top:8px">Mapa: <span class="hist-dots"><span class="d-certo">+</span></span> último resultado acerto · <span class="hist-dots"><span class="d-erro">-</span></span> erro · <span class="hist-dots"><span class="d-dica">D</span></span> com dica · cinza: ainda sem dado.</p>
+      <p class="ajuda" style="margin-top:8px">Depois de criar, os programas aparecem na aba <b>Programas</b>. Mapa: <span class="hist-dots"><span class="d-certo">+</span></span> último resultado acerto · <span class="hist-dots"><span class="d-erro">-</span></span> erro · <span class="hist-dots"><span class="d-dica">D</span></span> com dica · cinza: ainda sem dado.</p>
     </div>
     <div class="card"><table id="tabSeq"></table></div>
   </section>
@@ -806,11 +806,16 @@ async function garantirTexto(texto, tag) {
 async function criarPrograma(p) {
   if (PROGS.some(x => x.nome === p.nome)) return 0;
   const prog = Object.assign({ id: uid(), area:'Leitura', arranjo:1, distTag:'', ordem:'aleatoria' }, p);
-  await DB.salvar('programas', prog); PROGS.push(prog); return 1;
+  PROGS.push(prog); await DB.salvar('programas', prog); return 1;
 }
+let criandoSeq = false;
 $('#criarSeq').onclick = async () => {
-  let novos = 0;
+  if (criandoSeq) return;
+  criandoSeq = true; const botao = $('#criarSeq'); botao.disabled = true;
+  let novos = 0, etapa = 0;
+  try {
   for (const e of SEQ) {
+    etapa++; $('#seqMsg').textContent = `Criando... etapa ${etapa} de ${SEQ.length}`;
     const tag = `Leitura ${e.cod}`;
     const ids = {}; for (const x of e.itens) ids[x] = await garantirTexto(x, tag);
     const rel = (lista) => lista.map(x => ({ a: ids[x], b:'' }));
@@ -829,8 +834,11 @@ $('#criarSeq').onclick = async () => {
       novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Ensino dos erros`, tipo:'apresentacao', fase:'treino', apoio:'completo', instr:'Lê para mim', pares: rel(e.itens), critA:7, critN:8, max:25 });
     }
   }
+  } catch (err) { $('#seqMsg').textContent = 'Erro ao criar: ' + err.message + '. Clique de novo para continuar de onde parou.'; criandoSeq = false; botao.disabled = false; return; }
   preencherTags(); renderEst(); renderProgs(); renderSeq();
-  $('#seqMsg').textContent = novos ? `${novos} programas criados. Veja na aba Programas (começam com L00, L01...).` : 'Tudo já estava criado.';
+  const totalSeq = PROGS.filter(p => /^L\d\d /.test(p.nome)).length;
+  $('#seqMsg').innerHTML = (novos ? `<b class="ok">Pronto: ${novos} programas criados agora.</b> ` : `<b class="ok">Os programas da sequência já estão criados.</b> `) + `Total da sequência: ${totalSeq} programas. Abra a aba <b>Programas</b> (começam com L00, L01...).`;
+  criandoSeq = false; botao.disabled = false;
 };
 // Ordenar a lista de programas pelo código da etapa (L00, L01...) já acontece pela ordem alfabética do nome.
 
@@ -862,6 +870,11 @@ async function carregar() {
   preencherTags(); renderEst(); renderProgs();
   const qs = new URLSearchParams(location.search);
   if (qs.get('diagnostico')) {
+    if (qs.get('testeseq')) {
+      const p1 = $('#criarSeq').onclick(), p2 = $('#criarSeq').onclick(); const desab = $('#criarSeq').disabled;
+      await p1; await p2; const nomes = PROGS.map(p => p.nome);
+      const r = document.createElement('pre'); r.id = 'seq'; r.textContent = JSON.stringify({ desabilitadoDurante: desab, programas: PROGS.length, duplicados: nomes.length - new Set(nomes).size, msg: $('#seqMsg').innerText }); document.body.appendChild(r);
+    }
     if (qs.get('grava')) { const e = { id: uid(), tipo:'txt', nome:'TESTE', dado:'TESTE', tags:['diag'] }; await DB.salvar('estimulos', e); EST.push(e); }
     let sw = 'sem suporte';
     try { if ('serviceWorker' in navigator) { await new Promise(r => setTimeout(r, 1500)); const reg = await navigator.serviceWorker.getRegistration(); sw = reg ? (reg.active ? 'ativo' : 'registrado') : 'não registrado'; } } catch (e) { sw = 'erro'; }
