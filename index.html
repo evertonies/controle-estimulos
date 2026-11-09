@@ -132,39 +132,130 @@
   .festa-txt { font-size:7vh; font-weight:900; color:var(--azul); }
   .confete { position:fixed; top:-5vh; font-size:4vh; animation:cai linear forwards; pointer-events:none; z-index:21; }
   @keyframes cai { to { transform:translateY(115vh) rotate(540deg); } }
+  /* ===== Visual 2: mais limpo ===== */
+  :root { --azul:#1f4e79; --azul2:#2f6db5; --verde:#2e8b57; --vermelho:#c0392b; --amarelo:#b7791f; --cinza:#f1f3f6; --borda:#e4e7ec; --texto:#1f2933; --suave:#6b7280; --fundo:#f6f7f9; --ok-bg:#e7f5ec; --erro-bg:#fdecea; --dica-bg:#fdf4dc; --acento-bg:#e8f0fa; }
+  body { background:var(--fundo); font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  header { background:#fff; color:var(--texto); border-bottom:1px solid var(--borda); padding:10px 20px; gap:20px; position:sticky; top:0; z-index:5; }
+  .marca { display:flex; align-items:center; gap:8px; font-weight:700; font-size:17px; color:var(--azul); }
+  .marca img { width:28px; height:28px; border-radius:7px; }
+  nav { display:flex; gap:4px; background:var(--cinza); padding:4px; border-radius:999px; }
+  nav button { color:var(--suave); font-size:15px; padding:8px 16px; border-radius:999px; }
+  nav button.ativo { background:#fff; color:var(--texto); font-weight:600; box-shadow:0 1px 2px #0000001a; }
+  .pill { margin-left:auto; background:var(--acento-bg); color:var(--azul2); }
+  .pill:empty { display:none; }
+  main { max-width:1000px; padding:20px; }
+  .titulo-pag { font-size:24px; font-weight:600; margin:6px 0 16px; color:var(--texto); }
+  h2 { color:var(--texto); font-weight:600; }
+  h2.sub { font-size:15px; color:var(--suave); margin:26px 0 10px; }
+  .card { border:1px solid var(--borda); border-radius:14px; padding:16px 18px; }
+  button.btn { background:var(--azul2); border-radius:10px; padding:9px 16px; font-weight:500; }
+  button.btn.sec { background:#fff; color:var(--texto); border:1px solid var(--borda); }
+  button.btn.verde { background:var(--azul2); }
+  input[type=text], input[type=number], select, textarea { border:1px solid var(--borda); border-radius:10px; padding:8px 10px; background:#fff; }
+  table th { background:var(--cinza); font-weight:600; color:var(--suave); }
+  table th, table td { border-color:var(--borda); }
+  .grade-areas { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+  .area { text-align:left; background:#fff; border:1px solid var(--borda); border-radius:16px; padding:18px; cursor:pointer; display:flex; flex-direction:column; gap:6px; font-family:inherit; color:var(--texto); font-size:14px; }
+  .area:hover { border-color:#c9d3e0; }
+  .area .ic { width:40px; height:40px; border-radius:12px; background:var(--acento-bg); color:var(--azul2); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; }
+  .area b { font-size:17px; margin-top:4px; }
+  .area span:not(.ic) { color:var(--suave); }
+  .area .continuar { margin-top:8px; align-self:flex-start; }
+  .lista { background:#fff; border:1px solid var(--borda); border-radius:14px; overflow:hidden; }
+  .lista .lin { display:flex; align-items:center; gap:12px; padding:11px 16px; border-top:1px solid var(--borda); font-size:14px; }
+  .lista .lin:first-child { border-top:none; }
+  .lista .vazio { padding:16px; color:var(--suave); font-size:14px; }
+  .meta { color:var(--suave); font-size:13px; }
+  details.como { background:#fff; border:1px solid var(--borda); border-radius:14px; padding:10px 16px; margin-bottom:14px; font-size:14px; line-height:1.55; }
+  details.como summary { cursor:pointer; color:var(--azul2); font-weight:600; }
+  .filtros { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 14px; }
+  .filtros button { border:1px solid var(--borda); background:#fff; color:var(--suave); border-radius:999px; padding:7px 14px; font-size:14px; cursor:pointer; font-family:inherit; }
+  .filtros button.on { background:var(--azul2); border-color:var(--azul2); color:#fff; }
+  .etapa { background:#fff; border:1px solid var(--borda); border-radius:14px; margin-bottom:10px; }
+  .etapa .cab { display:flex; align-items:center; gap:10px; padding:13px 16px; cursor:pointer; }
+  .etapa .cod { font-weight:700; color:var(--azul2); font-size:14px; min-width:38px; }
+  .etapa .nome { font-weight:600; font-size:15px; }
+  .etapa .seta-ab { margin-left:auto; color:var(--suave); transition:transform .2s; }
+  .etapa.aberta .seta-ab { transform:rotate(180deg); }
+  .etapa .corpo { display:none; padding:0 16px 8px; }
+  .etapa.aberta .corpo { display:block; }
+  .estado { font-size:12px; padding:3px 9px; border-radius:999px; background:var(--cinza); color:var(--suave); white-space:nowrap; }
+  .estado.andamento { background:var(--acento-bg); color:var(--azul2); }
+  .estado.feita { background:var(--ok-bg); color:var(--verde); }
+  .chips { margin:2px 0 6px; }
+  .chips .c { display:inline-block; font-size:12px; padding:3px 9px; border-radius:999px; margin:2px; background:var(--cinza); color:var(--suave); font-weight:600; }
+  .chips .c.ok { background:var(--ok-bg); color:var(--verde); }
+  .chips .c.no { background:var(--erro-bg); color:var(--vermelho); }
+  .chips .c.di { background:var(--dica-bg); color:var(--amarelo); }
+  .chips .c.ens { box-shadow:inset 0 0 0 1.5px var(--azul2); }
+  .passo { display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--borda); font-size:14px; }
+  .passo .bola { width:22px; height:22px; border-radius:50%; border:2px solid var(--borda); flex:none; display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff; }
+  .passo.feito .bola { background:var(--verde); border-color:var(--verde); }
+  .passo.proximo .bola { border-color:var(--azul2); }
+  .passo .rot { flex:1; }
+  .passo .fase { font-size:11px; color:var(--suave); background:var(--cinza); border-radius:6px; padding:1px 6px; margin-left:6px; }
+  .play { width:38px; height:38px; border-radius:50%; border:none; background:var(--cinza); color:var(--suave); font-size:15px; cursor:pointer; flex:none; }
+  .passo.proximo .play, .play.forte { background:var(--azul2); color:#fff; }
+  .tres { width:34px; height:34px; border:none; background:transparent; color:var(--suave); font-size:20px; cursor:pointer; border-radius:50%; flex:none; }
+  .tres:hover { background:var(--cinza); }
+  #menuAcoes { position:absolute; z-index:30; background:#fff; border:1px solid var(--borda); border-radius:12px; box-shadow:0 8px 24px #0000001f; padding:6px; display:none; min-width:180px; }
+  #menuAcoes button, #barraMenu button { display:block; width:100%; text-align:left; background:none; border:none; padding:9px 12px; border-radius:8px; font-size:14px; cursor:pointer; font-family:inherit; color:var(--texto); }
+  #menuAcoes button:hover, #barraMenu button:hover { background:var(--cinza); }
+  .perigo-txt { color:var(--vermelho) !important; }
+  .vazio-area { text-align:center; padding:34px 20px; background:#fff; border:1px dashed #cfd6df; border-radius:14px; color:var(--suave); }
+  .voltar { background:none; border:none; color:var(--azul2); font-size:14px; cursor:pointer; padding:0 0 12px; font-family:inherit; }
+  /* sessão */
+  #barra { background:#fff; border-top:1px solid var(--borda); padding:8px 14px; gap:10px; position:relative; }
+  #barra .info { font-size:12px; color:var(--suave); }
+  #barra .instr { font-size:14px; color:var(--texto); font-weight:600; }
+  .redondo { width:48px; height:48px; border-radius:50%; border:none; font-size:20px; font-weight:700; cursor:pointer; flex:none; }
+  .r-certo { background:var(--ok-bg); color:var(--verde); }
+  .r-erro { background:var(--erro-bg); color:var(--vermelho); }
+  .r-dica { background:var(--dica-bg); color:var(--amarelo); font-size:16px; }
+  .r-mais { background:var(--cinza); color:var(--suave); }
+  #barraMenu { display:none; position:absolute; right:12px; bottom:64px; background:#fff; border:1px solid var(--borda); border-radius:12px; box-shadow:0 8px 24px #0000001f; padding:6px; min-width:200px; z-index:13; }
+  #barraMenu.aberto { display:block; }
+  #pontos { font-size:3.4vh; gap:.6vw; padding-top:1.2vh; min-height:5vh; }
+  .chip-teste { background:var(--erro-bg); color:var(--vermelho); border-radius:6px; padding:1px 6px; font-weight:600; font-size:11px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Controle de Estímulos</h1>
+  <div class="marca"><img src="icone-192.png" alt="">Estímulos</div>
   <nav>
-    <button data-aba="estimulos" class="ativo">Estímulos</button>
-    <button data-aba="sequencia">Sequência de leitura</button>
+    <button data-aba="inicio" class="ativo">Aplicar</button>
+    <button data-aba="sequencia">Leitura</button>
     <button data-aba="matematica">Matemática</button>
-    <button data-aba="programas">Programas</button>
-    <button data-aba="historico">Histórico</button>
-    <button data-aba="dados">Dados</button>
+    <button data-aba="mais">Mais</button>
   </nav>
   <span id="aprendizTopo" class="pill"></span>
 </header>
 
 <main>
+  <!-- INÍCIO -->
+  <section id="aba-inicio">
+    <h1 class="titulo-pag">O que vamos aplicar hoje?</h1>
+    <div class="grade-areas" id="cardsInicio"></div>
+    <h2 class="sub">Últimas sessões</h2>
+    <div class="lista" id="ultimas"></div>
+  </section>
+
   <!-- ESTÍMULOS -->
-  <section id="aba-estimulos">
+  <section id="aba-estimulos" style="display:none">
     <div class="card">
       <h2>Adicionar imagens</h2>
       <div class="linha">
-        <label>Conjunto / etiqueta (opcional)<input type="text" id="tagImg" placeholder="ex.: Animais, Hierarquia 02"></label>
+        <label>Conjunto / etiqueta (opcional)<input type="text" id="tagImg" placeholder="Animais, Hierarquia 02"></label>
         <label>Arquivos<input type="file" id="arquivos" accept="image/*" multiple></label>
       </div>
-      <p class="ajuda">O nome do arquivo vira o nome do estímulo (pode editar depois clicando no nome). As imagens ficam guardadas só neste navegador.</p>
+      <p class="ajuda">O nome do arquivo vira o nome do estímulo (toque no nome para editar). As imagens ficam só neste aparelho.</p>
     </div>
     <div class="card">
-      <h2>Adicionar estímulos de texto (letras, sílabas, palavras, frases)</h2>
+      <h2>Adicionar estímulos de texto</h2>
       <div class="linha">
-        <label>Conjunto / etiqueta (opcional)<input type="text" id="tagTxt" placeholder="ex.: Família do M"></label>
+        <label>Conjunto / etiqueta (opcional)<input type="text" id="tagTxt" placeholder="Família do M"></label>
       </div>
-      <textarea id="textos" placeholder="Um estímulo por linha. Ex.:&#10;MA&#10;ME&#10;MI"></textarea>
+      <textarea id="textos" placeholder="Um estímulo por linha:&#10;MA&#10;ME&#10;MI"></textarea>
       <button class="btn" id="addTextos">Adicionar</button>
     </div>
     <div class="card">
@@ -176,35 +267,52 @@
     </div>
   </section>
 
-  <!-- SEQUÊNCIA DE LEITURA -->
+  <!-- LEITURA -->
   <section id="aba-sequencia" style="display:none">
-    <div class="card">
-      <h2 style="margin-top:0">Sequência sugerida de sílabas</h2>
-      <p style="font-size:14px;line-height:1.5">Como usar: <b>1)</b> aplique primeiro a <b>linha de base</b> de cada etapa (fase teste, sem feedback), começando pelo que ele já aprendeu com você. <b>2)</b> Itens com acerto na linha de base não precisam de ensino: entram só na manutenção. <b>3)</b> Ensine só o que errou. <b>4)</b> Em famílias novas, ensine as sílabas marcadas como "ensinar" e use o programa de <b>sonda</b> para ver se as outras derivam sem treino. <b>5)</b> Quando derivar em duas famílias seguidas, passe a ensinar só o som da consoante e sondar a família inteira.</p>
-      <div class="linha">
-        <button class="btn verde" id="criarSeq">Criar estímulos e programas da sequência</button>
-        <span class="ajuda" id="seqMsg">Cria só o que ainda não existe; pode clicar de novo sem duplicar.</span>
-      </div>
-      <p class="ajuda" style="margin-top:8px">Depois de criar, os programas aparecem na aba <b>Programas</b>. Mapa: <span class="hist-dots"><span class="d-certo">+</span></span> último resultado acerto · <span class="hist-dots"><span class="d-erro">-</span></span> erro · <span class="hist-dots"><span class="d-dica">D</span></span> com dica · cinza: ainda sem dado.</p>
-    </div>
-    <div class="card"><table id="tabSeq"></table></div>
-    <div class="card">
-      <h2 style="margin-top:0">Leitura com figuras (proposta da Carol)</h2>
-      <p style="font-size:14px;line-height:1.5"><b>Palavra → figura</b> (F01, F02...): ele lê a palavra impressa (com as sílabas separadas e setas) e seleciona a figura entre 3. Conjuntos de 3 palavras CV-CV, na ordem das famílias da sequência (36 palavras; a meta da Carol é pelo menos 25). Cada conjunto tem: <b>1 Sonda sem treino</b> (aplique primeiro: se acertar, não precisa ensinar), <b>2 Ensino</b> e <b>3 Teste inverso</b> (figura → palavra, sem treino: implicação mútua).<br>
-      <b>Sílaba inicial</b> (S01, S02...): ele vê a figura e seleciona a sílaba com que ela começa, com 3 ou mais figuras por sílaba (PEI 2.1). Cada grupo tem sonda e ensino.</p>
-      <p class="ajuda">Figuras: Twemoji (CC BY 4.0), embutidas no app; aparecem iguais em qualquer aparelho. Para usar uma imagem sua (por exemplo do Canva), envie na aba Estímulos uma imagem com o mesmo nome da palavra (ex.: "vaca"): ela passa a aparecer no lugar do emoji em todos os programas.</p>
-      <div class="linha"><button class="btn verde" id="criarFig">Criar programas com figuras (F e S)</button><span class="ajuda" id="figMsg"></span></div>
-      <table id="tabFig" style="margin-top:10px"></table>
-    </div>
+    <div class="cab-pag"><h1 class="titulo-pag">Leitura</h1></div>
+    <details class="como">
+      <summary>Como usar</summary>
+      <ol>
+        <li>Aplique primeiro a <b>linha de base</b> ou a <b>sonda</b> de cada etapa (sem feedback).</li>
+        <li>O que ele acertar não precisa de ensino. Ensine só o que errou.</li>
+        <li>Nas famílias novas, ensine as sílabas indicadas e use a sonda para ver se as outras saem sem treino. Quando derivar em duas famílias seguidas, ensine só o som da consoante.</li>
+        <li>Nas palavras com figura: sonda → ensino → teste inverso (figura → palavra).</li>
+      </ol>
+      <p class="ajuda">Cores das sílabas: verde = acertou da última vez, vermelho = errou, amarelo = com dica, cinza = sem dado. Figuras: Twemoji (CC BY 4.0). Para usar uma imagem sua, envie em Mais → Estímulos uma imagem com o mesmo nome da palavra.</p>
+      <div class="linha"><button class="btn sec" id="criarSeq">Criar sílabas e palavras (L)</button><span class="ajuda" id="seqMsg"></span></div>
+      <div class="linha" style="margin-top:8px"><button class="btn sec" id="criarFig">Criar programas com figuras (F e S)</button><span class="ajuda" id="figMsg"></span></div>
+    </details>
+    <div class="filtros" id="filtrosLeitura"><button data-f="L" class="on">Sílabas e palavras</button><button data-f="F">Palavra e figura</button><button data-f="S">Sílaba inicial</button></div>
+    <div id="cardsLeitura"></div>
+    <table id="tabSeq" hidden></table><table id="tabFig" hidden></table>
   </section>
+
   <!-- MATEMÁTICA -->
   <section id="aba-matematica" style="display:none">
-    <div class="card">
-      <h2 style="margin-top:0">Matemática - programas sugeridos</h2>
-      <p style="font-size:14px;line-height:1.5">Programas montados a partir do PEI, das supervisões (Carol: mais e menos; Roberta: dinheiro e horas) e do ABLLS-R. As quantidades, cédulas, moedas e relógios são desenhados pelo próprio app.<br>
-      Como usar: aplique primeiro a <b>sonda</b> ou a <b>linha de base</b>; ensine só o que errar; depois aplique o <b>teste inverso</b> (sem treino) para ver se a relação aparece nos dois sentidos. No mais/menos, siga a ordem dos protocolos: diferença grande → blocos de 3 → misturado → exemplos novos sem treino.</p>
-      <div class="linha"><button class="btn verde" id="criarMat">Criar programas de matemática (N, C, M, D, H)</button><span class="ajuda" id="matMsg"></span></div>
-      <table id="tabMat" style="margin-top:10px"></table>
+    <div class="cab-pag"><h1 class="titulo-pag">Matemática</h1></div>
+    <details class="como">
+      <summary>Como usar</summary>
+      <ol>
+        <li>Aplique primeiro a <b>sonda</b> ou a <b>linha de base</b>; ensine só o que errar.</li>
+        <li>Depois aplique o <b>teste inverso</b> (sem treino) para ver se a relação aparece nos dois sentidos.</li>
+        <li>No mais/menos, siga a ordem: diferença grande → blocos de 3 → misturado → exemplos novos sem treino.</li>
+      </ol>
+      <p class="ajuda">Base: PEI, supervisões (Carol: mais e menos; Roberta: dinheiro e horas) e ABLLS-R. Quantidades, cédulas, moedas e relógios são desenhados pelo app.</p>
+      <div class="linha"><button class="btn sec" id="criarMat">Criar programas de matemática</button><span class="ajuda" id="matMsg"></span></div>
+    </details>
+    <div class="filtros" id="filtrosMat"><button data-f="N" class="on">Número e quantidade</button><button data-f="C">Ler e contar</button><button data-f="M">Mais e menos</button><button data-f="D">Dinheiro</button><button data-f="H">Horas</button></div>
+    <div id="cardsMat"></div>
+    <table id="tabMat" hidden></table>
+  </section>
+
+  <!-- MAIS -->
+  <section id="aba-mais" style="display:none">
+    <h1 class="titulo-pag">Mais</h1>
+    <div class="grade-areas">
+      <button class="area" data-ir="programas"><span class="ic">≡</span><b>Todos os programas</b><span>Lista completa, criar e editar programas</span></button>
+      <button class="area" data-ir="historico"><span class="ic">◷</span><b>Histórico</b><span>Sessões registradas e exportar para Excel</span></button>
+      <button class="area" data-ir="estimulos"><span class="ic">▣</span><b>Estímulos</b><span>Imagens, textos e figuras</span></button>
+      <button class="area" data-ir="dados"><span class="ic">⚙</span><b>Dados e opções</b><span>Aprendiz, cópia de segurança, opções da sessão</span></button>
     </div>
   </section>
   <!-- PROGRAMAS -->
@@ -336,14 +444,17 @@
       <div class="instr" id="sInstr"></div>
       <div id="sInfo"></div>
     </div>
-    <button class="btn verde" id="bCerto" title="Acerto (tecla C)">✓ Acerto</button>
-    <button class="btn perigo" id="bErro" title="Erro (tecla E)">✗ Erro</button>
-    <button class="btn" style="background:var(--amarelo)" id="bDica" title="Com dica (tecla D)">Dica</button>
-    <button class="btn sec" id="bRepetir" title="Repetir animação / instrução (tecla R)">↻</button>
-    <button class="btn sec" id="bFalar" title="Falar instrução (tecla F)">🔊</button>
-    <button class="btn sec" id="bDesfazer" title="Desfazer (tecla Z)">Desfazer</button>
-    <button class="btn sec" id="bEncerrar">Encerrar</button>
-    <button class="btn sec" id="bOcultar" title="Esconder controles (tecla H)">▾</button>
+    <button class="redondo r-certo" id="bCerto" title="Acerto (tecla C)" aria-label="Acerto">✓</button>
+    <button class="redondo r-erro" id="bErro" title="Erro (tecla E)" aria-label="Erro">✕</button>
+    <button class="redondo r-dica" id="bDica" title="Com dica (tecla D)" aria-label="Com dica">D</button>
+    <button class="redondo r-mais" id="bMais" title="Mais opções" aria-label="Mais opções">⋯</button>
+    <div id="barraMenu">
+      <button id="bRepetir" title="Tecla R">↻ Repetir</button>
+      <button id="bFalar" title="Tecla F">Falar instrução</button>
+      <button id="bDesfazer" title="Tecla Z">Desfazer última</button>
+      <button id="bOcultar" title="Tecla H">Esconder controles</button>
+      <button id="bEncerrar" class="perigo-txt">Encerrar sessão</button>
+    </div>
   </div>
 </div>
 
@@ -1215,6 +1326,196 @@ async function carregar() {
     const d = document.createElement('pre'); d.id = 'diag'; d.textContent = JSON.stringify({ modo: DB.ls ? 'localStorage' : DB.mem ? 'memoria' : 'indexeddb', estimulos: EST.length, sw }); document.body.appendChild(d);
   }
 }
+
+// ================= Interface 2: navegação, início e etapas em cartões =================
+const ABAS = ['inicio','sequencia','matematica','mais','estimulos','programas','historico','dados'];
+const SUB_MAIS = ['estimulos','programas','historico','dados'];
+let abaAtual = 'inicio';
+function mostrar(aba) {
+  abaAtual = aba;
+  ABAS.forEach(a => { const s = $('#aba-' + a); if (s) s.style.display = (a === aba ? '' : 'none'); });
+  const navAba = SUB_MAIS.includes(aba) ? 'mais' : aba;
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('ativo', x.dataset.aba === navAba));
+  if (aba === 'inicio') renderInicio();
+  if (aba === 'sequencia') renderLeitura();
+  if (aba === 'matematica') renderMatCards();
+  if (aba === 'historico') renderHist();
+  if (aba === 'programas') renderProgs();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => mostrar(b.dataset.aba));
+document.querySelectorAll('#aba-mais [data-ir]').forEach(b => b.onclick = () => mostrar(b.dataset.ir));
+SUB_MAIS.forEach(a => { const s = $('#aba-' + a); if (s) s.insertAdjacentHTML('afterbegin', `<button class="voltar" data-voltar>‹ Mais</button>`); });
+document.querySelectorAll('[data-voltar]').forEach(b => b.onclick = () => mostrar('mais'));
+
+// ----- Estado de programas e etapas -----
+const ehSondaProg = (p) => p.critA === p.critN && p.critN === p.max;
+function sessoesDe(p) { return SESS.filter(s => s.progId === p.id).sort((a, b) => b.inicio - a.inicio); }
+function feito(p) { return SESS.some(s => s.progId === p.id && (s.atingiu || (ehSondaProg(p) && s.total >= p.max))); }
+const codDe = (nome) => (nome.match(/^([A-Z])(\d\d) /) || [])[0]?.trim();
+function rotuloPasso(p) { const sem = p.nome.replace(/^[A-Z]\d\d /, ''); const i = sem.lastIndexOf(' - '); return i >= 0 ? sem.slice(i + 3) : sem; }
+function tituloGrupo(ps) { const sem = ps[0].nome.replace(/^[A-Z]\d\d /, ''); const i = sem.lastIndexOf(' - '); return i >= 0 ? sem.slice(0, i) : sem; }
+const ORDEM_PASSO = (p) => { const r = rotuloPasso(p); const m = r.match(/^(\d) /); if (m) return +m[1]; if (/Linha de base|Mostre|Fluência/.test(r)) return 1; if (/Ensino|Leitura misturada|Ler a hora/.test(r)) return 2; if (/Sonda|Seleção|inverso/.test(r)) return 3; return 2; };
+function grupos(letra, juntar = false) {
+  const ps = PROGS.filter(p => p.nome.startsWith(letra) && /^[A-Z]\d\d /.test(p.nome));
+  const mapa = new Map();
+  for (const p of ps) { const k = juntar ? letra : codDe(p.nome); if (!mapa.has(k)) mapa.set(k, []); mapa.get(k).push(p); }
+  const lista = [...mapa.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  lista.forEach(([k, arr]) => arr.sort((a, b) => juntar ? a.nome.localeCompare(b.nome) : (ORDEM_PASSO(a) - ORDEM_PASSO(b) || a.nome.localeCompare(b.nome))));
+  return lista;
+}
+function estadoGrupo(arr) { const f = arr.filter(feito).length, s = arr.some(p => sessoesDe(p).length); return f === arr.length ? 'feita' : (s ? 'andamento' : 'nova'); }
+const ESTADO_TXT = { feita:'concluída', andamento:'em andamento', nova:'não iniciada' };
+const abertos = {};
+function chipsHtml(itens, ensinar = []) {
+  if (!itens || !itens.length) return '';
+  const ult = ultimoResultado();
+  return '<div class="chips">' + itens.map(x => { const r = ult[x] ?? ult[String(x).toLowerCase()]; const cls = r === '+' ? 'ok' : r === '-' ? 'no' : r === 'P' ? 'di' : ''; return `<span class="c ${cls} ${ensinar.includes(x) ? 'ens' : ''}">${esc(x)}</span>`; }).join('') + '</div>';
+}
+function ultimoTxt(p) { const s = sessoesDe(p)[0]; if (!s) return ''; return `${s.acertos}/${s.total} · ${new Date(s.inicio).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' })}`; }
+function cartaoEtapa(chave, cod, titulo, arr, itens = [], ensinar = []) {
+  const est = estadoGrupo(arr);
+  const prox = arr.find(p => !feito(p));
+  const aberto = abertos[chave] ?? false;
+  const passos = arr.map(p => {
+    const f = feito(p), pr = p === prox;
+    return `<div class="passo ${f ? 'feito' : ''} ${pr ? 'proximo' : ''}"><span class="bola">${f ? '✓' : ''}</span><span class="rot">${esc(rotuloPasso(p))}${p.fase === 'teste' ? '<span class="fase">sem feedback</span>' : ''}</span><span class="meta">${ultimoTxt(p)}</span><button class="play" data-play="${p.id}" aria-label="Aplicar">▶</button><button class="tres" data-acoes="${p.id}" aria-label="Mais ações">⋯</button></div>`;
+  }).join('');
+  return `<div class="etapa ${aberto ? 'aberta' : ''}" data-chave="${chave}"><div class="cab"><span class="cod">${esc(cod)}</span><span class="nome">${esc(titulo)}</span><span class="estado ${est}">${ESTADO_TXT[est]}</span><span class="seta-ab">⌄</span></div><div class="corpo">${chipsHtml(itens, ensinar)}${passos}</div></div>`;
+}
+function ligarCartoes(cont) {
+  cont.querySelectorAll('.etapa .cab').forEach(c => c.onclick = () => { const e = c.parentElement; e.classList.toggle('aberta'); abertos[e.dataset.chave] = e.classList.contains('aberta'); });
+  cont.querySelectorAll('[data-play]').forEach(b => b.onclick = (ev) => { ev.stopPropagation(); const p = PROGS.find(x => x.id === b.dataset.play); if (p) iniciar(p); });
+  cont.querySelectorAll('[data-acoes]').forEach(b => b.onclick = (ev) => { ev.stopPropagation(); abrirMenuAcoes(b, b.dataset.acoes); });
+}
+function abrirPadrao(lista, chaveDe) {
+  // abre etapas em andamento e a primeira ainda não concluída
+  let primeira = true;
+  for (const [k, arr] of lista) { const ch = chaveDe(k); if (abertos[ch] !== undefined) continue; const e = estadoGrupo(arr); if (e === 'andamento') abertos[ch] = true; else if (e === 'nova' && primeira) { abertos[ch] = true; primeira = false; } }
+}
+function vazioArea(texto, botaoId) { return `<div class="vazio-area"><p style="margin:0 0 12px">${texto}</p><button class="btn" onclick="document.getElementById('${botaoId}').click()">Criar programas</button></div>`; }
+
+// ----- Leitura -----
+let filtroLeitura = 'L';
+function renderLeitura() {
+  document.querySelectorAll('#filtrosLeitura button').forEach(b => b.classList.toggle('on', b.dataset.f === filtroLeitura));
+  const cont = $('#cardsLeitura');
+  const lista = grupos(filtroLeitura);
+  if (!lista.length) { cont.innerHTML = vazioArea(filtroLeitura === 'L' ? 'Os programas de sílabas e palavras ainda não foram criados neste aparelho.' : 'Os programas com figuras ainda não foram criados neste aparelho.', filtroLeitura === 'L' ? 'criarSeq' : 'criarFig'); return; }
+  abrirPadrao(lista, k => 'lei-' + k);
+  cont.innerHTML = lista.map(([k, arr]) => {
+    if (filtroLeitura === 'L') { const e = SEQ.find(x => x.cod === k); return cartaoEtapa('lei-' + k, k, e ? e.nome : tituloGrupo(arr), arr, e ? e.itens : [], e ? e.ensinar : []); }
+    const t = tituloGrupo(arr); const itens = (t.match(/\(([^)]*)\)/) || [])[1]?.split(', ') || [];
+    return cartaoEtapa('lei-' + k, k, t.replace(/\s*\([^)]*\)/, '') + (itens.length ? ' · ' + itens.join(', ') : ''), arr, filtroLeitura === 'F' ? itens : []);
+  }).join('');
+  ligarCartoes(cont);
+}
+document.querySelectorAll('#filtrosLeitura button').forEach(b => b.onclick = () => { filtroLeitura = b.dataset.f; renderLeitura(); });
+
+// ----- Matemática -----
+let filtroMat = 'N';
+const TIT_MAT = { M:'Mais e menos', D:'Dinheiro' };
+function renderMatCards() {
+  document.querySelectorAll('#filtrosMat button').forEach(b => b.classList.toggle('on', b.dataset.f === filtroMat));
+  const cont = $('#cardsMat');
+  const juntar = filtroMat === 'M' || filtroMat === 'D';
+  const lista = grupos(filtroMat, juntar);
+  if (!lista.length) { cont.innerHTML = vazioArea('Os programas de matemática ainda não foram criados neste aparelho.', 'criarMat'); return; }
+  abrirPadrao(lista, k => 'mat-' + k);
+  cont.innerHTML = lista.map(([k, arr]) => {
+    if (juntar) return cartaoEtapa('mat-' + k, k, TIT_MAT[k], arr);
+    const t = tituloGrupo(arr); const itens = (t.match(/\(([^)]*)\)/) || [])[1]?.split(', ') || [];
+    return cartaoEtapa('mat-' + k, k, t.replace(/\s*\([^)]*\)/, '') + (itens.length ? ' · ' + itens.join(', ') : ''), arr, filtroMat === 'N' ? itens : []);
+  }).join('');
+  if (juntar) cont.querySelectorAll('.passo .rot').forEach((r, i) => { const p = lista[0][1][i]; if (p) r.innerHTML = `<b style="color:var(--azul2);margin-right:6px">${esc(codDe(p.nome))}</b>` + esc(p.nome.replace(/^[A-Z]\d\d /, '')) + (p.fase === 'teste' ? '<span class="fase">sem feedback</span>' : ''); });
+  ligarCartoes(cont);
+}
+document.querySelectorAll('#filtrosMat button').forEach(b => b.onclick = () => { filtroMat = b.dataset.f; renderMatCards(); });
+renderSeq = () => { if (abaAtual === 'sequencia') renderLeitura(); };
+renderFig = () => { if (abaAtual === 'sequencia') renderLeitura(); };
+renderMat = () => { if (abaAtual === 'matematica') renderMatCards(); };
+
+// ----- Menu ⋯ (editar, duplicar, inverso, excluir) -----
+const menu = document.createElement('div'); menu.id = 'menuAcoes'; document.body.appendChild(menu);
+function fecharMenu() { menu.style.display = 'none'; }
+document.addEventListener('click', (e) => { if (!menu.contains(e.target)) fecharMenu(); if (!e.target.closest('#barraMenu') && e.target.id !== 'bMais') $('#barraMenu').classList.remove('aberto'); });
+function abrirMenuAcoes(btn, id) {
+  const p = PROGS.find(x => x.id === id); if (!p) return;
+  menu.innerHTML = `<button data-a="editar">Editar</button><button data-a="duplicar">Duplicar</button>${p.tipo === 'mts' ? '<button data-a="inverso">Criar teste inverso (IM)</button>' : ''}<button data-a="excluir" class="perigo-txt">Excluir</button>`;
+  const r = btn.getBoundingClientRect();
+  menu.style.display = 'block';
+  menu.style.top = (window.scrollY + r.bottom + 4) + 'px';
+  menu.style.left = Math.max(8, window.scrollX + r.right - menu.offsetWidth) + 'px';
+  menu.querySelectorAll('button').forEach(b => b.onclick = async () => {
+    fecharMenu(); const a = b.dataset.a;
+    if (a === 'editar') { mostrar('programas'); abrirEditor(p); }
+    else if (a === 'duplicar') { const c = JSON.parse(JSON.stringify(p)); c.id = uid(); c.nome += ' (cópia)'; mostrar('programas'); abrirEditor(c); }
+    else if (a === 'inverso') { const c = JSON.parse(JSON.stringify(p)); c.id = uid(); c.nome += ' - TESTE INVERSO (IM)'; c.fase = 'teste'; c.pares = c.pares.map(x => ({ a:x.b, b:x.a })); mostrar('programas'); abrirEditor(c); }
+    else if (a === 'excluir') { if (!confirm(`Excluir o programa "${p.nome}"? As sessões já registradas continuam no histórico.`)) return; await DB.apagar('programas', p.id); PROGS = PROGS.filter(x => x.id !== p.id); redesenhar(); }
+  });
+}
+function redesenhar() { if (abaAtual === 'sequencia') renderLeitura(); else if (abaAtual === 'matematica') renderMatCards(); else if (abaAtual === 'programas') renderProgs(); else if (abaAtual === 'inicio') renderInicio(); }
+
+// ----- Lista completa de programas (Mais → Todos os programas) -----
+let buscaProg = '';
+renderProgs = function () {
+  const tab = $('#tabProgs');
+  if (!$('#buscaProg')) tab.insertAdjacentHTML('beforebegin', `<input type="text" id="buscaProg" placeholder="Buscar programa (ex.: L02, mais, cédula)" style="width:100%;margin:10px 0">`);
+  const bi = $('#buscaProg'); bi.oninput = () => { buscaProg = bi.value.toLowerCase(); renderProgs(); };
+  const lista = PROGS.filter(p => !buscaProg || p.nome.toLowerCase().includes(buscaProg) || (p.area || '').toLowerCase().includes(buscaProg)).sort((a, b) => a.nome.localeCompare(b.nome));
+  if (!PROGS.length) { tab.innerHTML = '<tr><td class="meta">Nenhum programa ainda. Crie pelas abas Leitura e Matemática ou em "+ Novo programa".</td></tr>'; return; }
+  tab.innerHTML = lista.map(p => `<tr><td style="border:none;border-top:1px solid var(--borda);padding:9px 4px"><div style="font-weight:600">${esc(p.nome)}</div><div class="meta">${esc(p.area || '')}${p.area ? ' · ' : ''}${TIPO_NOME[p.tipo]} · ${p.fase === 'teste' ? 'sem feedback' : 'treino'}${ultimoTxt(p) ? ' · última: ' + ultimoTxt(p) : ''}</div></td><td style="border:none;border-top:1px solid var(--borda);width:90px;text-align:right;white-space:nowrap"><button class="play forte" data-play="${p.id}" aria-label="Aplicar">▶</button> <button class="tres" data-acoes="${p.id}" aria-label="Mais ações">⋯</button></td></tr>`).join('');
+  tab.style.borderCollapse = 'collapse';
+  tab.querySelectorAll('[data-play]').forEach(b => b.onclick = () => { const p = PROGS.find(x => x.id === b.dataset.play); if (p) iniciar(p); });
+  tab.querySelectorAll('[data-acoes]').forEach(b => b.onclick = (ev) => { ev.stopPropagation(); abrirMenuAcoes(b, b.dataset.acoes); });
+};
+
+// ----- Início -----
+function etapaAtual(letras) {
+  const ps = PROGS.filter(p => letras.includes(p.nome[0]) && /^[A-Z]\d\d /.test(p.nome));
+  if (!ps.length) return null;
+  const ss = SESS.filter(s => ps.some(p => p.id === s.progId)).sort((a, b) => b.inicio - a.inicio);
+  let cod = ss.length ? codDe(PROGS.find(p => p.id === ss[0].progId)?.nome || '') : null;
+  let arr = cod ? ps.filter(p => codDe(p.nome) === cod) : [];
+  if (!arr.length || arr.every(feito)) {
+    const cods = [...new Set(ps.map(p => codDe(p.nome)))].sort();
+    cod = cods.find(c => ps.filter(p => codDe(p.nome) === c).some(p => !feito(p))) || cods[0];
+    arr = ps.filter(p => codDe(p.nome) === cod);
+  }
+  arr.sort((a, b) => ORDEM_PASSO(a) - ORDEM_PASSO(b) || a.nome.localeCompare(b.nome));
+  return { cod, arr, prox: arr.find(p => !feito(p)) || arr[0] };
+}
+function renderInicio() {
+  const areas = [
+    { t:'Leitura: sílabas e palavras', ic:'Aa', aba:'sequencia', f:'L', letras:['L'], vazio:'Criar a sequência de sílabas' },
+    { t:'Leitura com figuras', ic:'▦', aba:'sequencia', f:'F', letras:['F','S'], vazio:'Criar palavra e figura' },
+    { t:'Matemática', ic:'+−', aba:'matematica', f:'N', letras:['N','C','M','D','H'], vazio:'Criar programas de matemática' }
+  ];
+  $('#cardsInicio').innerHTML = areas.map((a, i) => {
+    const e = etapaAtual(a.letras);
+    const sub = e ? `${e.cod} · ${esc(e.cod.startsWith('L') ? (SEQ.find(x => x.cod === e.cod)?.nome || tituloGrupo(e.arr)) : tituloGrupo(e.arr).replace(/\s*\([^)]*\)/, ''))}` : 'Ainda sem programas';
+    const prox = e ? `<button class="btn continuar" data-cont="${e.prox.id}">▶ ${esc(rotuloPasso(e.prox))}</button>` : `<span class="meta">${a.vazio} em ${a.aba === 'matematica' ? 'Matemática' : 'Leitura'} → Como usar</span>`;
+    return `<div class="area" data-area="${i}"><span class="ic">${a.ic}</span><b>${a.t}</b><span>${sub}</span>${prox}</div>`;
+  }).join('');
+  $('#cardsInicio').querySelectorAll('.area').forEach(c => c.onclick = () => { const a = areas[+c.dataset.area]; if (a.aba === 'sequencia') filtroLeitura = a.f; mostrar(a.aba); });
+  $('#cardsInicio').querySelectorAll('[data-cont]').forEach(b => b.onclick = (ev) => { ev.stopPropagation(); const p = PROGS.find(x => x.id === b.dataset.cont); if (p) iniciar(p); });
+  const ult = SESS.slice().sort((a, b) => b.inicio - a.inicio).slice(0, 5);
+  $('#ultimas').innerHTML = ult.length ? ult.map(s => `<div class="lin"><span class="meta" style="min-width:86px">${new Date(s.inicio).toLocaleDateString('pt-BR')}</span><span style="flex:1">${esc(s.progNome)}</span><b>${s.acertos}/${s.total}</b>${s.atingiu ? '<span class="estado feita">critério</span>' : ''}</div>`).join('') : '<div class="vazio">Nenhuma sessão ainda. Escolha uma área acima para começar.</div>';
+}
+
+// ----- Barra da sessão -----
+$('#bMais').onclick = (e) => { e.stopPropagation(); $('#barraMenu').classList.toggle('aberto'); };
+$('#barraMenu').addEventListener('click', () => setTimeout(() => $('#barraMenu').classList.remove('aberto'), 0));
+atualizarInfo = function () {
+  const p = S.prog, r = S.tent.map(t => t.resp), ac = r.filter(x => x === '+').length;
+  $('#sInfo').innerHTML = `${p.fase === 'teste' ? '<span class="chip-teste">sem feedback</span> ' : ''}Tentativa ${Math.min(S.tent.length + 1, p.max)}/${p.max} · ${ac} certas · meta ${p.critA}/${p.critN}`;
+};
+const _fecharSessao = fecharSessao;
+fecharSessao = function () { _fecharSessao(); redesenhar(); };
+const _carregar = carregar;
+carregar = async function () { await _carregar(); redesenhar(); };
+// Ao terminar de criar programas, atualizar a tela atual
+['criarSeq','criarFig','criarMat'].forEach(id => { const b = $('#' + id); const f = b.onclick; b.onclick = async () => { await f(); redesenhar(); }; });
 
 // ================= Autoteste (?autoteste=1) =================
 function autoteste() {
