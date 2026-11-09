@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1f4e79">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Estímulos">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icone-192.png">
+<link rel="icon" href="icone-192.png">
+<title>Controle de Estímulos - ABA / RFT</title>
+<style>
+  :root { --azul:#1f4e79; --azul2:#2e6da4; --verde:#2e8b57; --vermelho:#c0392b; --amarelo:#e6a700; --cinza:#f2f4f7; --borda:#d0d5dd; --texto:#1d2939; }
+  * { box-sizing: border-box; }
+  html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  #sessao { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; overscroll-behavior:none; touch-action: manipulation; }
+  #sessao img { -webkit-user-drag:none; pointer-events:none; }
+  #sessao .item, #sessao .leitura, #sessao .parte { pointer-events:auto; }
+  body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--texto); background:#fff; }
+  header { background:var(--azul); color:#fff; padding:10px 16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0; }
+  nav button { background:transparent; color:#cfe0f1; border:none; font-size:15px; padding:8px 10px; cursor:pointer; border-radius:6px; }
+  nav button.ativo { background:#ffffff22; color:#fff; font-weight:bold; }
+  main { padding:16px; max-width:1200px; margin:0 auto; }
+  h2 { font-size:17px; margin:18px 0 8px; color:var(--azul); }
+  .card { border:1px solid var(--borda); border-radius:10px; padding:14px; margin-bottom:14px; background:#fff; }
+  .linha { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+  label { font-size:13px; color:#475467; display:flex; flex-direction:column; gap:4px; }
+  input[type=text], input[type=number], select, textarea { font-size:14px; padding:7px 8px; border:1px solid var(--borda); border-radius:6px; font-family:inherit; }
+  textarea { width:100%; min-height:70px; }
+  button.btn { background:var(--azul2); color:#fff; border:none; padding:8px 14px; border-radius:6px; font-size:14px; cursor:pointer; }
+  button.btn.sec { background:#e4e7ec; color:var(--texto); }
+  button.btn.perigo { background:var(--vermelho); }
+  button.btn.verde { background:var(--verde); }
+  button.btn:disabled { opacity:.5; cursor:default; }
+  .ajuda { font-size:12px; color:#667085; margin:4px 0 0; }
+  .grade { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+  .estim { border:1px solid var(--borda); border-radius:8px; padding:6px; text-align:center; font-size:12px; position:relative; background:#fff; }
+  .estim.sel { outline:3px solid var(--azul2); }
+  .estim .vis { height:80px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .estim .vis img { max-height:80px; max-width:100%; }
+  .estim .vis .txt { font-size:22px; font-weight:bold; }
+  .estim .x { position:absolute; top:2px; right:4px; color:var(--vermelho); cursor:pointer; font-weight:bold; }
+  .tag { display:inline-block; background:var(--cinza); border-radius:10px; padding:1px 7px; font-size:11px; margin:2px; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th, td { border:1px solid var(--borda); padding:5px 7px; text-align:left; vertical-align:top; }
+  th { background:var(--cinza); }
+  .pares td select { width:100%; }
+  /* sessão */
+  #sessao { position:fixed; inset:0; background:#fff; display:none; flex-direction:column; z-index:10; }
+  #sessao.aberta { display:flex; }
+  #barra { background:#f8fafc; border-bottom:1px solid var(--borda); padding:8px 12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:14px; }
+  #barra .info { flex:1; min-width:220px; }
+  #barra .instr { font-weight:bold; color:var(--azul); font-size:15px; }
+  #barra button { font-size:16px; padding:10px 16px; }
+  #palco { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4vh; padding:2vh; }
+  #modelo { min-height:10vh; display:flex; align-items:center; justify-content:center; }
+  #comparacoes { display:flex; gap:3vw; flex-wrap:wrap; justify-content:center; align-items:center; }
+  .item { border:3px solid transparent; border-radius:14px; padding:1vh; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#fff; min-width:14vw; min-height:20vh; }
+  .item img { max-width:24vw; max-height:28vh; }
+  .item .txt { font-size:7vh; font-weight:bold; letter-spacing:2px; }
+  .item.modelo { cursor:default; border-color:var(--borda); }
+  .item.certo { border-color:var(--verde); background:#eaf7ef; }
+  .item.errado { border-color:var(--vermelho); background:#fdecea; }
+  #fim { display:none; text-align:center; font-size:20px; }
+  .ok { color:var(--verde); font-weight:bold; } .nok { color:var(--vermelho); font-weight:bold; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:10px; background:#eef4fb; color:var(--azul); font-size:12px; }
+  .hist-dots span { display:inline-block; width:14px; height:14px; border-radius:3px; margin:1px; font-size:10px; color:#fff; text-align:center; line-height:14px; }
+  .d-certo { background:var(--verde); } .d-erro { background:var(--vermelho); } .d-dica { background:var(--amarelo); }
+  /* ===== Tela do aprendiz ===== */
+  #sessao { background:#fbfcff; }
+  #barra { order:3; border-top:1px solid var(--borda); border-bottom:none; padding:6px 10px; gap:8px; font-size:12px; background:#f8fafcee; }
+  #barra .instr { font-size:13px; }
+  #barra button { font-size:14px; padding:8px 12px; }
+  #sessao.sem-barra #barra { display:none; }
+  #bMostrarBarra { display:none; position:fixed; right:10px; bottom:10px; z-index:12; border:none; background:#e4e7ec; border-radius:50%; width:40px; height:40px; font-size:18px; opacity:.35; cursor:pointer; }
+  #sessao.sem-barra #bMostrarBarra { display:block; }
+  #pontos { display:flex; justify-content:center; gap:1vw; padding:1.5vh 0 0; min-height:6vh; font-size:4.5vh; }
+  #pontos .estrela { color:#d0d5dd; transition:transform .3s, color .3s; }
+  #pontos .estrela.cheia { color:#f5b800; transform:scale(1.15); text-shadow:0 0 8px #ffe08a; }
+  #pontos .estrela.nova { animation:pulo .6s; }
+  @keyframes pulo { 0%{transform:scale(.5)} 60%{transform:scale(1.6)} 100%{transform:scale(1.15)} }
+  .cartao { background:#fff; border-radius:22px; box-shadow:0 6px 24px #1f4e7922; padding:5vh 6vw; display:flex; flex-direction:column; align-items:center; gap:3vh; }
+  .leitura { display:flex; gap:5vw; align-items:flex-end; justify-content:center; flex-wrap:wrap; cursor:pointer; transition:gap .6s; }
+  .palavra { display:flex; gap:5vw; align-items:flex-end; transition:gap .6s; }
+  .parte { display:flex; flex-direction:column; align-items:center; transition:transform .3s; }
+  .parte .g { font-size:var(--t,17vh); line-height:1; font-weight:900; color:#111; text-shadow:2px 3px 0 #00000022; transition:color .3s, transform .3s; letter-spacing:1px; }
+  .parte .seta { width:100%; min-width:8vw; height:4vh; margin-top:1vh; opacity:.9; transition:opacity .5s; }
+  .parte .seta line, .parte .seta polyline { stroke:#1a1fc4; stroke-width:5; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .leitura.animando .parte .seta { opacity:.25; }
+  .leitura .parte.ativa .g { color:var(--azul2); transform:translateY(-1vh) scale(1.08); }
+  .leitura .parte.ativa .seta { opacity:1; }
+  .leitura.junta, .leitura.junta .palavra { gap:0; }
+  .leitura.junta { gap:4vw; }
+  .leitura.junta .seta { opacity:0; }
+  .leitura.junta .parte .g { color:#111; }
+  .leitura.sem-setas .seta { display:none; }
+  .leitura.sem-setas, .leitura.sem-setas .palavra { gap:0; }
+  .leitura.sem-setas { gap:4vw; }
+  .figura-premio { max-height:30vh; max-width:40vw; animation:surge .5s; }
+  @keyframes surge { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+  .item { box-shadow:0 4px 14px #1f4e7918; transition:transform .15s; }
+  .item:active { transform:scale(.96); }
+  .item.certo { animation:pulo .5s; }
+  .item.errado { animation:treme .4s; }
+  @keyframes treme { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .estrela-voa { position:fixed; font-size:12vh; left:50%; top:45%; transform:translate(-50%,-50%); pointer-events:none; animation:voa .9s forwards; z-index:15; }
+  @keyframes voa { 0%{opacity:0;transform:translate(-50%,-50%) scale(.3)} 30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)} 100%{opacity:0;transform:translate(-50%,-260%) scale(.6)} }
+  #festa { position:fixed; inset:0; background:#fff8e1f2; display:none; align-items:center; justify-content:center; z-index:20; cursor:pointer; }
+  #festa.aberta { display:flex; }
+  .festa-caixa { text-align:center; animation:surge .5s; }
+  .festa-emoji { font-size:24vh; }
+  .festa-txt { font-size:7vh; font-weight:900; color:var(--azul); }
+  .confete { position:fixed; top:-5vh; font-size:4vh; animation:cai linear forwards; pointer-events:none; z-index:21; }
+  @keyframes cai { to { transform:translateY(115vh) rotate(540deg); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Controle de Estímulos</h1>
+  <nav>
+    <button data-aba="estimulos" class="ativo">Estímulos</button>
+    <button data-aba="sequencia">Sequência de leitura</button>
+    <button data-aba="programas">Programas</button>
+    <button data-aba="historico">Histórico</button>
+    <button data-aba="dados">Dados</button>
+  </nav>
+  <span id="aprendizTopo" class="pill"></span>
+</header>
+
+<main>
+  <!-- ESTÍMULOS -->
+  <section id="aba-estimulos">
+    <div class="card">
+      <h2>Adicionar imagens</h2>
+      <div class="linha">
+        <label>Conjunto / etiqueta (opcional)<input type="text" id="tagImg" placeholder="ex.: Animais, Hierarquia 02"></label>
+        <label>Arquivos<input type="file" id="arquivos" accept="image/*" multiple></label>
+      </div>
+      <p class="ajuda">O nome do arquivo vira o nome do estímulo (pode editar depois clicando no nome). As imagens ficam guardadas só neste navegador.</p>
+    </div>
+    <div class="card">
+      <h2>Adicionar estímulos de texto (letras, sílabas, palavras, frases)</h2>
+      <div class="linha">
+        <label>Conjunto / etiqueta (opcional)<input type="text" id="tagTxt" placeholder="ex.: Família do M"></label>
+      </div>
+      <textarea id="textos" placeholder="Um estímulo por linha. Ex.:&#10;MA&#10;ME&#10;MI"></textarea>
+      <button class="btn" id="addTextos">Adicionar</button>
+    </div>
+    <div class="card">
+      <div class="linha" style="justify-content:space-between">
+        <h2 style="margin:0">Biblioteca (<span id="nEstim">0</span>)</h2>
+        <label>Filtrar por etiqueta<select id="filtroTag"><option value="">Todas</option></select></label>
+      </div>
+      <div class="grade" id="grade" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- SEQUÊNCIA DE LEITURA -->
+  <section id="aba-sequencia" style="display:none">
+    <div class="card">
+      <h2 style="margin-top:0">Sequência sugerida de sílabas</h2>
+      <p style="font-size:14px;line-height:1.5">Como usar: <b>1)</b> aplique primeiro a <b>linha de base</b> de cada etapa (fase teste, sem feedback), começando pelo que ele já aprendeu com você. <b>2)</b> Itens com acerto na linha de base não precisam de ensino: entram só na manutenção. <b>3)</b> Ensine só o que errou. <b>4)</b> Em famílias novas, ensine as sílabas marcadas como "ensinar" e use o programa de <b>sonda</b> para ver se as outras derivam sem treino. <b>5)</b> Quando derivar em duas famílias seguidas, passe a ensinar só o som da consoante e sondar a família inteira.</p>
+      <div class="linha">
+        <button class="btn verde" id="criarSeq">Criar estímulos e programas da sequência</button>
+        <span class="ajuda" id="seqMsg">Cria só o que ainda não existe; pode clicar de novo sem duplicar.</span>
+      </div>
+      <p class="ajuda" style="margin-top:8px">Mapa: <span class="hist-dots"><span class="d-certo">+</span></span> último resultado acerto · <span class="hist-dots"><span class="d-erro">-</span></span> erro · <span class="hist-dots"><span class="d-dica">D</span></span> com dica · cinza: ainda sem dado.</p>
+    </div>
+    <div class="card"><table id="tabSeq"></table></div>
+  </section>
+  <!-- PROGRAMAS -->
+  <section id="aba-programas" style="display:none">
+    <div class="card">
+      <div class="linha" style="justify-content:space-between">
+        <h2 style="margin:0">Programas</h2>
+        <button class="btn" id="novoProg">+ Novo programa</button>
+      </div>
+      <table style="margin-top:10px" id="tabProgs"></table>
+    </div>
+    <div class="card" id="editor" style="display:none">
+      <h2 id="edTitulo">Novo programa</h2>
+      <div class="linha">
+        <label style="flex:2">Nome<input type="text" id="pNome" placeholder="ex.: Leitura L3 - conjunto 1 - treino A→C"></label>
+        <label>Moldura / área<input type="text" id="pArea" placeholder="ex.: Coordenação, Comparação"></label>
+      </div>
+      <div class="linha" style="margin-top:10px">
+        <label>Tipo de tentativa
+          <select id="pTipo">
+            <option value="selecao">Seleção (ouvinte): instrução + arranjo</option>
+            <option value="mts">Emparelhamento com modelo (MTS)</option>
+            <option value="apresentacao">Apresentação (leitura / tato): um estímulo</option>
+            <option value="estranhamento">Estranhamento: ache o diferente</option>
+          </select>
+        </label>
+        <label>Fase
+          <select id="pFase">
+            <option value="treino">Treino (com feedback e reforço)</option>
+            <option value="teste">Teste (sem feedback)</option>
+          </select>
+        </label>
+        <label>Ordem dos alvos
+          <select id="pOrdem">
+            <option value="aleatoria">Rotação aleatória balanceada</option>
+            <option value="blocos3">Blocos de 3 do mesmo alvo</option>
+            <option value="sequencial">Sequencial (na ordem da lista)</option>
+          </select>
+        </label>
+        <label>Opções no arranjo<input type="number" id="pArranjo" min="1" max="8" value="3" style="width:80px"></label>
+        <label>Apoio visual na leitura (texto)
+          <select id="pApoio">
+            <option value="completo">Completo: setas acendem e as partes se juntam</option>
+            <option value="setas">Só setas: partes separadas com setas</option>
+            <option value="junto">Sem apoio: palavra/sílaba inteira</option>
+          </select>
+        </label>
+      </div>
+      <div class="linha" style="margin-top:10px">
+        <label>Instrução (use {alvo} ou {modelo})<input type="text" id="pInstr" style="width:320px" placeholder='ex.: Mostre {alvo}'></label>
+        <label>Critério: acertos<input type="number" id="pCritA" min="1" value="7" style="width:70px"></label>
+        <label>em seguidas<input type="number" id="pCritN" min="1" value="8" style="width:70px"></label>
+        <label>Máximo de tentativas<input type="number" id="pMax" min="1" value="25" style="width:80px"></label>
+      </div>
+      <p class="ajuda">Padrão dos protocolos da Siri Ming (vol. 2): 7 corretas em 8 seguidas, encerrar com 25 tentativas. Avaliação do vol. 1: treino 6 seguidas, teste de IM 5/6, teste de IMC 7/8.</p>
+
+      <h2>Relações (cada linha é uma tentativa possível)</h2>
+      <p class="ajuda" id="ajudaPares"></p>
+      <table class="pares" id="tabPares"></table>
+      <div class="linha" style="margin-top:8px">
+        <button class="btn sec" id="addPar">+ Linha</button>
+        <label>Adicionar todos de uma etiqueta<select id="addTagSel"><option value="">--</option></select></label>
+        <button class="btn sec" id="addTag">Adicionar</button>
+      </div>
+      <h2>Distratores extras (opcional)</h2>
+      <p class="ajuda">Por padrão, os distratores são os outros alvos do programa. Escolha uma etiqueta para usar outros estímulos como distratores.</p>
+      <select id="pDistTag"><option value="">Só os alvos do programa</option></select>
+      <div class="linha" style="margin-top:14px">
+        <button class="btn verde" id="salvarProg">Salvar programa</button>
+        <button class="btn sec" id="cancelarProg">Cancelar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTÓRICO -->
+  <section id="aba-historico" style="display:none">
+    <div class="card">
+      <div class="linha" style="justify-content:space-between">
+        <h2 style="margin:0">Sessões registradas</h2>
+        <button class="btn" id="exportCsv">Exportar CSV (Excel)</button>
+      </div>
+      <table style="margin-top:10px" id="tabHist"></table>
+    </div>
+  </section>
+
+  <!-- DADOS -->
+  <section id="aba-dados" style="display:none">
+    <div class="card">
+      <h2>Aprendiz</h2>
+      <div class="linha"><label>Sigla do aprendiz<input type="text" id="aprendiz" placeholder="ex.: MHOM"></label><button class="btn sec" id="salvarAprendiz">Salvar</button></div>
+      <p class="ajuda">Use só a sigla. Os dados ficam guardados apenas neste navegador e neste aparelho.</p>
+    </div>
+    <div class="card">
+      <h2>Cópia de segurança</h2>
+      <div class="linha">
+        <button class="btn" id="backup">Baixar cópia (estímulos, programas e sessões)</button>
+        <label>Restaurar cópia<input type="file" id="restaurar" accept=".json"></label>
+      </div>
+      <p class="ajuda">Use a cópia para levar tudo para outro computador ou tablet, ou para não perder os dados se o navegador for limpo.</p>
+    </div>
+    <div class="card">
+      <h2>Opções da sessão</h2>
+      <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="optFala"> Falar a instrução em voz alta (português)</label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="optToque" checked> O aprendiz responde tocando na tela (marca acerto/erro sozinho)</label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="optSom" checked> Som de acerto no treino</label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px">Quadro de pontos (estrelas no treino): <input type="number" id="optPontos" min="0" max="20" value="10" style="width:70px"> <span class="ajuda">0 = desligado. Ao completar, aparece a tela de prêmio.</span></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="optFigura" checked> Na leitura, mostrar a figura com o mesmo nome depois do acerto (treino)</label>
+    </div>
+  </section>
+</main>
+
+<!-- SESSÃO -->
+<div id="sessao">
+  <div id="pontos"></div>
+  <div id="palco">
+    <div id="modelo"></div>
+    <div id="comparacoes"></div>
+    <div id="fim"></div>
+  </div>
+  <div id="festa"><div class="festa-caixa"><div class="festa-emoji" id="festaEmoji">🎉</div><div class="festa-txt" id="festaTxt">Muito bem!</div><div class="ajuda" style="font-size:16px;margin-top:2vh">toque para continuar</div></div></div>
+  <button id="bMostrarBarra" title="Mostrar controles">⚙</button>
+  <div id="barra">
+    <div class="info">
+      <div class="instr" id="sInstr"></div>
+      <div id="sInfo"></div>
+    </div>
+    <button class="btn verde" id="bCerto" title="Acerto (tecla C)">✓ Acerto</button>
+    <button class="btn perigo" id="bErro" title="Erro (tecla E)">✗ Erro</button>
+    <button class="btn" style="background:var(--amarelo)" id="bDica" title="Com dica (tecla D)">Dica</button>
+    <button class="btn sec" id="bRepetir" title="Repetir animação / instrução (tecla R)">↻</button>
+    <button class="btn sec" id="bFalar" title="Falar instrução (tecla F)">🔊</button>
+    <button class="btn sec" id="bDesfazer" title="Desfazer (tecla Z)">Desfazer</button>
+    <button class="btn sec" id="bEncerrar">Encerrar</button>
+    <button class="btn sec" id="bOcultar" title="Esconder controles (tecla H)">▾</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ================= Armazenamento (IndexedDB) =================
+const DB = { db:null };
+DB.abrir = () => new Promise((ok, falha) => {
+  const r = indexedDB.open('controle-estimulos', 1);
+  r.onupgradeneeded = () => { const d = r.result; ['estimulos','programas','sessoes','config'].forEach(n => { if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, { keyPath:'id' }); }); };
+  r.onsuccess = () => { DB.db = r.result; ok(); };
+  r.onerror = () => falha(r.error);
+});
+// Reserva em memória quando o navegador não permite IndexedDB (ex.: pré-visualização)
+DB.mem = null;
+DB.usarMemoria = () => { DB.mem = { estimulos:new Map(), programas:new Map(), sessoes:new Map(), config:new Map() }; };
+// Segunda opção: localStorage (funciona ao abrir o arquivo direto do computador)
+DB.ls = false;
+DB.usarLocalStorage = () => {
+  localStorage.setItem('ce-teste', '1'); localStorage.removeItem('ce-teste');
+  DB.usarMemoria(); DB.ls = true;
+  for (const loja of Object.keys(DB.mem)) { try { (JSON.parse(localStorage.getItem('ce-' + loja) || '[]')).forEach(o => DB.mem[loja].set(o.id, o)); } catch (e) {} }
+};
+DB.gravarLS = (loja) => { if (!DB.ls) return; try { localStorage.setItem('ce-' + loja, JSON.stringify([...DB.mem[loja].values()])); } catch (e) { alert('O espaço de armazenamento deste navegador acabou (as imagens ocupam muito). Baixe a cópia de segurança na aba Dados e use o app hospedado (https).'); } };
+DB.todos = (loja) => DB.mem ? Promise.resolve([...DB.mem[loja].values()]) : new Promise((ok, falha) => { const r = DB.db.transaction(loja).objectStore(loja).getAll(); r.onsuccess = () => ok(r.result); r.onerror = () => falha(r.error); });
+DB.salvar = (loja, obj) => DB.mem ? (DB.mem[loja].set(obj.id, JSON.parse(JSON.stringify(obj))), DB.gravarLS(loja), Promise.resolve()) : new Promise((ok, falha) => { const t = DB.db.transaction(loja, 'readwrite'); t.objectStore(loja).put(obj); t.oncomplete = () => ok(); t.onerror = () => falha(t.error); });
+DB.apagar = (loja, id) => DB.mem ? (DB.mem[loja].delete(id), DB.gravarLS(loja), Promise.resolve()) : new Promise((ok, falha) => { const t = DB.db.transaction(loja, 'readwrite'); t.objectStore(loja).delete(id); t.oncomplete = () => ok(); t.onerror = () => falha(t.error); });
+DB.limpar = (loja) => DB.mem ? (DB.mem[loja].clear(), DB.gravarLS(loja), Promise.resolve()) : new Promise((ok, falha) => { const t = DB.db.transaction(loja, 'readwrite'); t.objectStore(loja).clear(); t.oncomplete = () => ok(); t.onerror = () => falha(t.error); });
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let EST = [], PROGS = [], SESS = [], CFG = { id:'cfg', aprendiz:'', fala:false, toque:true, som:true, pontos:10, figura:true };
+const estPorId = (id) => EST.find(e => e.id === id);
+
+// ================= Lógica de tentativas (pura, testável) =================
+const Logica = {
+  embaralhar(a, rnd = Math.random) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
+  // Gera a ordem dos alvos (índices das relações) para N tentativas
+  ordem(nRel, nTent, modo, rnd = Math.random) {
+    const seq = [];
+    if (nRel === 0) return seq;
+    if (modo === 'sequencial') { for (let i = 0; i < nTent; i++) seq.push(i % nRel); return seq; }
+    if (modo === 'blocos3') {
+      let ultimo = -1;
+      while (seq.length < nTent) {
+        let saco = Logica.embaralhar([...Array(nRel).keys()], rnd);
+        if (saco.length > 1 && saco[0] === ultimo) saco.push(saco.shift());
+        for (const k of saco) { for (let b = 0; b < 3 && seq.length < nTent; b++) seq.push(k); ultimo = k; }
+      }
+      return seq;
+    }
+    // aleatória balanceada: sacos embaralhados, sem o mesmo alvo mais de 2 vezes seguidas
+    while (seq.length < nTent) {
+      let saco = Logica.embaralhar([...Array(nRel).keys()], rnd);
+      for (let tent = 0; tent < 20; tent++) {
+        const n = seq.length;
+        if (nRel > 1 && n >= 2 && seq[n-1] === seq[n-2] && saco[0] === seq[n-1]) { saco = Logica.embaralhar(saco, rnd); continue; }
+        if (nRel > 1 && n >= 1 && saco[0] === seq[n-1] && rnd() < 0.5) { saco = Logica.embaralhar(saco, rnd); continue; }
+        break;
+      }
+      for (const k of saco) { if (seq.length < nTent) seq.push(k); }
+    }
+    return seq;
+  },
+  // Posição do correto: evita a mesma posição mais de 2 vezes seguidas
+  posicao(tamanho, historico, rnd = Math.random) {
+    if (tamanho <= 1) return 0;
+    let p, guarda = 0;
+    do { p = Math.floor(rnd() * tamanho); guarda++; }
+    while (guarda < 50 && historico.length >= 2 && historico[historico.length-1] === p && historico[historico.length-2] === p);
+    return p;
+  },
+  // Monta o arranjo de comparações: correto + distratores
+  arranjo(correto, pool, tamanho, pos, rnd = Math.random) {
+    const dis = Logica.embaralhar(pool.filter(x => x !== correto), rnd).slice(0, Math.max(0, tamanho - 1));
+    const arr = dis.slice(); arr.splice(Math.min(pos, arr.length), 0, correto); return arr;
+  },
+  // Critério: pelo menos A acertos nas últimas N tentativas consecutivas (dica conta como erro)
+  criterio(resps, A, N) {
+    if (resps.length < N) return false;
+    const ult = resps.slice(-N); return ult.filter(r => r === '+').length >= A;
+  }
+};
+
+// ================= Navegação =================
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('ativo', x === b));
+  ['estimulos','sequencia','programas','historico','dados'].forEach(a => $('#aba-' + a).style.display = (a === b.dataset.aba ? '' : 'none'));
+  if (b.dataset.aba === 'historico') renderHist();
+  if (b.dataset.aba === 'sequencia') renderSeq();
+});
+
+// ================= Estímulos =================
+function visual(e, cls = '') {
+  if (!e) return '<span class="txt">?</span>';
+  return e.tipo === 'img' ? `<img src="${e.dado}" alt="${esc(e.nome)}">` : `<span class="txt ${cls}">${esc(e.dado)}</span>`;
+}
+function tagsTodas() { return [...new Set(EST.flatMap(e => e.tags || []))].sort(); }
+function preencherTags() {
+  const t = tagsTodas();
+  for (const sel of ['#filtroTag', '#addTagSel', '#pDistTag']) {
+    const s = $(sel), v = s.value, primeira = s.options[0].outerHTML;
+    s.innerHTML = primeira + t.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    s.value = v;
+  }
+}
+function renderEst() {
+  const f = $('#filtroTag').value;
+  const lista = EST.filter(e => !f || (e.tags || []).includes(f));
+  $('#nEstim').textContent = EST.length;
+  $('#grade').innerHTML = lista.map(e => `<div class="estim" data-id="${e.id}"><span class="x" title="Excluir">×</span><div class="vis">${visual(e)}</div><div class="nome" title="Clique para renomear" style="cursor:pointer">${esc(e.nome)}</div><div>${(e.tags||[]).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div></div>`).join('');
+  $('#grade').querySelectorAll('.estim').forEach(div => {
+    const e = estPorId(div.dataset.id);
+    div.querySelector('.x').onclick = async () => { if (!confirm(`Excluir "${e.nome}"?`)) return; await DB.apagar('estimulos', e.id); EST = EST.filter(x => x.id !== e.id); renderEst(); preencherTags(); };
+    div.querySelector('.nome').onclick = async () => {
+      const n = prompt('Nome do estímulo:', e.nome); if (n === null) return;
+      const t = prompt('Etiquetas (separadas por vírgula):', (e.tags || []).join(', ')); if (t === null) return;
+      e.nome = n.trim() || e.nome; e.tags = t.split(',').map(x => x.trim()).filter(Boolean);
+      await DB.salvar('estimulos', e); renderEst(); preencherTags();
+    };
+  });
+}
+function lerArquivo(f) { return new Promise((ok, falha) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = falha; r.readAsDataURL(f); }); }
+function reduzir(dataUrl, max = 900) {
+  return new Promise(ok => { const img = new Image(); img.onload = () => {
+    const k = Math.min(1, max / Math.max(img.width, img.height)); if (k >= 1) return ok(dataUrl);
+    const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); ok(c.toDataURL('image/png')); };
+    img.onerror = () => ok(dataUrl); img.src = dataUrl; });
+}
+$('#arquivos').onchange = async (ev) => {
+  const tag = $('#tagImg').value.trim();
+  for (const f of ev.target.files) {
+    const dado = await reduzir(await lerArquivo(f));
+    const e = { id: uid(), tipo:'img', nome: f.name.replace(/\.[^.]+$/, ''), dado, tags: tag ? [tag] : [] };
+    await DB.salvar('estimulos', e); EST.push(e);
+  }
+  ev.target.value = ''; renderEst(); preencherTags();
+};
+$('#addTextos').onclick = async () => {
+  const tag = $('#tagTxt').value.trim();
+  const linhas = $('#textos').value.split('\n').map(x => x.trim()).filter(Boolean);
+  for (const l of linhas) { const e = { id: uid(), tipo:'txt', nome:l, dado:l, tags: tag ? [tag] : [] }; await DB.salvar('estimulos', e); EST.push(e); }
+  $('#textos').value = ''; renderEst(); preencherTags();
+};
+$('#filtroTag').onchange = renderEst;
+
+// ================= Programas =================
+let edicao = null; // programa em edição
+const TIPO_NOME = { selecao:'Seleção', mts:'Emparelhamento (MTS)', apresentacao:'Apresentação', estranhamento:'Estranhamento' };
+const INSTR_PADRAO = { selecao:'Mostre {alvo}', mts:'Onde vai?', apresentacao:'O que é?', estranhamento:'Ache o diferente' };
+const AJUDA_PARES = {
+  selecao:'Escolha o estímulo-alvo de cada linha. A instrução usa o nome do alvo ({alvo}). Os outros alvos viram distratores.',
+  mts:'Em cada linha escolha o MODELO (aparece em cima) e a COMPARAÇÃO CORRETA (embaixo). Ex.: palavra falada/figura → palavra impressa. Para o teste de implicação mútua, use o botão "Criar inverso" na lista de programas.',
+  apresentacao:'Escolha os estímulos que serão apresentados um a um (ex.: sílabas para ler). O terapeuta marca acerto, erro ou dica.',
+  estranhamento:'Em cada linha escolha o ESTÍMULO DIFERENTE (alvo) e o estímulo IGUAL que vai se repetir. "Opções no arranjo" é o total de figuras na tela.'
+};
+function opcoesEst(sel) { return '<option value="">--</option>' + EST.map(e => `<option value="${e.id}" ${e.id === sel ? 'selected' : ''}>${esc(e.nome)}${e.tags && e.tags.length ? ' [' + esc(e.tags[0]) + ']' : ''}</option>`).join(''); }
+function renderPares() {
+  const tipo = $('#pTipo').value; $('#ajudaPares').textContent = AJUDA_PARES[tipo];
+  const duas = (tipo === 'mts' || tipo === 'estranhamento');
+  const c1 = tipo === 'mts' ? 'Modelo' : tipo === 'estranhamento' ? 'Diferente (alvo)' : 'Alvo';
+  const c2 = tipo === 'mts' ? 'Comparação correta' : 'Igual (repetido)';
+  $('#tabPares').innerHTML = `<tr><th>#</th><th>${c1}</th>${duas ? `<th>${c2}</th>` : ''}<th></th></tr>` +
+    edicao.pares.map((p, i) => `<tr><td>${i+1}</td><td><select data-i="${i}" data-k="a">${opcoesEst(p.a)}</select></td>${duas ? `<td><select data-i="${i}" data-k="b">${opcoesEst(p.b)}</select></td>` : ''}<td><button class="btn sec" data-del="${i}">×</button></td></tr>`).join('');
+  $('#tabPares').querySelectorAll('select').forEach(s => s.onchange = () => { edicao.pares[+s.dataset.i][s.dataset.k] = s.value; });
+  $('#tabPares').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { edicao.pares.splice(+b.dataset.del, 1); renderPares(); });
+}
+function abrirEditor(p) {
+  edicao = JSON.parse(JSON.stringify(p));
+  $('#editor').style.display = ''; $('#edTitulo').textContent = p.nome ? 'Editar programa' : 'Novo programa';
+  $('#pNome').value = p.nome || ''; $('#pArea').value = p.area || ''; $('#pTipo').value = p.tipo; $('#pFase').value = p.fase; $('#pOrdem').value = p.ordem;
+  $('#pArranjo').value = p.arranjo; $('#pApoio').value = p.apoio || 'completo'; $('#pInstr').value = p.instr; $('#pCritA').value = p.critA; $('#pCritN').value = p.critN; $('#pMax').value = p.max; $('#pDistTag').value = p.distTag || '';
+  renderPares(); $('#editor').scrollIntoView({ behavior:'smooth' });
+}
+$('#pTipo').onchange = () => { if (!$('#pInstr').value || Object.values(INSTR_PADRAO).includes($('#pInstr').value)) $('#pInstr').value = INSTR_PADRAO[$('#pTipo').value]; if ($('#pTipo').value === 'apresentacao') $('#pArranjo').value = 1; renderPares(); };
+$('#novoProg').onclick = () => abrirEditor({ id: uid(), nome:'', area:'', tipo:'selecao', fase:'treino', ordem:'aleatoria', arranjo:3, instr:INSTR_PADRAO.selecao, critA:7, critN:8, max:25, pares:[{a:'',b:''},{a:'',b:''}], distTag:'' });
+$('#addPar').onclick = () => { edicao.pares.push({ a:'', b:'' }); renderPares(); };
+$('#addTag').onclick = () => { const t = $('#addTagSel').value; if (!t) return; EST.filter(e => (e.tags||[]).includes(t)).forEach(e => edicao.pares.push({ a:e.id, b:'' })); edicao.pares = edicao.pares.filter(p => p.a || p.b); renderPares(); };
+$('#cancelarProg').onclick = () => { $('#editor').style.display = 'none'; edicao = null; };
+$('#salvarProg').onclick = async () => {
+  const p = edicao;
+  Object.assign(p, { nome: $('#pNome').value.trim(), area: $('#pArea').value.trim(), tipo: $('#pTipo').value, fase: $('#pFase').value, ordem: $('#pOrdem').value,
+    arranjo: Math.max(1, Math.min(8, +$('#pArranjo').value || 1)), apoio: $('#pApoio').value, instr: $('#pInstr').value.trim(), critA: +$('#pCritA').value || 1, critN: +$('#pCritN').value || 1, max: +$('#pMax').value || 25, distTag: $('#pDistTag').value });
+  const duas = (p.tipo === 'mts' || p.tipo === 'estranhamento');
+  p.pares = p.pares.filter(x => x.a && (!duas || x.b));
+  if (!p.nome) return alert('Dê um nome ao programa.');
+  if (!p.pares.length) return alert('Inclua pelo menos uma relação completa.');
+  if (p.critA > p.critN) return alert('O número de acertos do critério não pode ser maior que o de tentativas seguidas.');
+  await DB.salvar('programas', p);
+  const i = PROGS.findIndex(x => x.id === p.id); if (i >= 0) PROGS[i] = p; else PROGS.push(p);
+  $('#editor').style.display = 'none'; edicao = null; renderProgs();
+};
+function renderProgs() {
+  if (!PROGS.length) { $('#tabProgs').innerHTML = '<tr><td>Nenhum programa ainda. Comece adicionando estímulos e depois clique em "+ Novo programa".</td></tr>'; return; }
+  $('#tabProgs').innerHTML = '<tr><th>Programa</th><th>Área</th><th>Tipo</th><th>Fase</th><th>Relações</th><th>Última sessão</th><th></th></tr>' +
+    PROGS.slice().sort((a,b) => a.nome.localeCompare(b.nome)).map(p => {
+      const ss = SESS.filter(s => s.progId === p.id).sort((a,b) => b.inicio - a.inicio);
+      const u = ss[0] ? `${new Date(ss[0].inicio).toLocaleDateString('pt-BR')} - ${ss[0].pct}% ${ss[0].atingiu ? '<span class="ok">critério</span>' : ''}` : '-';
+      return `<tr><td><b>${esc(p.nome)}</b></td><td>${esc(p.area)}</td><td>${TIPO_NOME[p.tipo]}</td><td>${p.fase === 'teste' ? 'Teste' : 'Treino'}</td><td>${p.pares.length}</td><td>${u}</td>
+      <td style="white-space:nowrap"><button class="btn verde" data-ini="${p.id}">Iniciar</button> <button class="btn sec" data-ed="${p.id}">Editar</button> <button class="btn sec" data-dup="${p.id}">Duplicar</button>${p.tipo === 'mts' ? ` <button class="btn sec" data-inv="${p.id}" title="Cria um teste com modelo e comparação trocados (B→A)">Criar inverso</button>` : ''} <button class="btn perigo" data-del="${p.id}">×</button></td></tr>`;
+    }).join('');
+  const ach = (id) => PROGS.find(p => p.id === id);
+  $('#tabProgs').querySelectorAll('[data-ini]').forEach(b => b.onclick = () => iniciar(ach(b.dataset.ini)));
+  $('#tabProgs').querySelectorAll('[data-ed]').forEach(b => b.onclick = () => abrirEditor(ach(b.dataset.ed)));
+  $('#tabProgs').querySelectorAll('[data-dup]').forEach(b => b.onclick = () => { const p = JSON.parse(JSON.stringify(ach(b.dataset.dup))); p.id = uid(); p.nome += ' (cópia)'; abrirEditor(p); });
+  $('#tabProgs').querySelectorAll('[data-inv]').forEach(b => b.onclick = () => { const p = JSON.parse(JSON.stringify(ach(b.dataset.inv))); p.id = uid(); p.nome += ' - TESTE INVERSO (IM)'; p.fase = 'teste'; p.pares = p.pares.map(x => ({ a:x.b, b:x.a })); abrirEditor(p); });
+  $('#tabProgs').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { const p = ach(b.dataset.del); if (!confirm(`Excluir o programa "${p.nome}"? As sessões já registradas continuam no histórico.`)) return; await DB.apagar('programas', p.id); PROGS = PROGS.filter(x => x.id !== p.id); renderProgs(); });
+}
+
+// ================= Sessão =================
+let S = null;
+function falar(t) { if (!CFG.fala || !('speechSynthesis' in window) || !t) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'pt-BR'; u.rate = 0.9; speechSynthesis.speak(u); }
+let audioCtx = null;
+function bip() { if (!CFG.som) return; try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.18); } catch (e) {} }
+function textoInstr(p, rel) {
+  const alvo = estPorId(rel.a), mod = estPorId(rel.a);
+  return (p.instr || '').replace(/\{alvo\}/g, alvo ? alvo.nome : '').replace(/\{modelo\}/g, mod ? mod.nome : '');
+}
+// ================= Tela do aprendiz: leitura com setas, pontos e comemoração =================
+const VOGAIS = 'AEIOUÁÉÍÓÚÂÊÔÃÕÀ';
+function unidades(w) { return w.toUpperCase().match(/CH|NH|LH|QU(?=[AEIOÃÁÉÍÓ])|GU(?=[EIÉÍ])|RR|SS|ÃO|ÕE|ÃE|./g) || []; }
+const ehVogal = (u) => VOGAIS.includes(u[0]);
+function silabas(w) {
+  const u = unidades(w);
+  const nucleos = u.map((x, i) => ehVogal(x) ? i : -1).filter(i => i >= 0);
+  if (nucleos.length < 2) return null;
+  const cortes = [];
+  for (let k = 0; k < nucleos.length - 1; k++) {
+    const a = nucleos[k], b = nucleos[k + 1], cons = b - a - 1;
+    if (cons === 0) cortes.push(b);                                        // hiato: TO-U-RO, PA-PA-I
+    else if (cons === 1) cortes.push(a + 1);                               // V-CV
+    else {
+      const c1 = u[b - 2], c2 = u[b - 1];
+      const grupo = (c2 === 'L' || c2 === 'R') && 'BCDFGPTV'.includes(c1);  // PR, BL, TR...
+      cortes.push(grupo ? b - 2 : b - 1);                                  // V-CCV ou VC-CV
+    }
+  }
+  const sil = []; let ini = 0;
+  for (const c of cortes) { sil.push(u.slice(ini, c).join('')); ini = c; }
+  sil.push(u.slice(ini).join(''));
+  return sil;
+}
+function partesDe(palavra) {
+  if (palavra.includes('-')) return palavra.split('-').filter(Boolean);
+  return silabas(palavra) || unidades(palavra);
+}
+const SETA = '<svg class="seta" viewBox="0 0 100 20" preserveAspectRatio="none"><line x1="4" y1="10" x2="93" y2="10" vector-effect="non-scaling-stroke"/><polyline points="82,3 95,10 82,17" vector-effect="non-scaling-stroke"/></svg>';
+function htmlLeitura(texto, apoio) {
+  const palavras = String(texto).trim().split(/\s+/);
+  const total = palavras.join('').replace(/-/g, '').length + palavras.length;
+  const tam = Math.max(6, Math.min(17, 70 / Math.max(1, total) * 2.2));
+  const cls = apoio === 'junto' ? 'junta sem-setas' : '';
+  return `<div class="leitura ${cls}" style="--t:${tam.toFixed(1)}vh">` + palavras.map(w => `<div class="palavra">` + partesDe(w).map(pt => `<div class="parte"><span class="g">${esc(pt)}</span>${SETA}</div>`).join('') + `</div>`).join('') + `</div>`;
+}
+function limparTimers() { if (S && S.timers) { S.timers.forEach(clearTimeout); S.timers = []; } }
+function ligarLeitura(apoio) {
+  const L = $('#modelo .leitura'); if (!L || !S) return;
+  limparTimers(); S.timers = [];
+  const partes = [...L.querySelectorAll('.parte')];
+  partes.forEach(p => p.classList.remove('ativa'));
+  if (apoio === 'completo') {
+    L.classList.remove('junta'); L.classList.add('animando');
+    const passo = 800;
+    partes.forEach((p, i) => S.timers.push(setTimeout(() => { partes.forEach(x => x.classList.remove('ativa')); p.classList.add('ativa'); }, 400 + i * passo)));
+    S.timers.push(setTimeout(() => { partes.forEach(x => x.classList.remove('ativa')); L.classList.remove('animando'); L.classList.add('junta'); }, 400 + partes.length * passo + 300));
+    L.onclick = () => ligarLeitura(apoio);
+  } else if (apoio === 'setas') {
+    partes.forEach(p => p.onclick = (ev) => { ev.stopPropagation(); partes.forEach(x => x.classList.remove('ativa')); p.classList.add('ativa'); });
+  }
+}
+function desenharPontos(nova = -1) {
+  const el = $('#pontos');
+  if (!S || !CFG.pontos || S.prog.fase === 'teste') { el.innerHTML = ''; return; }
+  el.innerHTML = Array.from({ length: CFG.pontos }, (_, i) => `<span class="estrela ${i < S.pontos ? 'cheia' : ''} ${i === nova ? 'nova' : ''}">★</span>`).join('');
+}
+function ganharPonto() {
+  if (!S || !CFG.pontos || S.prog.fase === 'teste') return;
+  S.pontos++; desenharPontos(S.pontos - 1);
+  if (S.pontos >= CFG.pontos) { S.festaAberta = true; setTimeout(() => abrirFesta('🎁', 'Você completou! Hora do prêmio!', true), 700); }
+}
+function estrelaVoa() { const d = document.createElement('div'); d.className = 'estrela-voa'; d.textContent = '⭐'; $('#sessao').appendChild(d); setTimeout(() => d.remove(), 1000); }
+function mostrarFigura(a) {
+  if (!CFG.figura || !S || S.prog.tipo !== 'apresentacao') return;
+  const e = estPorId(a.rel.a); if (!e || e.tipo !== 'txt') return;
+  const nome = e.dado.replace(/-/g, '').trim().toLowerCase();
+  const fig = EST.find(x => x.tipo === 'img' && x.nome.trim().toLowerCase() === nome);
+  const cartao = $('#modelo .cartao'); if (!fig || !cartao) return;
+  cartao.insertAdjacentHTML('beforeend', `<img class="figura-premio" src="${fig.dado}" alt="">`); S.figuraMostrada = true;
+}
+function abrirFesta(emoji, txt, completouPontos = false) {
+  if (S) { S.festaAberta = true; S.zerarPontos = completouPontos; }
+  $('#festaEmoji').textContent = emoji; $('#festaTxt').textContent = txt; $('#festa').classList.add('aberta');
+  const simbolos = ['⭐','🎉','✨','🌟','🎈'];
+  for (let i = 0; i < 28; i++) { const c = document.createElement('div'); c.className = 'confete'; c.textContent = simbolos[i % simbolos.length]; c.style.left = (Math.random() * 100) + 'vw'; c.style.animationDuration = (1.8 + Math.random() * 2) + 's'; c.style.animationDelay = (Math.random() * .6) + 's'; document.body.appendChild(c); setTimeout(() => c.remove(), 5000); }
+  if (CFG.som) { [0, 160, 320].forEach((t, i) => setTimeout(() => { try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = [660, 880, 1100][i]; g.gain.value = 0.07; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.15); } catch (e) {} }, t)); }
+}
+function fecharFesta() {
+  $('#festa').classList.remove('aberta'); document.querySelectorAll('.confete').forEach(c => c.remove());
+  if (!S) return;
+  S.festaAberta = false;
+  if (S.zerarPontos) { S.pontos = 0; S.zerarPontos = false; desenharPontos(); }
+  if (S.aposFesta) { const f = S.aposFesta; S.aposFesta = null; f(); }
+}
+
+function iniciar(p) {
+  const faltando = p.pares.some(x => !estPorId(x.a) || ((p.tipo === 'mts' || p.tipo === 'estranhamento') && !estPorId(x.b)));
+  if (faltando) return alert('Algum estímulo deste programa foi excluído. Edite o programa antes de iniciar.');
+  S = { id: uid(), progId: p.id, prog: JSON.parse(JSON.stringify(p)), aprendiz: CFG.aprendiz, inicio: Date.now(), ordem: Logica.ordem(p.pares.length, p.max, p.ordem), tent: [], posHist: [], atual: null, fim: false, pontos: 0 };
+  desenharPontos();
+  $('#sessao').classList.add('aberta'); $('#fim').style.display = 'none';
+  try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {}
+  manterTelaAcesa(true);
+  proxima();
+}
+function poolDistratores(p) {
+  if (p.distTag) return EST.filter(e => (e.tags || []).includes(p.distTag)).map(e => e.id);
+  if (p.tipo === 'mts') return [...new Set(p.pares.map(x => x.b))];
+  return [...new Set(p.pares.map(x => x.a))];
+}
+function proxima() {
+  limparTimers();
+  const p = S.prog, n = S.tent.length;
+  if (n >= p.max || S.fim) return encerrar();
+  const rel = p.pares[S.ordem[n]];
+  let modelo = null, correto = null, opcoes = [];
+  if (p.tipo === 'selecao' || p.tipo === 'mts') {
+    if (p.tipo === 'mts') { modelo = rel.a; correto = rel.b; } else { correto = rel.a; }
+    const pool = poolDistratores(p).filter(x => x !== correto);
+    const tam = Math.min(p.arranjo, pool.length + 1);
+    const pos = Logica.posicao(tam, S.posHist);
+    opcoes = Logica.arranjo(correto, pool, tam, pos); S.posHist.push(opcoes.indexOf(correto));
+  }
+  else if (p.tipo === 'apresentacao') { modelo = rel.a; }
+  else if (p.tipo === 'estranhamento') { correto = rel.a; const tam = Math.max(2, p.arranjo); const pos = Logica.posicao(tam, S.posHist); opcoes = Array(tam - 1).fill(rel.b); opcoes.splice(pos, 0, rel.a); S.posHist.push(pos); }
+  S.atual = { rel, modelo, correto, opcoes, t0: Date.now(), respondida: false };
+  const instr = textoInstr(p, rel);
+  $('#sInstr').textContent = instr || '(sem instrução)';
+  atualizarInfo();
+  const em = modelo ? estPorId(modelo) : null;
+  if (em && p.tipo === 'apresentacao' && em.tipo === 'txt') { $('#modelo').innerHTML = `<div class="cartao">${htmlLeitura(em.dado, p.apoio || 'completo')}</div>`; ligarLeitura(p.apoio || 'completo'); }
+  else $('#modelo').innerHTML = em ? (p.tipo === 'apresentacao' ? `<div class="cartao">${visual(em)}</div>` : `<div class="item modelo">${visual(em)}</div>`) : '';
+  $('#comparacoes').innerHTML = opcoes.map((id, i) => `<div class="item" data-i="${i}">${visual(estPorId(id))}</div>`).join('');
+  $('#comparacoes').querySelectorAll('.item').forEach(div => div.onclick = () => toque(+div.dataset.i));
+  falar(instr);
+}
+function atualizarInfo() {
+  const p = S.prog, r = S.tent.map(t => t.resp), ac = r.filter(x => x === '+').length;
+  const ult = r.slice(-p.critN).filter(x => x === '+').length;
+  $('#sInfo').innerHTML = `<b>${esc(p.nome)}</b> · ${p.fase === 'teste' ? '<span class="nok">TESTE (sem feedback)</span>' : 'Treino'} · Tentativa ${Math.min(S.tent.length + 1, p.max)}/${p.max} · Acertos ${ac}/${S.tent.length} · Últimas ${p.critN}: ${ult}/${Math.min(p.critN, r.length)} (critério ${p.critA}/${p.critN})`;
+}
+function toque(i) {
+  if (!S.atual || S.atual.respondida || !CFG.toque || S.prog.tipo === 'apresentacao') return;
+  const certo = S.atual.opcoes[i] === S.atual.correto;
+  registrar(certo ? '+' : '-', S.atual.opcoes[i], i);
+}
+function registrar(resp, escolhido = null, idx = null) {
+  if (!S || !S.atual || S.atual.respondida) return;
+  S.atual.respondida = true;
+  const a = S.atual, p = S.prog;
+  S.tent.push({ n: S.tent.length + 1, alvo: a.rel.a ? (estPorId(a.rel.a)||{}).nome : '', relB: a.rel.b ? (estPorId(a.rel.b)||{}).nome : '', correto: a.correto ? (estPorId(a.correto)||{}).nome : '', escolhido: escolhido ? (estPorId(escolhido)||{}).nome : '', posicao: a.correto ? a.opcoes.indexOf(a.correto) + 1 : '', resp, ms: Date.now() - a.t0 });
+  const itens = $('#comparacoes').querySelectorAll('.item');
+  if (p.fase === 'treino') {
+    if (idx !== null && itens[idx]) itens[idx].classList.add(resp === '+' ? 'certo' : 'errado');
+    if (resp !== '+' && a.correto) { const ic = a.opcoes.indexOf(a.correto); if (itens[ic]) itens[ic].classList.add('certo'); }
+    if (resp === '+') {
+      limparTimers(); const L = $('#modelo .leitura'); if (L) { L.querySelectorAll('.parte').forEach(x => x.classList.remove('ativa')); L.classList.remove('animando'); L.classList.add('junta'); }
+      bip(); ganharPonto(); estrelaVoa(); mostrarFigura(a);
+    }
+  }
+  atualizarInfo();
+  if (Logica.criterio(S.tent.map(t => t.resp), p.critA, p.critN)) { S.atingiu = true; S.fim = true; }
+  const espera = p.fase === 'treino' ? (resp === '+' ? (S.figuraMostrada ? 1800 : 900) : 1500) : 350; S.figuraMostrada = false;
+  setTimeout(() => { if (S && S.festaAberta) S.aposFesta = proxima; else proxima(); }, espera);
+}
+function desfazer() { if (!S || !S.tent.length) return; S.tent.pop(); S.posHist = S.posHist.slice(0, S.tent.length); S.fim = false; S.atingiu = false; S.atual = null; proxima(); }
+async function encerrar(manual = false) {
+  if (!S) return;
+  const p = S.prog, r = S.tent.map(t => t.resp), ac = r.filter(x => x === '+').length;
+  const sess = { id: S.id, progId: p.id, progNome: p.nome, area: p.area, tipo: p.tipo, fase: p.fase, aprendiz: S.aprendiz, inicio: S.inicio, fimEm: Date.now(), tentativas: S.tent, acertos: ac, total: r.length, pct: r.length ? Math.round(100 * ac / r.length) : 0, atingiu: !!S.atingiu, critA: p.critA, critN: p.critN, interrompida: manual && !S.atingiu && r.length < p.max };
+  if (r.length) { await DB.salvar('sessoes', sess); SESS.push(sess); }
+  $('#modelo').innerHTML = ''; $('#comparacoes').innerHTML = '';
+  $('#sInstr').textContent = 'Sessão encerrada'; $('#pontos').innerHTML = '';
+  const ehSonda = p.critA === p.critN && p.critN === p.max;
+  abrirFesta('👏', 'Terminamos! Muito bem!');
+  $('#fim').style.display = 'block';
+  $('#fim').innerHTML = `<p>${esc(p.nome)}</p><p style="font-size:34px">${ac}/${r.length} (${sess.pct}%)</p>
+    <p>${ehSonda ? 'Aplicação concluída (linha de base / sonda)' : sess.atingiu ? '<span class="ok">Critério atingido</span>' : (r.length >= p.max ? '<span class="nok">Critério não atingido em ' + p.max + ' tentativas</span>' : 'Encerrada antes do fim')}</p>
+    <div class="hist-dots">${S.tent.map(t => `<span class="${t.resp === '+' ? 'd-certo' : t.resp === 'P' ? 'd-dica' : 'd-erro'}">${t.resp === 'P' ? 'D' : t.resp}</span>`).join('')}</div>
+    <p style="margin-top:20px"><button class="btn" id="fechaSessao">Voltar</button></p>`;
+  $('#fechaSessao').onclick = fecharSessao;
+  S = null; renderProgs();
+}
+let travaTela = null;
+async function manterTelaAcesa(on) { try { if (on && 'wakeLock' in navigator) travaTela = await navigator.wakeLock.request('screen'); else if (!on && travaTela) { await travaTela.release(); travaTela = null; } } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && $('#sessao').classList.contains('aberta') && S) manterTelaAcesa(true); });
+function fecharSessao() { manterTelaAcesa(false); $('#sessao').classList.remove('aberta'); try { document.fullscreenElement && document.exitFullscreen(); } catch (e) {} }
+$('#bCerto').onclick = () => registrar('+', S && S.atual ? S.atual.correto : null, S && S.atual && S.atual.correto ? S.atual.opcoes.indexOf(S.atual.correto) : null);
+$('#bErro').onclick = () => registrar('-');
+$('#bDica').onclick = () => registrar('P');
+$('#bFalar').onclick = () => { if (S && S.atual) { const old = CFG.fala; CFG.fala = true; falar(textoInstr(S.prog, S.atual.rel)); CFG.fala = old; } };
+$('#bDesfazer').onclick = desfazer;
+$('#bRepetir').onclick = () => { if (!S || !S.atual) return; if (S.prog.tipo === 'apresentacao') ligarLeitura(S.prog.apoio || 'completo'); else falar(textoInstr(S.prog, S.atual.rel)); };
+$('#bOcultar').onclick = () => $('#sessao').classList.add('sem-barra');
+$('#bMostrarBarra').onclick = () => $('#sessao').classList.remove('sem-barra');
+$('#festa').onclick = fecharFesta;
+$('#bEncerrar').onclick = () => { if (S) { if (confirm('Encerrar a sessão agora e salvar o que foi registrado?')) encerrar(true); } else fecharSessao(); };
+document.addEventListener('keydown', (e) => {
+  if (!$('#sessao').classList.contains('aberta') || !S) return;
+  const k = e.key.toLowerCase();
+  if (k === 'h') $('#sessao').classList.toggle('sem-barra'); else if (k === 'r') $('#bRepetir').click(); else if (k === ' ' && S.festaAberta) fecharFesta(); else if (k === 'c') $('#bCerto').click(); else if (k === 'e') $('#bErro').click(); else if (k === 'd') $('#bDica').click(); else if (k === 'f') $('#bFalar').click(); else if (k === 'z') desfazer();
+});
+
+// ================= Histórico =================
+function renderHist() {
+  const ss = SESS.slice().sort((a,b) => b.inicio - a.inicio);
+  if (!ss.length) { $('#tabHist').innerHTML = '<tr><td>Nenhuma sessão registrada.</td></tr>'; return; }
+  $('#tabHist').innerHTML = '<tr><th>Data</th><th>Aprendiz</th><th>Programa</th><th>Fase</th><th>Resultado</th><th>Critério</th><th>Tentativas</th><th></th></tr>' +
+    ss.map(s => `<tr><td>${new Date(s.inicio).toLocaleString('pt-BR')}</td><td>${esc(s.aprendiz)}</td><td>${esc(s.progNome)}</td><td>${s.fase === 'teste' ? 'Teste' : 'Treino'}</td><td>${s.acertos}/${s.total} (${s.pct}%)</td>
+    <td>${s.atingiu ? '<span class="ok">Atingido</span>' : '<span class="nok">Não</span>'} (${s.critA}/${s.critN})</td>
+    <td class="hist-dots">${s.tentativas.map(t => `<span class="${t.resp === '+' ? 'd-certo' : t.resp === 'P' ? 'd-dica' : 'd-erro'}" title="${esc(t.correto || t.alvo)}${t.escolhido ? ' → ' + esc(t.escolhido) : ''}">${t.resp === 'P' ? 'D' : t.resp}</span>`).join('')}</td>
+    <td><button class="btn perigo" data-del="${s.id}">×</button></td></tr>`).join('');
+  $('#tabHist').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { if (!confirm('Excluir esta sessão do histórico?')) return; await DB.apagar('sessoes', b.dataset.del); SESS = SESS.filter(x => x.id !== b.dataset.del); renderHist(); });
+}
+function baixar(nome, conteudo, tipo) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([conteudo], { type: tipo })); a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+$('#exportCsv').onclick = () => {
+  const cab = ['Data','Hora','Aprendiz','Programa','Área','Tipo','Fase','Tentativa','Alvo/Modelo','Correto','Escolhido','Posição do correto','Resposta','Tempo (s)','Acertos da sessão','Total','%','Critério','Atingiu'];
+  const linhas = [cab];
+  SESS.slice().sort((a,b) => a.inicio - b.inicio).forEach(s => s.tentativas.forEach(t => {
+    const d = new Date(s.inicio);
+    linhas.push([d.toLocaleDateString('pt-BR'), d.toLocaleTimeString('pt-BR'), s.aprendiz, s.progNome, s.area, TIPO_NOME[s.tipo], s.fase === 'teste' ? 'Teste' : 'Treino', t.n, t.alvo, t.correto, t.escolhido, t.posicao, t.resp === '+' ? 'Acerto' : t.resp === 'P' ? 'Dica' : 'Erro', (t.ms/1000).toFixed(1).replace('.', ','), s.acertos, s.total, s.pct, `${s.critA}/${s.critN}`, s.atingiu ? 'Sim' : 'Não']);
+  }));
+  const csv = '﻿' + linhas.map(l => l.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+  baixar(`sessoes-${CFG.aprendiz || 'aprendiz'}-${new Date().toISOString().slice(0,10)}.csv`, csv, 'text/csv;charset=utf-8');
+};
+
+// ================= Sequência de leitura =================
+// Progressão: vogais → sons das prolongáveis → famílias CV prolongáveis (consoantes parecidas separadas, com contraste depois) →
+// oclusivas → revisão mista → sílabas travadas com S, depois R, depois contraste S×R, depois L e N → vogal + consoante → dígrafos → palavras.
+const fam = (c, vogais = ['A','E','I','O','U']) => vogais.map(v => c + v);
+const SEQ = [
+  { cod:'L00', nome:'Vogais (som)', itens:['A','E','I','O','U'], ensinar:[], nota:'Q3/Q4 adquiridos em 21/05: só linha de base e manutenção.' },
+  { cod:'L01', nome:'Sons das consoantes prolongáveis', itens:['M','S','L','F','N','V','J','Z','X','R'], ensinar:[], nota:'Ele diz o SOM da consoante (/mmm/), não o nome da letra. Ensinar só os que errar na linha de base.' },
+  { cod:'L02', nome:'Família do M', itens:fam('M'), ensinar:['MA','MO'], nota:'Primeira família: ensinar 2 e sondar 3.' },
+  { cod:'L03', nome:'Família do S', itens:fam('S'), ensinar:['SA','SO'], nota:'Som bem diferente do M: boa segunda família.' },
+  { cod:'L04', nome:'Família do L', itens:fam('L'), ensinar:['LA','LU'], nota:'' },
+  { cod:'L05', nome:'Família do F', itens:fam('F'), ensinar:['FA'], nota:'A partir daqui, tentar ensinar só 1 sílaba (ou só o som) e sondar o resto.' },
+  { cod:'L06', nome:'Família do N', itens:fam('N'), ensinar:['NA'], nota:'N depois de M já firme (sons parecidos).' },
+  { cod:'L07', nome:'Contraste M × N', itens:[...fam('M'), ...fam('N')], ensinar:[], contraste:true, nota:'Leitura misturada e seleção ("mostre /ma/"). Só depois de M e N firmes.' },
+  { cod:'L08', nome:'Família do V', itens:fam('V'), ensinar:['VA'], nota:'V depois de F (sons parecidos).' },
+  { cod:'L09', nome:'Contraste F × V', itens:[...fam('F'), ...fam('V')], ensinar:[], contraste:true, nota:'' },
+  { cod:'L10', nome:'Família do J', itens:fam('J'), ensinar:['JA'], nota:'' },
+  { cod:'L11', nome:'Família do Z', itens:fam('Z'), ensinar:['ZA'], nota:'' },
+  { cod:'L12', nome:'Contraste S × Z', itens:[...fam('S'), ...fam('Z')], ensinar:[], contraste:true, nota:'' },
+  { cod:'L13', nome:'Família do X (som de CH)', itens:fam('X'), ensinar:['XA'], nota:'' },
+  { cod:'L14', nome:'Família do R (som forte no começo)', itens:fam('R'), ensinar:['RA'], nota:'No começo da palavra o R é forte (RATO). O R fraco aparece entre vogais (CARO) e no fim da sílaba (MAR).' },
+  { cod:'L15', nome:'Família do P', itens:fam('P'), ensinar:['PA'], nota:'Oclusivas: o som é curto, usar gesto de apoio.' },
+  { cod:'L16', nome:'Família do T', itens:fam('T'), ensinar:['TA'], nota:'' },
+  { cod:'L17', nome:'Família do B', itens:fam('B'), ensinar:['BA'], nota:'' },
+  { cod:'L18', nome:'Contraste P × B', itens:[...fam('P'), ...fam('B')], ensinar:[], contraste:true, nota:'' },
+  { cod:'L19', nome:'Família do D', itens:fam('D'), ensinar:['DA'], nota:'' },
+  { cod:'L20', nome:'Contraste T × D', itens:[...fam('T'), ...fam('D')], ensinar:[], contraste:true, nota:'' },
+  { cod:'L21', nome:'Família do C (CA, CO, CU)', itens:['CA','CO','CU'], ensinar:['CA'], nota:'CE e CI ficam para depois (outro som).' },
+  { cod:'L22', nome:'Família do G (GA, GO, GU)', itens:['GA','GO','GU'], ensinar:['GA'], nota:'GE e GI têm som de J: ensinar depois.' },
+  { cod:'L23', nome:'Contraste C × G', itens:['CA','CO','CU','GA','GO','GU'], ensinar:[], contraste:true, nota:'' },
+  { cod:'L24', nome:'Revisão mista CV (manutenção e fluência)', itens:['MA','SE','LI','FO','NU','VE','JA','ZO','XI','RA','PE','TI','BO','DU','CA','GO','MU','SI','LO','FE'], ensinar:[], revisao:true, nota:'Aplicar no começo das sessões e depois de intervalos sem atendimento. Errou: a família volta para ensino.' },
+  { cod:'L25', nome:'Sílabas com S no fim', itens:[...fam('M').map(s => s + 'S'), ...fam('L').map(s => s + 'S'), ...fam('P').map(s => s + 'S')], ensinar:['MAS','MES','LAS'], nota:'Só com a sílaba CV firme. Ensinar poucas e sondar as outras (ele já deriva com S).' },
+  { cod:'L26', nome:'Sílabas com R no fim', itens:[...fam('M').map(s => s + 'R'), ...fam('L').map(s => s + 'R'), ...fam('P').map(s => s + 'R')], ensinar:['MAR','MER','LAR'], nota:'Começar só depois do S firme.' },
+  { cod:'L27', nome:'Contraste S × R no fim', itens:['MAS','MAR','MES','MER','MIS','MIR','MOS','MOR','LAS','LAR','PES','PER','POS','POR'], ensinar:[], contraste:true, nota:'Ponto frágil dele. Primeiro "iguais ou diferentes?" falado (aba Igual-Diferente do plano), depois seleção e leitura misturadas.' },
+  { cod:'L28', nome:'Sílabas com L e N no fim', itens:['MAL','MEL','SOL','SAL','FIL','MAN','MEN','SON','TAN','LIN'], ensinar:['MAL','MAN'], nota:'' },
+  { cod:'L29', nome:'Vogal + consoante', itens:['AS','ES','IS','OS','US','AR','ER','IR','OR','UR','AL','EL','IL','OL','UL'], ensinar:['AS','AR'], nota:'' },
+  { cod:'L30', nome:'Dígrafos CH, NH, LH', itens:['CHA','CHE','CHI','CHO','CHU','NHA','NHE','NHI','NHO','NHU','LHA','LHE','LHI','LHO','LHU'], ensinar:['CHA','NHA','LHA'], nota:'Um dígrafo por vez; contraste NH × LH no fim.' },
+  { cod:'L31', nome:'QU, GU e GE/GI', itens:['QUA','QUE','QUI','QUO','GUE','GUI','GE','GI','CE','CI'], ensinar:['QUE','GUE','GE','CE'], nota:'' },
+  { cod:'L32', nome:'Palavras 1 (só prolongáveis)', itens:['MALA','MOLA','SALA','VELA','LUA','NAVE','NEVE','FILA','MEL','SOL'], ensinar:[], palavras:true, nota:'Palavras do Canva e outras com as mesmas sílabas: sondar a leitura sem treino.' },
+  { cod:'L33', nome:'Palavras 2 (com oclusivas)', itens:['SAPO','MATO','TATU','TETO','BOLA','BOTA','DADO','DAMA','FADA','CABO','COCO','SUCO','VACA','FACA','PENA','LUTA','BALA','SETA','RUA','TOMATE','TAPETE','TUCANO'], ensinar:[], palavras:true, nota:'' },
+  { cod:'L34', nome:'Palavras 3 (com sílabas travadas)', itens:['MAPAS','PATOS','MAR','MESA','PORTA','SALTO','CARTA','MOSCA'], ensinar:[], palavras:true, nota:'' }
+];
+// Estado de cada item: último registro em qualquer sessão
+function ultimoResultado() {
+  const mapa = {};
+  SESS.slice().sort((a,b) => a.inicio - b.inicio).forEach(s => s.tentativas.forEach(t => { const k = t.alvo; if (k) mapa[k] = t.resp; }));
+  return mapa;
+}
+function renderSeq() {
+  const ult = ultimoResultado();
+  const chip = (x, ens) => { const r = ult[x]; const cls = r === '+' ? 'd-certo' : r === '-' ? 'd-erro' : r === 'P' ? 'd-dica' : ''; return `<span class="tag ${cls}" style="${cls ? 'color:#fff' : ''};${ens ? 'outline:2px solid var(--azul2)' : ''}" title="${ens ? 'ensinar' : 'sondar'}">${esc(x)}</span>`; };
+  $('#tabSeq').innerHTML = '<tr><th>Etapa</th><th>Nome</th><th>Itens (contorno azul = ensinar; resto = sondar)</th><th>Observação</th></tr>' +
+    SEQ.map(e => `<tr><td><b>${e.cod}</b></td><td>${esc(e.nome)}</td><td>${e.itens.map(x => chip(x, e.ensinar.includes(x))).join('')}</td><td style="font-size:12px">${esc(e.nota)}</td></tr>`).join('');
+}
+async function garantirTexto(texto, tag) {
+  let e = EST.find(x => x.tipo === 'txt' && x.dado === texto);
+  let mudou = false;
+  if (!e) { e = { id: uid(), tipo:'txt', nome:texto, dado:texto, tags:[] }; EST.push(e); mudou = true; }
+  if (!(e.tags || []).includes(tag)) { e.tags = (e.tags || []).concat(tag); mudou = true; }
+  if (mudou) await DB.salvar('estimulos', e);
+  return e.id;
+}
+async function criarPrograma(p) {
+  if (PROGS.some(x => x.nome === p.nome)) return 0;
+  const prog = Object.assign({ id: uid(), area:'Leitura', arranjo:1, distTag:'', ordem:'aleatoria' }, p);
+  await DB.salvar('programas', prog); PROGS.push(prog); return 1;
+}
+$('#criarSeq').onclick = async () => {
+  let novos = 0;
+  for (const e of SEQ) {
+    const tag = `Leitura ${e.cod}`;
+    const ids = {}; for (const x of e.itens) ids[x] = await garantirTexto(x, tag);
+    const rel = (lista) => lista.map(x => ({ a: ids[x], b:'' }));
+    const n = e.itens.length;
+    novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Linha de base`, tipo:'apresentacao', fase:'teste', apoio:'setas', instr:'Lê para mim', pares: rel(e.itens), critA:n, critN:n, max:n });
+    if (e.contraste) {
+      novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Leitura misturada`, tipo:'apresentacao', fase:'treino', apoio:'setas', instr:'Lê para mim', pares: rel(e.itens), critA:7, critN:8, max:25 });
+      novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Seleção (ouvinte)`, tipo:'selecao', fase:'treino', instr:'Mostre {alvo}', arranjo:2, pares: rel(e.itens), critA:7, critN:8, max:25 });
+    } else if (e.revisao) {
+      novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Fluência`, tipo:'apresentacao', fase:'teste', apoio:'junto', instr:'Lê para mim', pares: rel(e.itens), critA:n, critN:n, max:n });
+    } else if (e.ensinar.length) {
+      const sondar = e.itens.filter(x => !e.ensinar.includes(x));
+      novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Ensino`, tipo:'apresentacao', fase:'treino', apoio:'completo', instr:'Lê para mim', pares: rel(e.ensinar), critA:7, critN:8, max:25 });
+      if (sondar.length) novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Sonda sem treino`, tipo:'apresentacao', fase:'teste', apoio:'setas', instr:'Lê para mim', pares: rel(sondar), critA:sondar.length, critN:sondar.length, max:sondar.length });
+    } else if (!e.palavras) {
+      novos += await criarPrograma({ nome:`${e.cod} ${e.nome} - Ensino dos erros`, tipo:'apresentacao', fase:'treino', apoio:'completo', instr:'Lê para mim', pares: rel(e.itens), critA:7, critN:8, max:25 });
+    }
+  }
+  preencherTags(); renderEst(); renderProgs(); renderSeq();
+  $('#seqMsg').textContent = novos ? `${novos} programas criados. Veja na aba Programas (começam com L00, L01...).` : 'Tudo já estava criado.';
+};
+// Ordenar a lista de programas pelo código da etapa (L00, L01...) já acontece pela ordem alfabética do nome.
+
+// ================= Dados =================
+$('#salvarAprendiz').onclick = async () => { CFG.aprendiz = $('#aprendiz').value.trim(); await DB.salvar('config', CFG); $('#aprendizTopo').textContent = CFG.aprendiz ? 'Aprendiz: ' + CFG.aprendiz : ''; };
+['optFala','optToque','optSom','optPontos','optFigura'].forEach(id => $('#' + id).onchange = async () => { CFG.fala = $('#optFala').checked; CFG.toque = $('#optToque').checked; CFG.som = $('#optSom').checked; CFG.pontos = Math.max(0, Math.min(20, +$('#optPontos').value || 0)); CFG.figura = $('#optFigura').checked; await DB.salvar('config', CFG); });
+$('#backup').onclick = () => baixar(`controle-estimulos-copia-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify({ versao:1, estimulos:EST, programas:PROGS, sessoes:SESS, config:CFG }), 'application/json');
+$('#restaurar').onchange = async (ev) => {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d.estimulos || !d.programas) throw new Error('arquivo inválido');
+    if (!confirm('Restaurar vai SUBSTITUIR os estímulos, programas e sessões deste navegador pelos da cópia. Continuar?')) return;
+    for (const loja of ['estimulos','programas','sessoes']) await DB.limpar(loja);
+    for (const e of d.estimulos) await DB.salvar('estimulos', e);
+    for (const p of d.programas) await DB.salvar('programas', p);
+    for (const s of (d.sessoes || [])) await DB.salvar('sessoes', s);
+    if (d.config) await DB.salvar('config', Object.assign(d.config, { id:'cfg' }));
+    await carregar(); alert('Cópia restaurada.');
+  } catch (e) { alert('Não foi possível ler a cópia: ' + e.message); }
+  ev.target.value = '';
+};
+
+async function carregar() {
+  [EST, PROGS, SESS] = await Promise.all([DB.todos('estimulos'), DB.todos('programas'), DB.todos('sessoes')]);
+  const c = (await DB.todos('config'))[0]; if (c) CFG = Object.assign(CFG, c);
+  $('#aprendiz').value = CFG.aprendiz || ''; $('#aprendizTopo').textContent = CFG.aprendiz ? 'Aprendiz: ' + CFG.aprendiz : '';
+  $('#optFala').checked = !!CFG.fala; $('#optToque').checked = CFG.toque !== false; $('#optSom').checked = CFG.som !== false; $('#optPontos').value = CFG.pontos ?? 10; $('#optFigura').checked = CFG.figura !== false;
+  preencherTags(); renderEst(); renderProgs();
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('diagnostico')) {
+    if (qs.get('grava')) { const e = { id: uid(), tipo:'txt', nome:'TESTE', dado:'TESTE', tags:['diag'] }; await DB.salvar('estimulos', e); EST.push(e); }
+    let sw = 'sem suporte';
+    try { if ('serviceWorker' in navigator) { await new Promise(r => setTimeout(r, 1500)); const reg = await navigator.serviceWorker.getRegistration(); sw = reg ? (reg.active ? 'ativo' : 'registrado') : 'não registrado'; } } catch (e) { sw = 'erro'; }
+    const d = document.createElement('pre'); d.id = 'diag'; d.textContent = JSON.stringify({ modo: DB.ls ? 'localStorage' : DB.mem ? 'memoria' : 'indexeddb', estimulos: EST.length, sw }); document.body.appendChild(d);
+  }
+}
+
+// ================= Autoteste (?autoteste=1) =================
+function autoteste() {
+  const res = {}; let semente = 42; const rnd = () => { semente = (semente * 16807) % 2147483647; return (semente - 1) / 2147483646; };
+  const o = Logica.ordem(4, 400, 'aleatoria', rnd); const cont = [0,0,0,0]; o.forEach(k => cont[k]++);
+  let maxRep = 1, rep = 1; for (let i = 1; i < o.length; i++) { rep = o[i] === o[i-1] ? rep + 1 : 1; maxRep = Math.max(maxRep, rep); }
+  res.aleatoria = { contagem: cont, maxRepeticao: maxRep };
+  const b = Logica.ordem(3, 18, 'blocos3', rnd); res.blocos3 = b.join('');
+  const hist = []; let mr = 1, r2 = 1; for (let i = 0; i < 500; i++) { const p = Logica.posicao(3, hist, rnd); if (i && p === hist[hist.length-1]) r2++; else r2 = 1; mr = Math.max(mr, r2); hist.push(p); }
+  const cp = [0,0,0]; hist.forEach(p => cp[p]++); res.posicao = { contagem: cp, maxRepeticao: mr };
+  const arr = Logica.arranjo('X', ['A','B','X','C'], 3, 2, rnd); res.arranjo = { arr, temX: arr.includes('X'), posX: arr.indexOf('X'), semDup: new Set(arr).size === arr.length };
+  res.criterio = { a: Logica.criterio(['-','+','+','+','+','+','+','+'], 7, 8), b: Logica.criterio(['+','+','-','+','+','+','+','P'], 7, 8), c: Logica.criterio(['+','+','+'], 7, 8), d: Logica.criterio(['-','+','+','+','+','+','+','-','+'], 7, 8) };
+  res.partes = ['MA','MAS','CHA','QUE','MÃO','MOLA','NAVIO','TOURO','PAPAI','TUCANO','PORTA','CARTA','MOSCA','PRATO','CHAVE','QUEIJO','ALAKAZAM','VAPOREON','DOMINGO','TERÇA','SÁBADO','MO-LA'].map(w => partesDe(w).join('|'));
+  document.body.innerHTML = '<pre id="resultado">' + JSON.stringify(res) + '</pre>';
+}
+
+$('#sessao').addEventListener('contextmenu', e => e.preventDefault());
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+if (new URLSearchParams(location.search).get('autoteste')) autoteste();
+else {
+  const avisoMemoria = () => { try { DB.usarLocalStorage(); return carregar(); } catch (e) {} DB.usarMemoria(); const d = document.createElement('div'); d.style.cssText = 'background:#fff4e5;color:#7a4b00;padding:8px 16px;font-size:13px;border-bottom:1px solid #f5c26b'; d.textContent = 'Atenção: este navegador não permitiu guardar dados. O app funciona, mas nada fica salvo ao fechar. Abra o arquivo index.html direto no Chrome ou no Edge, ou baixe a cópia (aba Dados) antes de sair.'; document.body.insertBefore(d, document.querySelector('main')); return carregar(); };
+  // Arquivo local: sempre localStorage (o IndexedDB pode travar em file://). Hospedado: sempre IndexedDB.
+  if (location.protocol === 'file:') avisoMemoria();
+  else { try { DB.abrir().then(carregar).catch(avisoMemoria); } catch (e) { avisoMemoria(); } }
+}
+</script>
+</body>
+</html>
