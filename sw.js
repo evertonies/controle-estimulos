@@ -1,6 +1,6 @@
 // Funcionamento offline: guarda os arquivos do app no aparelho.
 // Busca primeiro na rede (para receber atualizações) e usa a cópia guardada quando estiver sem internet.
-const CACHE = 'estimulos-v1';
+const CACHE = 'estimulos-v2';
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icone-192.png', './icone-512.png'];
 
 self.addEventListener('install', (e) => {
