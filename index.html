@@ -43,6 +43,12 @@
   .estim .vis { height:80px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
   .estim .vis img { max-height:80px; max-width:100%; }
   .estim .vis .txt { font-size:22px; font-weight:bold; }
+  .emoji { font-size:56px; line-height:1.1; }
+  .cartao.mts .parte .g { font-size:calc(var(--t,17vh) * .62); }
+  .cartao.mts .parte .seta { height:3vh; }
+  .item .emoji { font-size:20vh; }
+  .cartao .emoji, .emoji.figura-premio { font-size:24vh; }
+  .tag .emoji { font-size:14px; }
   .estim .x { position:absolute; top:2px; right:4px; color:var(--vermelho); cursor:pointer; font-weight:bold; }
   .tag { display:inline-block; background:var(--cinza); border-radius:10px; padding:1px 7px; font-size:11px; margin:2px; }
   table { border-collapse:collapse; width:100%; font-size:13px; }
@@ -171,6 +177,14 @@
       <p class="ajuda" style="margin-top:8px">Depois de criar, os programas aparecem na aba <b>Programas</b>. Mapa: <span class="hist-dots"><span class="d-certo">+</span></span> último resultado acerto · <span class="hist-dots"><span class="d-erro">-</span></span> erro · <span class="hist-dots"><span class="d-dica">D</span></span> com dica · cinza: ainda sem dado.</p>
     </div>
     <div class="card"><table id="tabSeq"></table></div>
+    <div class="card">
+      <h2 style="margin-top:0">Leitura com figuras (proposta da Carol)</h2>
+      <p style="font-size:14px;line-height:1.5"><b>Palavra → figura</b> (F01, F02...): ele lê a palavra impressa (com as sílabas separadas e setas) e seleciona a figura entre 3. Conjuntos de 3 palavras CV-CV, na ordem das famílias da sequência (36 palavras; a meta da Carol é pelo menos 25). Cada conjunto tem: <b>1 Sonda sem treino</b> (aplique primeiro: se acertar, não precisa ensinar), <b>2 Ensino</b> e <b>3 Teste inverso</b> (figura → palavra, sem treino: implicação mútua).<br>
+      <b>Sílaba inicial</b> (S01, S02...): ele vê a figura e seleciona a sílaba com que ela começa, com 3 ou mais figuras por sílaba (PEI 2.1). Cada grupo tem sonda e ensino.</p>
+      <p class="ajuda">As figuras são emoji. Para usar uma imagem sua (por exemplo do Canva), envie na aba Estímulos uma imagem com o mesmo nome da palavra (ex.: "vaca"): ela passa a aparecer no lugar do emoji em todos os programas.</p>
+      <div class="linha"><button class="btn verde" id="criarFig">Criar programas com figuras (F e S)</button><span class="ajuda" id="figMsg"></span></div>
+      <table id="tabFig" style="margin-top:10px"></table>
+    </div>
   </section>
   <!-- PROGRAMAS -->
   <section id="aba-programas" style="display:none">
@@ -395,12 +409,13 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('ativo', x === b));
   ['estimulos','sequencia','programas','historico','dados'].forEach(a => $('#aba-' + a).style.display = (a === b.dataset.aba ? '' : 'none'));
   if (b.dataset.aba === 'historico') renderHist();
-  if (b.dataset.aba === 'sequencia') renderSeq();
+  if (b.dataset.aba === 'sequencia') { renderSeq(); renderFig(); }
 });
 
 // ================= Estímulos =================
 function visual(e, cls = '') {
   if (!e) return '<span class="txt">?</span>';
+  if (e.tipo === 'emoji') { const img = EST.find(x => x.tipo === 'img' && x.nome.trim().toLowerCase() === e.nome.trim().toLowerCase()); return img ? `<img src="${img.dado}" alt="${esc(e.nome)}">` : `<span class="emoji" title="${esc(e.nome)}">${e.dado}</span>`; }
   return e.tipo === 'img' ? `<img src="${e.dado}" alt="${esc(e.nome)}">` : `<span class="txt ${cls}">${esc(e.dado)}</span>`;
 }
 function tagsTodas() { return [...new Set(EST.flatMap(e => e.tags || []))].sort(); }
@@ -592,9 +607,9 @@ function mostrarFigura(a) {
   if (!CFG.figura || !S || S.prog.tipo !== 'apresentacao') return;
   const e = estPorId(a.rel.a); if (!e || e.tipo !== 'txt') return;
   const nome = e.dado.replace(/-/g, '').trim().toLowerCase();
-  const fig = EST.find(x => x.tipo === 'img' && x.nome.trim().toLowerCase() === nome);
+  const fig = EST.find(x => x.tipo === 'img' && x.nome.trim().toLowerCase() === nome) || EST.find(x => x.tipo === 'emoji' && x.nome.trim().toLowerCase() === nome);
   const cartao = $('#modelo .cartao'); if (!fig || !cartao) return;
-  cartao.insertAdjacentHTML('beforeend', `<img class="figura-premio" src="${fig.dado}" alt="">`); S.figuraMostrada = true;
+  cartao.insertAdjacentHTML('beforeend', fig.tipo === 'img' ? `<img class="figura-premio" src="${fig.dado}" alt="">` : `<span class="emoji figura-premio">${fig.dado}</span>`); S.figuraMostrada = true;
 }
 function abrirFesta(emoji, txt, completouPontos = false) {
   if (S) { S.festaAberta = true; S.zerarPontos = completouPontos; }
@@ -646,7 +661,8 @@ function proxima() {
   $('#sInstr').textContent = instr || '(sem instrução)';
   atualizarInfo();
   const em = modelo ? estPorId(modelo) : null;
-  if (em && p.tipo === 'apresentacao' && em.tipo === 'txt') { $('#modelo').innerHTML = `<div class="cartao">${htmlLeitura(em.dado, p.apoio || 'completo')}</div>`; ligarLeitura(p.apoio || 'completo'); }
+  if (em && p.tipo === 'mts' && em.tipo === 'txt') { $('#modelo').innerHTML = `<div class="cartao mts" style="padding:2.5vh 5vw">${htmlLeitura(em.dado, p.apoio || 'junto')}</div>`; ligarLeitura(p.apoio || 'junto'); }
+  else if (em && p.tipo === 'apresentacao' && em.tipo === 'txt') { $('#modelo').innerHTML = `<div class="cartao">${htmlLeitura(em.dado, p.apoio || 'completo')}</div>`; ligarLeitura(p.apoio || 'completo'); }
   else $('#modelo').innerHTML = em ? (p.tipo === 'apresentacao' ? `<div class="cartao">${visual(em)}</div>` : `<div class="item modelo">${visual(em)}</div>`) : '';
   $('#comparacoes').innerHTML = opcoes.map((id, i) => `<div class="item" data-i="${i}">${visual(estPorId(id))}</div>`).join('');
   $('#comparacoes').querySelectorAll('.item').forEach(div => div.onclick = () => toque(+div.dataset.i));
@@ -841,6 +857,77 @@ $('#criarSeq').onclick = async () => {
   criandoSeq = false; botao.disabled = false;
 };
 // Ordenar a lista de programas pelo código da etapa (L00, L01...) já acontece pela ordem alfabética do nome.
+
+// ================= Leitura com figuras (proposta da Carol: palavra → figura e sílaba inicial) =================
+// Figuras em emoji; se houver uma imagem enviada com o mesmo nome, ela é usada no lugar.
+const FIGURAS = {
+  MALA:'🧳', LUA:'🌙', VELA:'🕯️', LUVA:'🧤', NEVE:'❄️', UVA:'🍇', FOCA:'🦭', FOGO:'🔥', FADA:'🧚', NAVE:'🚀', SINO:'🔔', SUCO:'🧃',
+  SAPO:'🐸', MAPA:'🗺️', MOTO:'🏍️', PATO:'🦆', PIPA:'🪁', PERA:'🍐', PENA:'🪶', LUPA:'🔍', TOMATE:'🍅', BATATA:'🥔',
+  BOLA:'⚽', BOLO:'🎂', BOTA:'🥾', BALA:'🍬', DADO:'🎲', DEDO:'☝️', VACA:'🐄', VASO:'🏺', COCO:'🥥', CAMA:'🛏️', CASA:'🏠', CAFÉ:'☕',
+  GATO:'🐱', GALO:'🐓', CAVALO:'🐎', CAMELO:'🐫', MACACO:'🐒', BANANA:'🍌', PIANO:'🎹', PIPOCA:'🍿', SAPATO:'👞', SALADA:'🥗',
+  GALINHA:'🐔', FOLHA:'🍃', MOCHILA:'🎒', MORANGO:'🍓', COELHO:'🐰', BALÃO:'🎈', PAPAI:'👨', PALHAÇO:'🤡', VASSOURA:'🧹', PIZZA:'🍕', MAÇÃ:'🍎', COPO:'🥛', LOBO:'🐺', RATO:'🐭', RAPOSA:'🦊', RAIO:'⚡', JACARÉ:'🐊', JANELA:'🪟', JABUTI:'🐢'
+};
+// Palavras CV-CV para palavra → figura (Carol: pelo menos 25), em ordem de dificuldade pela sequência de consoantes do app
+const PALAVRAS_FIG = ['MALA','LUA','VELA','LUVA','NEVE','UVA','FOCA','FOGO','FADA','NAVE','SINO','SUCO','RATO','SAPO','MAPA','MOTO','PATO','PIPA','PERA','PENA','LUPA','LOBO','BOLA','BOLO','BOTA','BALA','DADO','DEDO','VACA','VASO','COCO','CAMA','CASA','CAFÉ','GATO','GALO'];
+// Divide em grupos de 3; se sobrar 1, junta ao grupo anterior (nunca fica conjunto sem distrator)
+function emGrupos(lista, tam = 3) { const g = []; for (let i = 0; i < lista.length; i += tam) g.push(lista.slice(i, i + tam)); if (g.length > 1 && g[g.length - 1].length < 2) g[g.length - 2].push(...g.pop()); return g; }
+// Sílaba inicial: pelo menos 3 figuras por sílaba
+const SILABA_INICIAL = [
+  ['MA', ['MALA','MAPA','MACACO','MAÇÃ']], ['SA', ['SAPO','SAPATO','SALADA']], ['LU', ['LUA','LUVA','LUPA']], ['FO', ['FOCA','FOGO','FOLHA']],
+  ['VA', ['VACA','VASO','VASSOURA']], ['MO', ['MOTO','MOCHILA','MORANGO']], ['PA', ['PATO','PAPAI','PALHAÇO']], ['PI', ['PIPA','PIANO','PIPOCA','PIZZA']],
+  ['BO', ['BOLA','BOLO','BOTA']], ['BA', ['BALA','BANANA','BALÃO','BATATA']], ['CA', ['CAMA','CASA','CAFÉ','CAVALO','CAMELO']], ['CO', ['COCO','COELHO','COPO']], ['GA', ['GATO','GALO','GALINHA']], ['RA', ['RATO','RAPOSA','RAIO']], ['JA', ['JACARÉ','JANELA','JABUTI']]
+];
+async function garantirFigura(palavra, tag) {
+  const nome = palavra.toLowerCase();
+  let e = EST.find(x => x.tipo === 'emoji' && x.nome === nome);
+  let mudou = false;
+  if (!e) { e = { id: uid(), tipo:'emoji', nome, dado: FIGURAS[palavra] || '❓', tags:[] }; EST.push(e); mudou = true; }
+  if (!(e.tags || []).includes(tag)) { e.tags = (e.tags || []).concat(tag); mudou = true; }
+  if (mudou) await DB.salvar('estimulos', e);
+  return e.id;
+}
+function renderFig() {
+  const ult = ultimoResultado();
+  const conj = emGrupos(PALAVRAS_FIG);
+  const chip = (x) => { const r = ult[x]; const cls = r === '+' ? 'd-certo' : r === '-' ? 'd-erro' : r === 'P' ? 'd-dica' : ''; return `<span class="tag ${cls}" style="${cls ? 'color:#fff' : ''}">${FIGURAS[x] || ''} ${esc(x)}</span>`; };
+  $('#tabFig').innerHTML = '<tr><th>Programa</th><th>Itens</th></tr>' +
+    conj.map((c, i) => `<tr><td><b>F${String(i + 1).padStart(2, '0')}</b> Palavra → figura</td><td>${c.map(chip).join('')}</td></tr>`).join('') +
+    emGrupos(SILABA_INICIAL).map((g, i) => `<tr><td><b>S${String(i + 1).padStart(2, '0')}</b> Sílaba inicial</td><td>${g.map(([sil, ps]) => `<b>${sil}</b>: ` + ps.map(p => `${FIGURAS[p] || ''}`).join(' ')).join(' &nbsp;·&nbsp; ')}</td></tr>`).join('');
+}
+let criandoFig = false;
+async function criarFiguras() {
+  if (criandoFig) return; criandoFig = true; const b = $('#criarFig'); b.disabled = true; let novos = 0;
+  try {
+    // Palavra → figura, em conjuntos de 3 palavras
+    const gruposF = emGrupos(PALAVRAS_FIG);
+    for (let i = 0; i < gruposF.length; i++) {
+      const c = gruposF[i], k = 'F' + String(i + 1).padStart(2, '0'), tag = 'Figuras ' + k, nomes = c.join(', ');
+      $('#figMsg').textContent = `Criando ${k}...`;
+      const pares = [];
+      for (const w of c) pares.push({ a: await garantirTexto(w, tag), b: await garantirFigura(w, tag) });
+      const inv = pares.map(p => ({ a: p.b, b: p.a })), n = pares.length * 2;
+      novos += await criarPrograma({ nome:`${k} Palavra → figura (${nomes}) - 1 Sonda sem treino`, area:'Leitura com figuras', tipo:'mts', fase:'teste', ordem:'aleatoria', arranjo:3, apoio:'setas', instr:'Mostre a figura', pares, critA:n, critN:n, max:n });
+      novos += await criarPrograma({ nome:`${k} Palavra → figura (${nomes}) - 2 Ensino`, area:'Leitura com figuras', tipo:'mts', fase:'treino', ordem:'aleatoria', arranjo:3, apoio:'setas', instr:'Mostre a figura', pares, critA:7, critN:8, max:25 });
+      novos += await criarPrograma({ nome:`${k} Figura → palavra (${nomes}) - 3 Teste inverso (IM)`, area:'Leitura com figuras', tipo:'mts', fase:'teste', ordem:'aleatoria', arranjo:3, apoio:'junto', instr:'Qual é a palavra?', pares: inv, critA:n, critN:n, max:n });
+    }
+    // Sílaba inicial: 3 sílabas por programa
+    const gruposS = emGrupos(SILABA_INICIAL);
+    for (let g = 0; g < gruposS.length; g++) {
+      const grupo = gruposS[g], k = 'S' + String(g + 1).padStart(2, '0'), tag = 'Sílaba inicial ' + k, sils = grupo.map(x => x[0]).join(', ');
+      $('#figMsg').textContent = `Criando ${k}...`;
+      const pares = [];
+      for (const [sil, ps] of grupo) { const sid = await garantirTexto(sil, tag); for (const p of ps) pares.push({ a: await garantirFigura(p, tag), b: sid }); }
+      const n = pares.length;
+      novos += await criarPrograma({ nome:`${k} Sílaba inicial (${sils}) - 1 Sonda sem treino`, area:'Consciência fonológica', tipo:'mts', fase:'teste', ordem:'aleatoria', arranjo:3, instr:'Com que sílaba começa?', pares, critA:n, critN:n, max:n });
+      novos += await criarPrograma({ nome:`${k} Sílaba inicial (${sils}) - 2 Ensino`, area:'Consciência fonológica', tipo:'mts', fase:'treino', ordem:'aleatoria', arranjo:3, instr:'Com que sílaba começa?', pares, critA:7, critN:8, max:25 });
+    }
+  } catch (err) { $('#figMsg').textContent = 'Erro ao criar: ' + err.message + '. Clique de novo para continuar.'; criandoFig = false; b.disabled = false; return; }
+  preencherTags(); renderEst(); renderProgs(); renderFig();
+  const total = PROGS.filter(p => /^[FS]\d\d /.test(p.nome)).length;
+  $('#figMsg').innerHTML = (novos ? `<b class="ok">Pronto: ${novos} programas criados agora.</b> ` : `<b class="ok">Os programas com figuras já estão criados.</b> `) + `Total: ${total} programas (começam com F e S) na aba <b>Programas</b>.`;
+  criandoFig = false; b.disabled = false;
+}
+$('#criarFig').onclick = criarFiguras;
 
 // ================= Dados =================
 $('#salvarAprendiz').onclick = async () => { CFG.aprendiz = $('#aprendiz').value.trim(); await DB.salvar('config', CFG); $('#aprendizTopo').textContent = CFG.aprendiz ? 'Aprendiz: ' + CFG.aprendiz : ''; };
