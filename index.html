@@ -50,6 +50,13 @@
   .cartao .emoji, .emoji.figura-premio { font-size:24vh; }
   .tag .emoji { font-size:14px; }
   .figsvg { height:64px; width:auto; }
+  .cartao.pergunta { display:block; text-align:center; font-size:7vh; font-weight:700; color:var(--texto); padding:2.5vh 5vw; }
+  .cartao.pergunta b { color:var(--azul2); font-size:9vh; }
+  .item .gen-qtd { height:auto; max-height:30vh; width:16vw; }
+  .cartao .gen-qtd { height:auto; max-height:44vh; width:22vw; }
+  .item .gen-nota, .item .gen-relogio { height:18vh; max-width:30vw; }
+  .cartao .gen-nota, .cartao .gen-relogio { height:24vh; }
+  .item .gen-moeda { height:18vh; }
   .item .figsvg { height:22vh; max-width:24vw; }
   .cartao .figsvg, .figsvg.figura-premio { height:26vh; }
   .estim .x { position:absolute; top:2px; right:4px; color:var(--vermelho); cursor:pointer; font-weight:bold; }
@@ -133,6 +140,7 @@
   <nav>
     <button data-aba="estimulos" class="ativo">Estímulos</button>
     <button data-aba="sequencia">Sequência de leitura</button>
+    <button data-aba="matematica">Matemática</button>
     <button data-aba="programas">Programas</button>
     <button data-aba="historico">Histórico</button>
     <button data-aba="dados">Dados</button>
@@ -189,6 +197,16 @@
       <table id="tabFig" style="margin-top:10px"></table>
     </div>
   </section>
+  <!-- MATEMÁTICA -->
+  <section id="aba-matematica" style="display:none">
+    <div class="card">
+      <h2 style="margin-top:0">Matemática - programas sugeridos</h2>
+      <p style="font-size:14px;line-height:1.5">Programas montados a partir do PEI, das supervisões (Carol: mais e menos; Roberta: dinheiro e horas) e do ABLLS-R. As quantidades, cédulas, moedas e relógios são desenhados pelo próprio app.<br>
+      Como usar: aplique primeiro a <b>sonda</b> ou a <b>linha de base</b>; ensine só o que errar; depois aplique o <b>teste inverso</b> (sem treino) para ver se a relação aparece nos dois sentidos. No mais/menos, siga a ordem dos protocolos: diferença grande → blocos de 3 → misturado → exemplos novos sem treino.</p>
+      <div class="linha"><button class="btn verde" id="criarMat">Criar programas de matemática (N, C, M, D, H)</button><span class="ajuda" id="matMsg"></span></div>
+      <table id="tabMat" style="margin-top:10px"></table>
+    </div>
+  </section>
   <!-- PROGRAMAS -->
   <section id="aba-programas" style="display:none">
     <div class="card">
@@ -211,6 +229,7 @@
             <option value="mts">Emparelhamento com modelo (MTS)</option>
             <option value="apresentacao">Apresentação (leitura / tato): um estímulo</option>
             <option value="estranhamento">Estranhamento: ache o diferente</option>
+            <option value="par">Par: correto × outro (mais/menos, vale mais)</option>
           </select>
         </label>
         <label>Fase
@@ -414,14 +433,16 @@ const Logica = {
 // ================= Navegação =================
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('ativo', x === b));
-  ['estimulos','sequencia','programas','historico','dados'].forEach(a => $('#aba-' + a).style.display = (a === b.dataset.aba ? '' : 'none'));
+  ['estimulos','sequencia','matematica','programas','historico','dados'].forEach(a => $('#aba-' + a).style.display = (a === b.dataset.aba ? '' : 'none'));
   if (b.dataset.aba === 'historico') renderHist();
   if (b.dataset.aba === 'sequencia') { renderSeq(); renderFig(); }
+  if (b.dataset.aba === 'matematica') renderMat();
 });
 
 // ================= Estímulos =================
 function visual(e, cls = '') {
   if (!e) return '<span class="txt">?</span>';
+  if (['qtd','nota','moeda','relogio'].includes(e.tipo)) return `<img class="figsvg gen gen-${e.tipo}" src="${figuraGerada(e)}" alt="${esc(e.nome)}">`;
   if (e.tipo === 'emoji') { const img = EST.find(x => x.tipo === 'img' && x.nome.trim().toLowerCase() === e.nome.trim().toLowerCase()); return img ? `<img src="${img.dado}" alt="${esc(e.nome)}">` : figuraHtml(e); }
   return e.tipo === 'img' ? `<img src="${e.dado}" alt="${esc(e.nome)}">` : `<span class="txt ${cls}">${esc(e.dado)}</span>`;
 }
@@ -477,20 +498,21 @@ $('#filtroTag').onchange = renderEst;
 
 // ================= Programas =================
 let edicao = null; // programa em edição
-const TIPO_NOME = { selecao:'Seleção', mts:'Emparelhamento (MTS)', apresentacao:'Apresentação', estranhamento:'Estranhamento' };
-const INSTR_PADRAO = { selecao:'Mostre {alvo}', mts:'Onde vai?', apresentacao:'O que é?', estranhamento:'Ache o diferente' };
+const TIPO_NOME = { selecao:'Seleção', mts:'Emparelhamento (MTS)', apresentacao:'Apresentação', estranhamento:'Estranhamento', par:'Par (mais/menos)' };
+const INSTR_PADRAO = { selecao:'Mostre {alvo}', mts:'Onde vai?', apresentacao:'O que é?', estranhamento:'Ache o diferente', par:'Qual tem MAIS?' };
 const AJUDA_PARES = {
   selecao:'Escolha o estímulo-alvo de cada linha. A instrução usa o nome do alvo ({alvo}). Os outros alvos viram distratores.',
   mts:'Em cada linha escolha o MODELO (aparece em cima) e a COMPARAÇÃO CORRETA (embaixo). Ex.: palavra falada/figura → palavra impressa. Para o teste de implicação mútua, use o botão "Criar inverso" na lista de programas.',
   apresentacao:'Escolha os estímulos que serão apresentados um a um (ex.: sílabas para ler). O terapeuta marca acerto, erro ou dica.',
-  estranhamento:'Em cada linha escolha o ESTÍMULO DIFERENTE (alvo) e o estímulo IGUAL que vai se repetir. "Opções no arranjo" é o total de figuras na tela.'
+  estranhamento:'Em cada linha escolha o ESTÍMULO DIFERENTE (alvo) e o estímulo IGUAL que vai se repetir. "Opções no arranjo" é o total de figuras na tela.',
+  par:'Em cada linha escolha o CORRETO e o OUTRO estímulo que aparece junto (ex.: em "Qual tem MAIS?", o correto é o que tem mais). Os dois aparecem lado a lado, em posição sorteada.'
 };
 function opcoesEst(sel) { return '<option value="">--</option>' + EST.map(e => `<option value="${e.id}" ${e.id === sel ? 'selected' : ''}>${esc(e.nome)}${e.tags && e.tags.length ? ' [' + esc(e.tags[0]) + ']' : ''}</option>`).join(''); }
 function renderPares() {
   const tipo = $('#pTipo').value; $('#ajudaPares').textContent = AJUDA_PARES[tipo];
-  const duas = (tipo === 'mts' || tipo === 'estranhamento');
-  const c1 = tipo === 'mts' ? 'Modelo' : tipo === 'estranhamento' ? 'Diferente (alvo)' : 'Alvo';
-  const c2 = tipo === 'mts' ? 'Comparação correta' : 'Igual (repetido)';
+  const duas = (tipo === 'mts' || tipo === 'estranhamento' || tipo === 'par');
+  const c1 = tipo === 'mts' ? 'Modelo' : tipo === 'estranhamento' ? 'Diferente (alvo)' : tipo === 'par' ? 'Correto' : 'Alvo';
+  const c2 = tipo === 'mts' ? 'Comparação correta' : tipo === 'par' ? 'Outro' : 'Igual (repetido)';
   $('#tabPares').innerHTML = `<tr><th>#</th><th>${c1}</th>${duas ? `<th>${c2}</th>` : ''}<th></th></tr>` +
     edicao.pares.map((p, i) => `<tr><td>${i+1}</td><td><select data-i="${i}" data-k="a">${opcoesEst(p.a)}</select></td>${duas ? `<td><select data-i="${i}" data-k="b">${opcoesEst(p.b)}</select></td>` : ''}<td><button class="btn sec" data-del="${i}">×</button></td></tr>`).join('');
   $('#tabPares').querySelectorAll('select').forEach(s => s.onchange = () => { edicao.pares[+s.dataset.i][s.dataset.k] = s.value; });
@@ -512,7 +534,7 @@ $('#salvarProg').onclick = async () => {
   const p = edicao;
   Object.assign(p, { nome: $('#pNome').value.trim(), area: $('#pArea').value.trim(), tipo: $('#pTipo').value, fase: $('#pFase').value, ordem: $('#pOrdem').value,
     arranjo: Math.max(1, Math.min(8, +$('#pArranjo').value || 1)), apoio: $('#pApoio').value, instr: $('#pInstr').value.trim(), critA: +$('#pCritA').value || 1, critN: +$('#pCritN').value || 1, max: +$('#pMax').value || 25, distTag: $('#pDistTag').value });
-  const duas = (p.tipo === 'mts' || p.tipo === 'estranhamento');
+  const duas = (p.tipo === 'mts' || p.tipo === 'estranhamento' || p.tipo === 'par');
   p.pares = p.pares.filter(x => x.a && (!duas || x.b));
   if (!p.nome) return alert('Dê um nome ao programa.');
   if (!p.pares.length) return alert('Inclua pelo menos uma relação completa.');
@@ -545,7 +567,7 @@ let audioCtx = null;
 function bip() { if (!CFG.som) return; try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.18); } catch (e) {} }
 function textoInstr(p, rel) {
   const alvo = estPorId(rel.a), mod = estPorId(rel.a);
-  return (p.instr || '').replace(/\{alvo\}/g, alvo ? alvo.nome : '').replace(/\{modelo\}/g, mod ? mod.nome : '');
+  return (rel.instr || p.instr || '').replace(/\{alvo\}/g, alvo ? alvo.nome : '').replace(/\{modelo\}/g, mod ? mod.nome : '');
 }
 // ================= Tela do aprendiz: leitura com setas, pontos e comemoração =================
 const VOGAIS = 'AEIOUÁÉÍÓÚÂÊÔÃÕÀ';
@@ -634,7 +656,7 @@ function fecharFesta() {
 }
 
 function iniciar(p) {
-  const faltando = p.pares.some(x => !estPorId(x.a) || ((p.tipo === 'mts' || p.tipo === 'estranhamento') && !estPorId(x.b)));
+  const faltando = p.pares.some(x => !estPorId(x.a) || ((p.tipo === 'mts' || p.tipo === 'estranhamento' || p.tipo === 'par') && !estPorId(x.b)));
   if (faltando) return alert('Algum estímulo deste programa foi excluído. Edite o programa antes de iniciar.');
   S = { id: uid(), progId: p.id, prog: JSON.parse(JSON.stringify(p)), aprendiz: CFG.aprendiz, inicio: Date.now(), ordem: Logica.ordem(p.pares.length, p.max, p.ordem), tent: [], posHist: [], atual: null, fim: false, pontos: 0 };
   desenharPontos();
@@ -662,6 +684,7 @@ function proxima() {
     opcoes = Logica.arranjo(correto, pool, tam, pos); S.posHist.push(opcoes.indexOf(correto));
   }
   else if (p.tipo === 'apresentacao') { modelo = rel.a; }
+  else if (p.tipo === 'par') { correto = rel.a; const pos = Logica.posicao(2, S.posHist); opcoes = pos === 0 ? [rel.a, rel.b] : [rel.b, rel.a]; S.posHist.push(pos); }
   else if (p.tipo === 'estranhamento') { correto = rel.a; const tam = Math.max(2, p.arranjo); const pos = Logica.posicao(tam, S.posHist); opcoes = Array(tam - 1).fill(rel.b); opcoes.splice(pos, 0, rel.a); S.posHist.push(pos); }
   S.atual = { rel, modelo, correto, opcoes, t0: Date.now(), respondida: false };
   const instr = textoInstr(p, rel);
@@ -671,6 +694,7 @@ function proxima() {
   if (em && p.tipo === 'mts' && em.tipo === 'txt') { $('#modelo').innerHTML = `<div class="cartao mts" style="padding:2.5vh 5vw">${htmlLeitura(em.dado, p.apoio || 'junto')}</div>`; ligarLeitura(p.apoio || 'junto'); }
   else if (em && p.tipo === 'apresentacao' && em.tipo === 'txt') { $('#modelo').innerHTML = `<div class="cartao">${htmlLeitura(em.dado, p.apoio || 'completo')}</div>`; ligarLeitura(p.apoio || 'completo'); }
   else $('#modelo').innerHTML = em ? (p.tipo === 'apresentacao' ? `<div class="cartao">${visual(em)}</div>` : `<div class="item modelo">${visual(em)}</div>`) : '';
+  if (p.tipo === 'par') $('#modelo').innerHTML = `<div class="cartao pergunta">${esc(instr).replace(/\b(MAIS|MENOS|MAIOR|MENOR)\b/g, '<b>$1</b>')}</div>`;
   $('#comparacoes').innerHTML = opcoes.map((id, i) => `<div class="item" data-i="${i}">${visual(estPorId(id))}</div>`).join('');
   $('#comparacoes').querySelectorAll('.item').forEach(div => div.onclick = () => toque(+div.dataset.i));
   falar(instr);
@@ -1003,6 +1027,149 @@ async function criarFiguras() {
 }
 $('#criarFig').onclick = criarFiguras;
 
+// ================= Matemática: figuras geradas pelo app (quantidades, cédulas, moedas, relógio) =================
+const svgUri = (s) => 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(s)));
+function svgQuantidade(n) {
+  // Bolinhas em linhas de 5 e blocos de 10 (como um "quadro de dez"), para facilitar a contagem
+  const r = 10, d = 26, col = 5, blocos = Math.ceil(n / 10);
+  const larg = col * d + 8, alt = blocos * (2 * d) + (blocos - 1) * 14 + 8;
+  let c = '';
+  for (let i = 0; i < n; i++) {
+    const b = Math.floor(i / 10), k = i % 10, lin = Math.floor(k / 5), cl = k % 5;
+    c += `<circle cx="${4 + cl * d + d / 2}" cy="${4 + b * (2 * d + 14) + lin * d + d / 2}" r="${r}" fill="#e2483d"/>`;
+  }
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${larg} ${alt}" width="${larg}" height="${alt}">${c}</svg>`);
+}
+const CEDULAS = { 2:['#5b8fb9','#dbe9f5'], 5:['#8e5aa8','#efe2f5'], 10:['#c0504d','#f8e1e0'], 20:['#d4a017','#fbf1cf'], 50:['#c8742c','#f9e6d3'], 100:['#2f6fb0','#dce9f7'], 200:['#8a6d4b','#efe6da'] };
+function svgCedula(v) {
+  const [cor, fundo] = CEDULAS[v] || ['#666', '#eee'];
+  const tg = v >= 100 ? 34 : v >= 10 ? 40 : 46, tp = v >= 100 ? 22 : 30;
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120" width="240" height="120"><rect x="2" y="2" width="236" height="116" rx="10" fill="${fundo}" stroke="${cor}" stroke-width="4"/><rect x="12" y="12" width="70" height="96" rx="6" fill="${cor}" opacity=".25"/><text x="160" y="72" font-family="Arial" font-weight="900" font-size="${tg}" text-anchor="middle" fill="${cor}">R$ ${v}</text><text x="160" y="100" font-family="Arial" font-size="14" text-anchor="middle" fill="${cor}">${v === 1 ? 'REAL' : 'REAIS'}</text><text x="47" y="70" font-family="Arial" font-weight="900" font-size="${tp}" text-anchor="middle" fill="${cor}">${v}</text></svg>`);
+}
+function svgMoeda(c) {
+  // c em centavos (100 = R$ 1)
+  const real = c === 100, cor = real ? '#d4a017' : (c === 5 ? '#b5651d' : c === 25 ? '#d4a017' : '#b8b8b8');
+  const txt = real ? '1' : String(c), sub = real ? 'REAL' : 'CENTAVOS';
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="56" fill="${cor}" stroke="#7a6a50" stroke-width="3"/>${real ? '<circle cx="60" cy="60" r="40" fill="#c9c9c9"/>' : ''}<text x="60" y="68" font-family="Arial" font-weight="900" font-size="38" text-anchor="middle" fill="#333">${txt}</text><text x="60" y="90" font-family="Arial" font-size="11" text-anchor="middle" fill="#333">${sub}</text></svg>`);
+}
+function svgRelogio(h) {
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" width="260" height="120"><rect x="2" y="2" width="256" height="116" rx="16" fill="#1d2939"/><rect x="14" y="14" width="232" height="92" rx="8" fill="#0b1220"/><text x="130" y="84" font-family="Courier New, monospace" font-weight="900" font-size="64" text-anchor="middle" fill="#3ee07a">${h}</text></svg>`);
+}
+function figuraGerada(e) {
+  if (e.tipo === 'qtd') return svgQuantidade(+e.dado);
+  if (e.tipo === 'nota') return svgCedula(+e.dado);
+  if (e.tipo === 'moeda') return svgMoeda(+e.dado);
+  if (e.tipo === 'relogio') return svgRelogio(e.dado);
+  return null;
+}
+async function garantirGerado(tipo, dado, nome, tag) {
+  let e = EST.find(x => x.tipo === tipo && String(x.dado) === String(dado));
+  let mudou = false;
+  if (!e) { e = { id: uid(), tipo, nome, dado: String(dado), tags:[] }; EST.push(e); mudou = true; }
+  if (!(e.tags || []).includes(tag)) { e.tags = (e.tags || []).concat(tag); mudou = true; }
+  if (mudou) await DB.salvar('estimulos', e);
+  return e.id;
+}
+const NUM_EXT = ['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez'];
+const qtdNome = (n) => `${n} bolinha${n === 1 ? '' : 's'}`;
+const notaNome = (v) => v === 2 ? 'dois reais' : v === 5 ? 'cinco reais' : v === 10 ? 'dez reais' : v === 20 ? 'vinte reais' : v === 50 ? 'cinquenta reais' : v === 100 ? 'cem reais' : 'duzentos reais';
+const moedaNome = (c) => c === 100 ? 'um real' : `${c === 5 ? 'cinco' : c === 10 ? 'dez' : c === 25 ? 'vinte e cinco' : 'cinquenta'} centavos`;
+
+// ----- Definição dos programas -----
+const MAT = {
+  numQtd: [ [1,3,5], [2,4,6], [3,6,9], [7,8,10], [11,15,20], [12,18,25], [20,25,30] ],
+  leitura: [ ['1 a 10', [1,2,3,4,5,6,7,8,9,10]], ['11 a 20', [11,12,13,14,15,16,17,18,19,20]], ['21 a 30', [21,22,23,24,25,26,27,28,29,30]], ['Dezenas 10 a 100', [10,20,30,40,50,60,70,80,90,100]] ],
+  contar: [ ['1 a 10', [1,2,3,4,5,6,7,8,9,10]], ['11 a 20', [11,12,13,14,15,16,17,18,19,20]] ],
+  maisGrande: [ [8,2], [7,1], [9,3], [10,4], [6,1] ],
+  maisPequena: [ [5,4], [7,6], [9,8], [3,2], [6,5] ],
+  novos: [ [12,5], [15,9], [20,14], [11,3], [18,17] ],
+  notas1: [2,5,10], notas2: [20,50,100,200], moedas: [5,10,25,50,100],
+  valeMais: [ [10,5], [50,20], [100,2], [20,10], [200,50] ],
+  horas: [ ['H01','Horas inteiras', [['7:00','sete horas'], ['9:00','nove horas'], ['12:00','meio-dia']]], ['H02','Inteiras e meia', [['9:00','nove horas'], ['9:30','nove e meia'], ['7:30','sete e meia']]], ['H03','Quinze e quarenta e cinco', [['9:15','nove e quinze'], ['9:30','nove e meia'], ['9:45','nove e quarenta e cinco']]] ]
+};
+let criandoMat = false;
+async function criarMatematica() {
+  if (criandoMat) return; criandoMat = true; const b = $('#criarMat'); b.disabled = true; let novos = 0;
+  const msg = (t) => $('#matMsg').textContent = t;
+  const prog = (p) => criarPrograma(Object.assign({ area:'Matemática', arranjo:3, apoio:'junto', ordem:'aleatoria' }, p));
+  try {
+    // N: numeral ↔ quantidade (ABLLS-R R8; Matemática - redes M1)
+    for (let i = 0; i < MAT.numQtd.length; i++) {
+      const g = MAT.numQtd[i], k = 'N' + String(i + 1).padStart(2, '0'), tag = 'Matemática ' + k, nomes = g.join(', '); msg(`Criando ${k}...`);
+      const pares = []; for (const n of g) pares.push({ a: await garantirTexto(String(n), tag), b: await garantirGerado('qtd', n, qtdNome(n), tag) });
+      const inv = pares.map(p => ({ a: p.b, b: p.a })), t = pares.length * 2;
+      novos += await prog({ nome:`${k} Numeral → quantidade (${nomes}) - 1 Sonda sem treino`, tipo:'mts', fase:'teste', instr:'Mostre a quantidade', pares, critA:t, critN:t, max:t });
+      novos += await prog({ nome:`${k} Numeral → quantidade (${nomes}) - 2 Ensino`, tipo:'mts', fase:'treino', instr:'Mostre a quantidade', pares, critA:7, critN:8, max:25 });
+      novos += await prog({ nome:`${k} Quantidade → numeral (${nomes}) - 3 Teste inverso (IM)`, tipo:'mts', fase:'teste', instr:'Qual é o número?', pares: inv, critA:t, critN:t, max:t });
+    }
+    // C: ler números (R7) e contar objetos (R4)
+    let ci = 0;
+    for (const [nome, nums] of MAT.leitura) {
+      const k = 'C' + String(++ci).padStart(2, '0'), tag = 'Matemática ' + k; msg(`Criando ${k}...`);
+      const pares = []; for (const n of nums) pares.push({ a: await garantirTexto(String(n), tag), b:'' });
+      novos += await prog({ nome:`${k} Ler números ${nome} - Linha de base`, tipo:'apresentacao', fase:'teste', arranjo:1, instr:'Que número é?', pares, critA:nums.length, critN:nums.length, max:nums.length });
+      novos += await prog({ nome:`${k} Ler números ${nome} - Ensino dos erros`, tipo:'apresentacao', fase:'treino', arranjo:1, instr:'Que número é?', pares, critA:7, critN:8, max:25 });
+    }
+    for (const [nome, nums] of MAT.contar) {
+      const k = 'C' + String(++ci).padStart(2, '0'), tag = 'Matemática ' + k; msg(`Criando ${k}...`);
+      const pares = []; for (const n of nums) pares.push({ a: await garantirGerado('qtd', n, qtdNome(n), tag), b:'' });
+      novos += await prog({ nome:`${k} Contar objetos ${nome} - Linha de base`, tipo:'apresentacao', fase:'teste', arranjo:1, instr:'Quantos tem?', pares, critA:nums.length, critN:nums.length, max:nums.length });
+      novos += await prog({ nome:`${k} Contar objetos ${nome} - Ensino dos erros`, tipo:'apresentacao', fase:'treino', arranjo:1, instr:'Quantos tem?', pares, critA:7, critN:8, max:25 });
+    }
+    // M: mais e menos (PEI 3.1; ABLLS-R R9 e R10)
+    msg('Criando M...');
+    const par = async (x, y, tag, instr) => ({ a: await garantirGerado('qtd', x, qtdNome(x), tag), b: await garantirGerado('qtd', y, qtdNome(y), tag), instr });
+    const maisG = [], menosG = [], misto = [], peq = [], novosEx = [];
+    for (const [x, y] of MAT.maisGrande) { maisG.push(await par(x, y, 'Matemática M01', 'Qual tem MAIS?')); menosG.push(await par(y, x, 'Matemática M02', 'Qual tem MENOS?')); }
+    misto.push(...maisG, ...menosG);
+    for (const [x, y] of MAT.maisPequena) { peq.push(await par(x, y, 'Matemática M04', 'Qual tem MAIS?')); peq.push(await par(y, x, 'Matemática M04', 'Qual tem MENOS?')); }
+    for (const [x, y] of MAT.novos) { novosEx.push(await par(x, y, 'Matemática M05', 'Qual tem MAIS?')); novosEx.push(await par(y, x, 'Matemática M05', 'Qual tem MENOS?')); }
+    novos += await prog({ nome:'M01 Mais (diferença grande)', tipo:'par', fase:'treino', instr:'Qual tem MAIS?', pares: maisG, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'M02 Menos (diferença grande)', tipo:'par', fase:'treino', instr:'Qual tem MENOS?', pares: menosG, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'M03 Mais e menos em blocos de 3', tipo:'par', fase:'treino', ordem:'blocos3', instr:'', pares: misto, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'M04 Mais e menos misturado (diferença pequena)', tipo:'par', fase:'treino', instr:'', pares: peq, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'M05 Mais e menos - sonda com exemplos novos (sem treino)', tipo:'par', fase:'teste', instr:'', pares: novosEx, critA:novosEx.length, critN:novosEx.length, max:novosEx.length });
+    // D: dinheiro (supervisão Roberta; ABLLS-R R22-R24)
+    msg('Criando D...');
+    const notaId = (v, tag) => garantirGerado('nota', v, notaNome(v), tag);
+    const d1 = [], d2 = [], d3 = [], d3i = [], d4 = [], d5 = [];
+    for (const v of MAT.notas1) d1.push({ a: await notaId(v, 'Matemática D01'), b:'' });
+    for (const v of MAT.notas2) d2.push({ a: await notaId(v, 'Matemática D02'), b:'' });
+    for (const v of [...MAT.notas1, ...MAT.notas2]) { const n = await notaId(v, 'Matemática D03'), t = await garantirTexto('R$ ' + v, 'Matemática D03'); d3.push({ a: n, b: t }); d3i.push({ a: t, b: n }); }
+    for (const c of MAT.moedas) d4.push({ a: await garantirGerado('moeda', c, moedaNome(c), 'Matemática D04'), b:'' });
+    for (const [x, y] of MAT.valeMais) d5.push({ a: await notaId(x, 'Matemática D05'), b: await notaId(y, 'Matemática D05'), instr:'Qual vale MAIS?' });
+    novos += await prog({ nome:'D01 Cédulas R$ 2, 5 e 10 - Mostre a cédula', tipo:'selecao', fase:'treino', instr:'Mostre {alvo}', pares: d1, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'D02 Cédulas R$ 20, 50, 100 e 200 - Mostre a cédula', tipo:'selecao', fase:'treino', instr:'Mostre {alvo}', pares: d2, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'D03 Cédula → valor escrito - Ensino', tipo:'mts', fase:'treino', instr:'Quanto vale?', pares: d3, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'D03 Valor escrito → cédula - Teste inverso (IM)', tipo:'mts', fase:'teste', instr:'Mostre a cédula', pares: d3i, critA:d3i.length, critN:d3i.length, max:d3i.length });
+    novos += await prog({ nome:'D04 Moedas - Mostre a moeda', tipo:'selecao', fase:'treino', instr:'Mostre {alvo}', pares: d4, critA:7, critN:8, max:25 });
+    novos += await prog({ nome:'D05 Qual vale mais? (cédulas)', tipo:'par', fase:'treino', instr:'Qual vale MAIS?', pares: d5, critA:7, critN:8, max:25 });
+    // H: horas no relógio digital (supervisão Roberta; ABLLS-R R21)
+    for (const [k, nome, hs] of MAT.horas) {
+      msg(`Criando ${k}...`); const tag = 'Matemática ' + k;
+      const pares = []; for (const [h, falada] of hs) pares.push({ a: await garantirGerado('relogio', h, falada, tag), b:'' });
+      novos += await prog({ nome:`${k} ${nome} - Mostre o relógio`, tipo:'selecao', fase:'treino', instr:'Mostre {alvo}', pares, critA:7, critN:8, max:25 });
+      novos += await prog({ nome:`${k} ${nome} - Ler a hora`, tipo:'apresentacao', fase:'teste', arranjo:1, instr:'Que horas são?', pares, critA:pares.length * 2, critN:pares.length * 2, max:pares.length * 2 });
+    }
+  } catch (err) { msg('Erro ao criar: ' + err.message + '. Clique de novo para continuar.'); criandoMat = false; b.disabled = false; return; }
+  preencherTags(); renderEst(); renderProgs(); renderMat();
+  const total = PROGS.filter(p => /^[NCMDH]\d\d /.test(p.nome)).length;
+  $('#matMsg').innerHTML = (novos ? `<b class="ok">Pronto: ${novos} programas criados agora.</b> ` : `<b class="ok">Os programas de matemática já estão criados.</b> `) + `Total: ${total} programas (começam com N, C, M, D e H) na aba <b>Programas</b>.`;
+  criandoMat = false; b.disabled = false;
+}
+function renderMat() {
+  const img = (src, h = 34) => `<img src="${src}" style="height:${h}px;vertical-align:middle;margin:2px">`;
+  const linhas = [
+    ['N01-N07', 'Numeral ↔ quantidade (R8)', MAT.numQtd.map(g => g.join('-')).join(' · ') + '<br>' + img(svgQuantidade(3)) + img(svgQuantidade(6)) + img(svgQuantidade(15), 44)],
+    ['C01-C06', 'Ler números (R7) e contar objetos (R4)', '1-10, 11-20, 21-30, dezenas até 100; contar 1-10 e 11-20'],
+    ['M01-M05', 'Mais e menos (PEI 3.1; R9, R10)', 'Diferença grande → blocos de 3 → misturado com diferença pequena → sonda com 5 exemplos novos sem treino'],
+    ['D01-D05', 'Dinheiro (Roberta; R22-R24)', img(svgCedula(2)) + img(svgCedula(10)) + img(svgCedula(50)) + img(svgMoeda(25), 30) + img(svgMoeda(100), 30)],
+    ['H01-H03', 'Horas no relógio digital (Roberta; R21)', img(svgRelogio('9:00')) + img(svgRelogio('9:30')) + ' inteiras → meia → 15 e 45']
+  ];
+  $('#tabMat').innerHTML = '<tr><th>Programas</th><th>O que é</th><th>Estímulos</th></tr>' + linhas.map(l => `<tr><td><b>${l[0]}</b></td><td>${l[1]}</td><td>${l[2]}</td></tr>`).join('');
+}
+$('#criarMat').onclick = criarMatematica;
+
 // ================= Dados =================
 $('#salvarAprendiz').onclick = async () => { CFG.aprendiz = $('#aprendiz').value.trim(); await DB.salvar('config', CFG); $('#aprendizTopo').textContent = CFG.aprendiz ? 'Aprendiz: ' + CFG.aprendiz : ''; };
 ['optFala','optToque','optSom','optPontos','optFigura'].forEach(id => $('#' + id).onchange = async () => { CFG.fala = $('#optFala').checked; CFG.toque = $('#optToque').checked; CFG.som = $('#optSom').checked; CFG.pontos = Math.max(0, Math.min(20, +$('#optPontos').value || 0)); CFG.figura = $('#optFigura').checked; await DB.salvar('config', CFG); });
@@ -1031,6 +1198,12 @@ async function carregar() {
   preencherTags(); renderEst(); renderProgs();
   const qs = new URLSearchParams(location.search);
   if (qs.get('diagnostico')) {
+    if (qs.get('testemat')) {
+      await criarMatematica();
+      const ps = PROGS.filter(p => /^[NCMDH]\d\d /.test(p.nome)); const nomes = ps.map(p => p.nome);
+      const r = document.createElement('pre'); r.id = 'mat'; r.textContent = JSON.stringify({ programas: ps.length, duplicados: nomes.length - new Set(nomes).size, poucos: ps.filter(p => p.pares.length < 2 && p.tipo !== 'apresentacao').map(p => p.nome), tipos: [...new Set(ps.map(p => p.tipo))], msg: $('#matMsg').innerText }); document.body.appendChild(r);
+      const alvo = qs.get('iniciar'); if (alvo) { CFG.pontos = 10; const p = ps.find(x => x.nome.startsWith(alvo)); if (p) iniciar(p); }
+    }
     if (qs.get('testeseq')) {
       const p1 = $('#criarSeq').onclick(), p2 = $('#criarSeq').onclick(); const desab = $('#criarSeq').disabled;
       await p1; await p2; const nomes = PROGS.map(p => p.nome);
