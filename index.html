@@ -289,6 +289,21 @@
   .etapa .cab { flex-wrap:wrap; }
   .tab-ablls td, .tab-ablls th { border:none; border-top:1px solid var(--borda); padding:7px 6px; vertical-align:middle; }
   .tab-ablls select { padding:4px 6px; }
+  /* ===== Leitura por módulos ===== */
+  .slots { display:flex; gap:1.2vw; justify-content:center; margin:1vh 0 3vh; }
+  .slot { width:9vh; height:11vh; border-bottom:6px solid #98a2b3; font-size:8vh; font-weight:900; display:flex; align-items:flex-end; justify-content:center; color:var(--texto); }
+  .slots.ok .slot { color:var(--verde); border-color:var(--verde); } .slots.erro .slot { color:var(--vermelho); border-color:var(--vermelho); }
+  .tiles { display:flex; gap:1.4vw; flex-wrap:wrap; justify-content:center; }
+  .tile { width:10vh; height:10vh; font-size:6.5vh; font-weight:900; border:none; border-radius:14px; background:#fff; box-shadow:0 4px 14px #1f4e7922; cursor:pointer; color:var(--texto); font-family:inherit; }
+  .tile:disabled { opacity:.25; }
+  #comparacoes:has(.slots) { flex-direction:column; }
+  .cronometro { font-size:5vh; font-weight:800; color:var(--azul2); background:#e8f0fa; border-radius:999px; padding:.6vh 2.4vw; }
+  .cronometro.fim { color:var(--vermelho); background:#fdecea; }
+  .txt.longo { font-size:5vh !important; letter-spacing:.5px !important; white-space:normal; line-height:1.25; display:inline-block; max-width:80vw; }
+  .cartao.regra .txt { font-size:4.6vh; font-weight:800; white-space:normal; line-height:1.3; }
+  .aviso-deriv { background:#fff; border:1px solid var(--borda); border-left:5px solid var(--azul2); border-radius:12px; padding:11px 14px; margin:0 0 12px; font-size:14px; line-height:1.5; }
+  .aviso-deriv.ok-d { border-left-color:var(--verde); } .aviso-deriv.nao-d { border-left-color:#e6a700; }
+  .chip-deriv { font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; background:var(--ok-bg); color:var(--verde); white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -1737,8 +1752,8 @@ function etapaAtual(letras) {
 }
 function renderInicio() {
   const areas = [
-    { t:'Leitura: sílabas e palavras', ic:'Aa', aba:'sequencia', f:'L', letras:['L'], vazio:'Criar a sequência de sílabas' },
-    { t:'Leitura com figuras', ic:'▦', aba:'sequencia', f:'F', letras:['F','S'], vazio:'Criar palavra e figura' },
+    { t:'Leitura: letras, sílabas e fluência', ic:'Aa', aba:'sequencia', f:'L1', letras:['B','L','V'], vazio:'Criar os módulos de leitura' },
+    { t:'Leitura: palavras e frases', ic:'▦', aba:'sequencia', f:'F', letras:['W','F','S','Z'], vazio:'Criar os módulos de leitura' },
     { t:'Matemática', ic:'+−', aba:'matematica', f:'N', letras:['K','N','Q','A','U','H','D'], vazio:'Criar programas de matemática' },
     { t:'Molduras relacionais', ic:'⇄', aba:'molduras', f:'I', letras:['I','P','O','E','G','T'], vazio:'Criar programas das molduras' }
   ];
@@ -2500,8 +2515,8 @@ const _voltarAtual = () => { const v = $('#aba-estimulos [data-voltar]'); if (v)
 
 // ----- Página da área geral -----
 const AREAS_APR = [
-  { t:'Leitura', aba:'sequencia', f:'L', letras:['L'] },
-  { t:'Leitura com figuras', aba:'sequencia', f:'F', letras:['F','S'] },
+  { t:'Leitura', aba:'sequencia', f:'L', letras:['B','L','V'] },
+  { t:'Palavras e frases', aba:'sequencia', f:'F', letras:['W','F','S','Z'] },
   { t:'Matemática', aba:'matematica', letras:['K','N','Q','A','U','H','D'] },
   { t:'Molduras', aba:'molduras', letras:['I','P','O','E','G','T'] }
 ];
@@ -2546,8 +2561,7 @@ const protHtml = (lista) => lista.map(t => `<span class="prot ${{ ABLLS:'ablls',
 const lerProt = (s) => String(s || '').split(/[;,\n]/).map(x => x.trim()).filter(Boolean);
 
 const COLECOES = [
-  { id:'L', t:'Leitura: sílabas e palavras', d:'35 etapas progressivas (L00–L34): linha de base, ensino só do que errar e sonda de derivação por família.', prot:['ABLLS-R Q1–Q4', 'ABLLS-R Q (leitura)', 'VB-MAPP Leitura'], botao:'criarSeq', letras:['L'], aba:'sequencia' },
-  { id:'F', t:'Leitura com figuras', d:'Palavra ↔ figura (F01–F12) e sílaba inicial (S01–S05), com teste inverso sem treino.', prot:['ABLLS-R Q (leitura)', 'VB-MAPP Leitura', 'PEAK-E'], botao:'criarFig', letras:['F','S'], aba:'sequencia' },
+  { id:'L', t:'Leitura (sequência da Carol + ABLLS-R Q1–Q17)', d:'Letras e sons, sílabas da Carol (linha de base → ensino de 1 ou 2 sílabas → sonda de derivação, S × R), fluência cronometrada, palavras (figura, sílaba inicial, montar, letra que falta) e frases com compreensão.', prot:['ABLLS-R Q1–Q17', 'VB-MAPP Leitura', 'PEAK-E'], botao:'criarLeit', letras:['B','L','V','W','F','S','Z'], aba:'sequencia' },
   { id:'M', t:'Matemática', d:'7 módulos progressivos cobrindo os itens R1–R29: contagem, número, conceitos, adição, subtração, horas e dinheiro, com linha de base, treino e testes de derivação.', prot:['ABLLS-R R1–R29', 'VB-MAPP Matemática', 'PEAK-E'], botao:'criarMat', letras:['K','N','Q','A','U','H','D'], aba:'matematica' },
   { id:'R', t:'Molduras relacionais (Siri Ming)', d:'Fase 1 não arbitrária e Fase 2 arbitrária, com programas encadeados: treino → manutenção → teste IM → teste IMC.', prot:['PEAK-E', 'PEAK-T', 'VB-MAPP VP-MTS'], botao:'criarMold', letras:['I','P','O','E','G','T'], aba:'molduras' }
 ];
@@ -2776,6 +2790,7 @@ function svgMat(d) {
     d.l.forEach((v, i) => { const r = rs[i], cx = x + r, [f, b] = MOEDA_COR[v]; c += `<circle cx="${cx}" cy="65" r="${r}" fill="${f}" stroke="${b}" stroke-width="3"/>` + (v === 100 ? `<circle cx="${cx}" cy="65" r="${r * .62}" fill="#e0b83c" stroke="#9c7a1c" stroke-width="2"/>` : '') + `<text x="${cx}" y="${65 + r * .2}" font-family="Arial" font-weight="900" font-size="${r * .62}" text-anchor="middle" fill="#3a3a3a">${v === 100 ? '1' : v}</text><text x="${cx}" y="${65 + r * .58}" font-family="Arial" font-size="${r * .2}" text-anchor="middle" fill="#3a3a3a">${v === 100 ? 'REAL' : 'CENTAVOS'}</text>`; x += 2 * r + gap; });
     return W(w, h, c);
   }
+  if (d.k === 'forma') { const cor = { vermelho:'#e2483d', azul:'#2f6db5', verde:'#2e9b5f', amarelo:'#f2b705' }[d.cor] || d.cor; const sh = d.f === 'quadrado' ? `<rect x="25" y="25" width="110" height="110" rx="8" fill="${cor}"/>` : d.f === 'círculo' ? `<circle cx="80" cy="80" r="58" fill="${cor}"/>` : d.f === 'triângulo' ? `<polygon points="80,18 145,138 15,138" fill="${cor}"/>` : `<polygon points="80,12 97,60 148,60 107,90 122,140 80,110 38,140 53,90 12,60 63,60" fill="${cor}"/>`; return W(160, 160, sh); }
   return W(10, 10, '');
 }
 const _visualMat = visual;
@@ -2786,7 +2801,7 @@ visual = function (e, cls = '') {
 };
 function nomeCena(d) {
   const val = (c) => c === 100 ? '1 real' : c + ' centavos';
-  return d.k === 'conta' ? `${d.a} ${d.op === '-' ? 'tira' : 'mais'} ${d.b}` : d.k === 'grupo' ? `${d.cheios} de ${d.n} pratos com bola` : d.k === 'esp' ? `${d.n} bolinhas espalhadas` : d.k === 'dois' ? `${d.a} e ${d.b} bolinhas${d.marca ? ' (seta no ' + (d.marca === 'a' ? '1º' : '2º') + ')' : ''}` : d.k === 'bola' ? `${d.f || 'bola'} tamanho ${d.s}` : d.k === 'bolas' ? `bolas ${d.s.join(' e ')}` : d.k === 'moedas' ? 'moedas: ' + d.l.map(val).join(' + ') : d.k;
+  return d.k === 'conta' ? `${d.a} ${d.op === '-' ? 'tira' : 'mais'} ${d.b}` : d.k === 'grupo' ? `${d.cheios} de ${d.n} pratos com bola` : d.k === 'esp' ? `${d.n} bolinhas espalhadas` : d.k === 'dois' ? `${d.a} e ${d.b} bolinhas${d.marca ? ' (seta no ' + (d.marca === 'a' ? '1º' : '2º') + ')' : ''}` : d.k === 'bola' ? `${d.f || 'bola'} tamanho ${d.s}` : d.k === 'bolas' ? `bolas ${d.s.join(' e ')}` : d.k === 'moedas' ? 'moedas: ' + d.l.map(val).join(' + ') : d.k === 'forma' ? `${d.f} ${d.cor}` : d.k;
 }
 
 // ----- Tentativas de tocar: contar, "me dá N" e completar até N -----
@@ -2841,11 +2856,11 @@ const _feitoMat = feito;
 feito = function (p) {
   if (p.lb) return SESS.some(s => s.progId === p.id && s.total >= p.max);
   if (_feitoMat(p)) return true;
-  if (p.mat) { const cod = codDe(p.nome); const l = PROGS.find(x => x.lb && codDe(x.nome) === cod); if (l && dominadoLB(l)) return true; }
+  if (p.mat && !p.credLB) { const cod = codDe(p.nome); const l = PROGS.find(x => x.lb && codDe(x.nome) === cod); if (l && dominadoLB(l)) return true; }
   return false;
 };
 function grupoFeito(cod) { const arr = PROGS.filter(p => codDe(p.nome) === cod); return arr.length > 0 && arr.every(feito); }
-function abllsApp() { const r = {}; for (const p of PROGS) { if (!p.ablls || !p.ablls.length || !feito(p)) continue; p.ablls.forEach(x => { r[x.it] = Math.max(r[x.it] || 0, x.nv); }); } return r; }
+function abllsApp() { const r = {}; for (const p of PROGS) { if (!p.ablls || !p.ablls.length || !((p.lb || p.credLB) ? dominadoLB(p) : feito(p))) continue; p.ablls.forEach(x => { r[x.it] = Math.max(r[x.it] || 0, x.nv); }); } return r; }
 
 // ----- Definição dos módulos -----
 function defMat3() {
@@ -3095,6 +3110,7 @@ async function idMat(x, tag) {
   if (x.ana) return garantirGerado('relogioA', x.ana, 'relógio de ponteiros ' + x.ana, tag);
   if (x.nota) return garantirGerado('nota', x.nota, notaNome(x.nota), tag);
   if (x.cena) return garantirGerado('mat', JSON.stringify(x.cena), nomeCena(x.cena), tag);
+  if (x.fig) return garantirFigura(x.fig, tag);
   return '';
 }
 async function relMat(r, tag) {
@@ -3102,6 +3118,8 @@ async function relMat(r, tag) {
   if (!o.b) o.b = o.a;
   if (r.tato) o.tato = true;
   if (r.toque) o.toque = r.toque;
+  if (r.r) o.r = await idMat(r.r, tag);
+  for (const k of ['montar', 'semFala', 'dica', 'fala']) if (r[k]) o[k] = r[k];
   return o;
 }
 let criandoMat3 = false;
@@ -3196,6 +3214,419 @@ function ligarPainelAblls() {
   $('#abllsData').onchange = async () => { a.abllsData = $('#abllsData').value; await salvarAprs(); };
   $('#cardsMat').querySelectorAll('[data-ir-mod]').forEach(l => l.onclick = (ev) => { ev.preventDefault(); filtroMat = l.dataset.irMod; renderMatCards(); });
 }
+
+// ================= Leitura por módulos (compatível com ABLLS-R Q1–Q17), preservando a sequência fônica da Carol =================
+const ABLLS_Q = [['Q1','Letras (ouvinte)',4],['Q2','Nomear letras',4],['Q3','Sons das letras (ouvinte)',4],['Q4','Nomear sons das letras',4],['Q5','Palavra com figura',4],['Q6','Palavra com palavra',4],['Q7','Letras da palavra em ordem',2],['Q8','Montar palavra com letras',2],['Q9','Letra que falta',2],['Q10','Ler palavras',4],['Q11','Decodificar palavras',2],['Q12','Ler grupos de 3 palavras',4],['Q13','Ler frases simples',4],['Q14','Palavra que falta na frase',2],['Q15','Ler e fazer ações',2],['Q16','Ler e fazer na folha / tela',2],['Q17','Ler e responder perguntas',2]];
+const MOD_LEIT = [
+  { k:'B', t:'Letras e sons', letras:['B'], itens:'Q1–Q4', d:'Nome e som das letras. Treina o ouvinte (mostre a letra) e testa o tato (que letra é? que som faz?) e a letra minúscula sem treino.' },
+  { k:'L', t:'Sílabas (Carol)', letras:['L'], itens:'Q4 · Q10', d:'Sequência fônica da Carol: linha de base → ensino de 1 ou 2 sílabas → sonda das outras sem treino. O que ele ler na linha de base não precisa de ensino.' },
+  { k:'V', t:'Fluência', letras:['V'], itens:'Carol', d:'Leitura cronometrada, como a Carol orientou: o app conta corretas e erros por minuto e compara com a meta.' },
+  { k:'P', t:'Palavras', letras:['W','F','S'], itens:'Q5–Q11', d:'Palavra igual, palavra e figura (Carol), sílaba inicial (Carol), letras em ordem, montar palavra, letra que falta e leitura de palavras novas.' },
+  { k:'Z', t:'Frases e compreensão', letras:['Z'], itens:'Q12–Q17', d:'Grupos de 3 palavras, frases, palavra que falta, ler e fazer, ler e responder.' }
+];
+const LETRA_MOD_LEIT = { B:'B', L:'L', V:'V', W:'P', F:'P', S:'P', Z:'Z' };
+
+// ----- Fala: o cartão pode mostrar uma instrução neutra e a voz dizer o alvo; sons de letras ficam com o terapeuta -----
+const _falarBase = falar;
+falar = function (t) {
+  const r = S && S.atual && S.atual.rel;
+  if (r && r.semFala) return;
+  if (r && r.fala && t === textoInstr(S.prog, r)) t = r.fala;
+  return _falarBase(t);
+};
+const _visualLeit = visual;
+visual = function (e, cls = '') {
+  if (e && e.tipo === 'txt' && String(e.dado).length > 14) return `<span class="txt longo ${cls}">${esc(e.dado)}</span>`;
+  return _visualLeit(e, cls);
+};
+function montarPalavra() {
+  const a = S.atual, w = [...a.rel.montar.palavra], extras = a.rel.montar.extras || [], comp = $('#comparacoes');
+  const letras = Logica.embaralhar([...w, ...extras]);
+  comp.innerHTML = `<div class="slots">${w.map(() => '<span class="slot"></span>').join('')}</div><div class="tiles">${letras.map((l, i) => `<button class="tile" data-i="${i}">${esc(l)}</button>`).join('')}</div><button class="mini-reset" title="Recomeçar">↺</button>`;
+  const slots = [...comp.querySelectorAll('.slot')]; let pos = 0;
+  comp.querySelectorAll('.tile').forEach(b => b.onclick = () => {
+    if (a.respondida || pos >= w.length) return;
+    slots[pos++].textContent = b.textContent; b.disabled = true;
+    if (pos === w.length) {
+      const feita = slots.map(s => s.textContent).join(''), certo = feita === w.join('');
+      registrar(certo ? '+' : '-'); const ult = S && S.tent[S.tent.length - 1]; if (ult) ult.escolhido = feita;
+      if (!semFeedback()) comp.querySelector('.slots').classList.add(certo ? 'ok' : 'erro');
+    }
+  });
+  comp.querySelector('.mini-reset').onclick = () => { if (a.respondida) return; pos = 0; slots.forEach(s => s.textContent = ''); comp.querySelectorAll('.tile').forEach(b => b.disabled = false); };
+}
+const _proximaLeit = proxima;
+proxima = function () {
+  if (!S) return;
+  _proximaLeit();
+  if (!S) return;
+  const a = S.atual, ativa = !!(a && !a.respondida && !S.fim);
+  if (!ativa) return;
+  if (a.rel.semFala) $('#bFalarApr').classList.remove('on');
+  if (a.rel.dica || a.rel.fala) $('#sInstr').textContent = (textoInstr(S.prog, a.rel) || '') + ' · fale: ' + (a.rel.dica || a.rel.fala);
+  if (a.rel.montar) montarPalavra();
+  if (S.prog.fluencia) iniciarCronometro();
+};
+
+// ----- Fluência cronometrada (corretas e erros por minuto) -----
+function iniciarCronometro() {
+  if (S.flu) return;
+  const seg = S.prog.fluencia.seg || 30;
+  S.flu = { t0: Date.now(), seg };
+  const atualiza = () => { if (!S || !S.flu || S.flu.parado || S.encerrando) return; const resta = Math.max(0, Math.ceil(seg - (Date.now() - S.flu.t0) / 1000)); $('#pontos').innerHTML = `<span class="cronometro ${resta <= 5 ? 'fim' : ''}">⏱ ${resta} s</span>`; if (resta <= 0) { S.fim = true; encerrar(); } };
+  S.flu.iv = setInterval(atualiza, 250); atualiza();
+}
+const _encerrarLeit = encerrar;
+encerrar = async function (manual = false) {
+  if (!S || S.encerrando) return;
+  S.encerrando = true;
+  const flu = S && S.flu && S.prog.fluencia ? { conf: S.prog.fluencia, t0: S.flu.t0, seg: S.flu.seg, tent: S.tent.slice() } : null;
+  if (S && S.flu) { clearInterval(S.flu.iv); S.flu.parado = true; }
+  await _encerrarLeit(manual);
+  if (!flu || !flu.tent.length) return;
+  const dur = Math.min(flu.seg, Math.max(1, (Date.now() - flu.t0) / 1000));
+  const ac = flu.tent.filter(t => t.resp === '+').length, er = flu.tent.length - ac;
+  const cm = Math.round(ac * 60 / dur), em = Math.round(er * 60 / dur);
+  const s = SESS[SESS.length - 1];
+  if (s) { s.fluencia = { seg: Math.round(dur), corretasMin: cm, errosMin: em, meta: flu.conf.meta, maxErros: flu.conf.maxErros }; s.atingiu = cm >= flu.conf.meta && em <= flu.conf.maxErros; await DB.salvar('sessoes', s); }
+  const f = $('#fim'); if (f) f.insertAdjacentHTML('afterbegin', `<p style="font-size:30px;margin:0 0 6px"><b>${cm}</b> corretas/min · <b>${em}</b> erros/min</p><p class="${s && s.atingiu ? 'ok' : 'meta'}">Meta: ${flu.conf.meta} corretas/min com até ${flu.conf.maxErros} erros/min ${s && s.atingiu ? '— atingida' : ''}</p>`);
+};
+const _ultimoTxtLeit = ultimoTxt;
+ultimoTxt = function (p) { const s = sessoesDe(p)[0]; if (p.fluencia && s && s.fluencia) return `${s.fluencia.corretasMin}/min · ${s.fluencia.errosMin} erros · ${new Date(s.inicio).toLocaleDateString('pt-BR')}`; return _ultimoTxtLeit(p); };
+
+// ----- Matemática: ouvinte com o alvo só na voz (o cartão não mostra o número) -----
+async function garantirFalaMat() {
+  const pad = /^(Mostre (o \d|\d|a moeda de|a nota de)|Me dá \d)/;
+  let mudou = 0;
+  for (const p of PROGS.filter(p => p.mat && /^[KNHD]\d\d /.test(p.nome) && !p.falaV2)) {
+    const rels = [...(p.pares || []), ...((p.etapas || []).flatMap(E => E.rels))];
+    rels.forEach(r => { if (!r.fala && pad.test(r.instr || '')) { r.fala = r.instr; r.instr = r.instr.startsWith('Me dá') ? 'Escuta e me dá' : 'Escuta e mostre'; } });
+    if (p.etapas) p.pares = p.etapas.flatMap(E => E.rels);
+    p.falaV2 = true; await DB.salvar('programas', p); mudou++;
+  }
+  return mudou;
+}
+const _renderMatCardsLeit = renderMatCards;
+renderMatCards = function () { if (PROGS.some(p => p.mat && /^[KNHD]\d\d /.test(p.nome) && !p.falaV2)) { garantirFalaMat().then(() => _renderMatCardsLeit()); return; } _renderMatCardsLeit(); };
+const _criarMat3Leit = criarMatematica3;
+criarMatematica3 = async function () { await _criarMat3Leit(); await garantirFalaMat(); };
+$('#criarMat').onclick = async () => { await criarMatematica3(); redesenhar(); };
+
+// ----- Painel ABLLS-R genérico (matemática e leitura) -----
+function painelAbllsG(lista, titulo, chaveData) {
+  const a = aprPorId(APR_ATUAL), lbs = (a && a.ablls) || {}, app = abllsApp(), fonte = {};
+  PROGS.forEach(p => (p.ablls || []).forEach(x => { (fonte[x.it] = fonte[x.it] || new Set()).add(codDe(p.nome)); }));
+  const linhas = lista.map(([it, nome, max]) => {
+    const lb = lbs[it], ap = app[it] || 0, at = Math.max(lb ?? 0, ap);
+    return `<tr><td><b>${it}</b></td><td>${esc(nome)}</td><td><select data-lb="${it}"><option value="">–</option>${Array.from({ length: max + 1 }, (_, v) => `<option value="${v}" ${lb === v ? 'selected' : ''}>${v}</option>`).join('')}</select> <span class="meta">/${max}</span></td><td>${ap ? `<b class="ok">${ap}</b>/${max}` : '<span class="meta">–</span>'}</td><td style="min-width:110px"><div class="nivel"><span style="width:${Math.round(100 * at / max)}%"></span></div><span class="meta">${at}/${max}</span></td><td class="meta">${[...(fonte[it] || [])].sort().map(c => `<a href="#" data-ir-cod="${c}">${c}</a>`).join(', ')}</td></tr>`;
+  }).join('');
+  const total = lista.reduce((s, x) => s + x[2], 0), soma = (f) => lista.reduce((s, [it]) => s + f(it), 0);
+  const tLb = soma(it => lbs[it] ?? 0), tAt = soma(it => Math.max(lbs[it] ?? 0, app[it] || 0));
+  return `<div class="card"><div class="linha" style="justify-content:space-between"><h2 style="margin:0">ABLLS-R · ${esc(titulo)}</h2><label>Data da linha de base<input type="date" id="abllsData" value="${esc((a && a[chaveData]) || '')}"></label></div>
+    <p class="ajuda">Linha de base: lance a pontuação da avaliação. App: nível que ele já mostrou aqui (passou no teste da etapa ou acertou a linha de base). Atual = o maior dos dois. Total: linha de base ${tLb}/${total} · atual ${tAt}/${total}. Os dados ficam só neste aparelho.</p>
+    <table class="tab-ablls"><tr><th>Item</th><th>Habilidade</th><th>Linha de base</th><th>App</th><th>Atual</th><th>Etapas</th></tr>${linhas}</table></div>`;
+}
+function ligarPainelG(cont, chaveData, rerender, irCod) {
+  const a = aprPorId(APR_ATUAL); if (!a) return;
+  cont.querySelectorAll('[data-lb]').forEach(s => s.onchange = async () => { a.ablls = a.ablls || {}; if (s.value === '') delete a.ablls[s.dataset.lb]; else a.ablls[s.dataset.lb] = +s.value; await salvarAprs(); rerender(); });
+  $('#abllsData').onchange = async () => { a[chaveData] = $('#abllsData').value; await salvarAprs(); };
+  cont.querySelectorAll('[data-ir-cod]').forEach(l => l.onclick = (ev) => { ev.preventDefault(); irCod(l.dataset.irCod); });
+}
+painelAblls = () => painelAbllsG(ABLLS_R, 'Matemática (R1–R29)', 'abllsData');
+ligarPainelAblls = () => ligarPainelG($('#cardsMat'), 'abllsData', renderMatCards, (c) => { filtroMat = c[0]; abertos['mat-' + c] = true; renderMatCards(); });
+
+// ----- Definição dos módulos novos de leitura -----
+function defLeit3() {
+  const G = [];
+  let semente = 23; const rnd = () => { semente = (semente * 16807) % 2147483647; return (semente - 1) / 2147483646; };
+  const T = (v) => ({ txt:String(v) }), FG = (w) => ({ fig:w }), C = (d) => ({ cena:d });
+  const outros = (lista, x, k = 2) => Logica.embaralhar(lista.filter(y => y !== x), rnd).slice(0, k);
+  const R = (m, a, b, c, instr, extra = {}) => Object.assign({ m, a, b, c, instr }, extra);
+  const tato = (m, instr, extra = {}) => Object.assign({ m, a:m, tato:true, instr }, extra);
+  const et = (nome, modo, rels, critA, critN, max, voltar = 0) => ({ nome, modo, rels, critA, critN, max, voltar });
+  const lb = (rels) => { const n = rels.length, folga = n >= 8 ? Math.floor(n / 8) : 0; return { rot:'Linha de base', lb:true, tipo:'par', rels, crit:[n - folga, n], max:n, ablls:[] }; };
+  const treinoP = (rot, rels, ablls = [], crit = [6, 6], max = 18) => ({ rot, tipo:'par', fase:'treino', rels, crit, max, ablls });
+  const testeP = (rot, rels, ablls = []) => { const n = rels.length, folga = n >= 8 ? Math.floor(n / 8) : 0; return { rot, tipo:'par', fase:'teste', rels, crit:[n - folga, n], max:n, ablls, credLB:true }; };
+  const enc = (rot, etapas, ablls = []) => ({ rot, tipo:'encadeado', etapas, ablls });
+  const rede = (treino, im, imc, ablls, rot = 'Ensino e testes') => enc(rot, [et('Treino', 'treino', treino, 6, 6, 18), et('Manutenção sem feedback', 'manut', treino, 6, 8, 8), et('Teste implicação mútua', 'teste', im, 5, 6, 6, 0), et('Teste combinatório', 'teste', imc, 7, 8, 8, 0)], ablls);
+  const ler = (rot, palavras, fase, ablls = [], extra = {}) => Object.assign({ rot, tipo:'apresentacao', fase, palavras, ablls }, extra);
+  const grupo = (cod, titulo, req, itens, passos) => G.push({ cod, titulo, req, itens, passos });
+  const ab = (...pares) => pares.map(([it, nv]) => ({ it, nv }));
+
+  // ===== B · Letras e sons =====
+  const SOM = { A:'/a/', E:'/é/', I:'/i/', O:'/ó/', U:'/u/', M:'/mmm/', S:'/sss/', L:'/lll/', F:'/fff/', N:'/nnn/', V:'/vvv/', J:'/jjj/', Z:'/zzz/', X:'/xxx/ (de chuva)', R:'/rrr/ (de rato)', P:'/p/', T:'/t/', B:'/b/', D:'/d/', C:'/k/ (de casa)', G:'/g/ (de gato)' };
+  const letras = (cod, titulo, ls, req, ablls, comSom = true) => {
+    const ouv = (x, min = false) => { const f = (s) => min ? s.toLowerCase() : s, [a, b] = outros(ls, x); return R(null, T(f(x)), T(f(a)), T(f(b)), 'Escuta e mostre a letra', { fala:`Mostre a letra ${f(x)}` }); };
+    const ouvSom = (x) => { const [a, b] = outros(ls, x); return R(null, T(x), T(a), T(b), 'Escuta o som e mostre a letra', { semFala:true, dica:`faça o som ${SOM[x]}` }); };
+    const tN = (x) => tato(T(x), 'Que letra é essa?'), tS = (x) => tato(T(x), 'Que som essa letra faz?');
+    const lbR = ls.flatMap((x, i) => comSom ? [i % 2 ? ouv(x) : tN(x), i % 2 ? tS(x) : ouvSom(x)] : [i % 2 ? ouv(x) : tN(x), ouv(x, true)]);
+    const passos = [lb(lbR), comSom ? rede(ls.flatMap(x => [ouv(x), ouvSom(x)]), ls.map(tN), ls.flatMap(x => [tS(x), ouv(x, true)]), ablls) : rede(ls.map(x => ouv(x)), ls.map(tN), ls.map(x => ouv(x, true)), ablls)];
+    grupo(cod, titulo, req, ls, passos);
+  };
+  letras('B01', 'Vogais', ['A','E','I','O','U'], [], ab(['Q1', 1], ['Q2', 1], ['Q3', 2], ['Q4', 2]));
+  letras('B02', 'Consoantes que se prolongam 1', ['M','S','L','F','N'], ['B01'], ab(['Q1', 2], ['Q2', 2], ['Q3', 3], ['Q4', 3]));
+  letras('B03', 'Consoantes que se prolongam 2', ['V','J','Z','X','R'], ['B02'], ab(['Q1', 3], ['Q2', 3]));
+  letras('B04', 'Consoantes de som curto', ['P','T','B','D','C','G'], ['B03'], ab(['Q3', 4], ['Q4', 4]));
+  letras('B05', 'Letras que faltam', ['H','K','Q','W','Y'], ['B04'], ab(['Q1', 4], ['Q2', 4]), false);
+
+  // ===== V · Fluência (Carol) =====
+  const CV = ['MA','SE','LI','FO','NU','VE','JA','ZO','XI','RA','PE','TI','BO','DU','CA','GO','MU','SI','LO','FE','NA','VI','JU','ZE','PO','TA','BE','DI','CO','GU'];
+  const CVC = ['MAS','MAR','MES','MER','MIS','MIR','MOS','MOR','LAS','LAR','PES','PER','POS','POR','MAL','MEL','SOL','SAL','MAN','SON'];
+  const PAL = ['MALA','MOLA','SALA','VELA','LUA','NAVE','FILA','SAPO','MATO','TATU','BOLA','BOTA','DADO','FADA','SUCO','VACA','FACA','PENA','BALA','SETA'];
+  const flu = (cod, titulo, itens, req, seg, meta, maxErros) => grupo(cod, titulo, req, [], [ler(`Leitura cronometrada (${seg} s)`, itens, 'teste', [], { fluencia:{ seg, meta, maxErros }, apoio:'junto' })]);
+  flu('V01', 'Sílabas CV misturadas', CV, ['L24'], 30, 40, 2);
+  flu('V02', 'Sílabas com S e R no fim', CVC, ['L27'], 30, 30, 2);
+  flu('V03', 'Palavras', PAL, ['L33'], 60, 25, 2);
+
+  // ===== W · Palavras =====
+  const igual = ([m, a, b, c]) => R(T(m), T(a), T(b), T(c), 'Mostre a palavra igual');
+  const d3 = [['GATO','GATO','MESA','LUVA'], ['BOLA','BOLA','PIPA','CASA'], ['SAPO','SAPO','LUVA','MESA'], ['FOCA','FOCA','BOLO','RUA']];
+  const d2 = [['GATO','GATO','PATA','MATE'], ['BOLA','BOLA','COLO','MOLE'], ['SAPO','SAPO','MAPA','SOPA'], ['MALA','MALA','BALE','MOLE']];
+  const d1 = [['GATO','GATO','PATO','GALO'], ['BOLA','BOLA','BOLO','MOLA'], ['FACA','FACA','VACA','FADA'], ['MALA','MALA','MOLA','BALA'], ['RATO','RATO','PATO','RALO']];
+  const dMin = [['gato','GATO','PATO','GALO'], ['bola','BOLA','BOLO','MOLA'], ['faca','FACA','VACA','FADA'], ['rato','RATO','PATO','RALO'], ['mala','MALA','MOLA','BALA'], ['dado','DADO','DEDO','NADO']];
+  grupo('W01', 'Palavra igual', [], [], [
+    lb([...d3.slice(0, 2), ...d2.slice(0, 2), ...d1.slice(0, 2), ...dMin.slice(0, 2)].map(igual)),
+    treinoP('Letras bem diferentes', d3.map(igual), ab(['Q6', 1])),
+    treinoP('Duas letras diferentes', d2.map(igual), ab(['Q6', 2])),
+    treinoP('Uma letra diferente', d1.map(igual), ab(['Q6', 3])),
+    testeP('Teste com letra minúscula (sem treino)', dMin.map(igual), ab(['Q6', 4]))
+  ]);
+  const ordem = (w) => tato(T(w), 'Aponta e fala as letras, da esquerda para a direita');
+  grupo('W02', 'Letras da palavra em ordem', ['B03'], [], [
+    lb(['SOL', 'MAR', 'GATO', 'PORTA'].map(ordem)),
+    treinoP('Palavras de 3 letras', ['SOL', 'MAR', 'LUA', 'RUA', 'PÃO'].map(ordem), ab(['Q7', 1]), [4, 4], 10),
+    testeP('Palavras de 5 letras (sem ajuda)', ['PORTA', 'CARTA', 'SALTO', 'MOSCA', 'BOLSA'].map(ordem), ab(['Q7', 2]))
+  ]);
+  const montar = (w, extras = []) => ({ m:T(w), a:T(w), montar:{ palavra:w, extras }, instr:'Monte a palavra igual' });
+  grupo('W03', 'Montar a palavra com letras', ['W01'], [], [
+    lb([montar('SOL'), montar('LUA'), montar('GATO', ['P', 'L']), montar('BOLA', ['D', 'O'])]),
+    treinoP('Até 3 letras, sem letras a mais', ['SOL', 'MAR', 'LUA', 'RUA', 'PÉ'].map(w => montar(w)), ab(['Q8', 1]), [4, 4], 12),
+    treinoP('Até 5 letras, com letras parecidas a mais', [['GATO', ['P', 'L']], ['BOLA', ['D', 'P']], ['PATO', ['B', 'D']], ['SAPO', ['Z', 'B']], ['MESA', ['N', 'Z']], ['PORTA', ['B', 'Q']]].map(([w, e]) => montar(w, e)), ab(['Q8', 2]), [5, 5], 15)
+  ]);
+  const falta = (w, i) => { const l = w[i], ops = outros(['A', 'E', 'I', 'O', 'U', 'L', 'T', 'P', 'C', 'B', 'D', 'M', 'S', 'V', 'G'].filter(x => x !== l), l); return R(FG(w), T(l), T(ops[0]), T(ops[1]), 'Qual letra falta?', { r:T([...w].map((c, k) => k === i ? '_' : c).join(' ')) }); };
+  grupo('W04', 'Letra que falta', ['W03'], [], [
+    lb([falta('GATO', 0), falta('BOLA', 2), falta('SAPO', 3), falta('VACA', 1)]),
+    treinoP('Falta a primeira letra', [['GATO', 0], ['PATO', 0], ['BOLA', 0], ['MALA', 0], ['VACA', 0]].map(([w, i]) => falta(w, i)), ab(['Q9', 1])),
+    testeP('Falta em qualquer posição (10 palavras)', [['SAPO', 2], ['BOLO', 3], ['CASA', 1], ['DADO', 2], ['PIPA', 3], ['FOCA', 1], ['LUA', 1], ['UVA', 2], ['GATO', 3], ['MALA', 2]].map(([w, i]) => falta(w, i)), ab(['Q9', 2]))
+  ]);
+  const CVCp = ['MAR', 'SOL', 'MEL', 'SAL', 'PAZ', 'LUZ', 'BAR', 'COR', 'DOR', 'PAR'];
+  const NOVAS = ['MACACO', 'PANELA', 'CAVALO', 'SAPATO', 'TOMADA', 'JANELA', 'BONECA', 'CANETA', 'PIPOCA', 'BANANA', 'CAMELO', 'GAVETA', 'TUCANO', 'PEPINO', 'BATATA', 'SALADA', 'PALITO', 'MENINO', 'FIVELA', 'BULE'];
+  grupo('W05', 'Decodificar palavras novas', ['L28'], [], [
+    ler('Linha de base: palavras CVC', CVCp, 'teste', ab(['Q11', 1]), { lb:true, apoio:'setas' }),
+    ler('Ensino das palavras CVC que errar', CVCp, 'treino', ab(['Q11', 1]), { apoio:'completo' }),
+    ler('Sonda: 20 palavras novas de 4 letras ou mais', NOVAS, 'teste', ab(['Q11', 2]), { credLB:true, apoio:'setas' })
+  ]);
+  const P50 = [...new Set(['MALA', 'MOLA', 'SALA', 'VELA', 'LUA', 'NAVE', 'NEVE', 'FILA', 'MEL', 'SOL', 'SAPO', 'MATO', 'TATU', 'TETO', 'BOLA', 'BOTA', 'DADO', 'DAMA', 'FADA', 'CABO', 'COCO', 'SUCO', 'VACA', 'FACA', 'PENA', 'LUTA', 'BALA', 'SETA', 'RUA', 'TOMATE', 'TAPETE', 'TUCANO', 'MAPAS', 'PATOS', 'MAR', 'MESA', 'PORTA', 'SALTO', 'CARTA', 'MOSCA', 'LUVA', 'UVA', 'FOCA', 'FOGO', 'SINO', 'RATO', 'MAPA', 'MOTO', 'PATO', 'PIPA', 'PERA', 'LUPA', 'LOBO', 'BOLO', 'DEDO', 'VASO', 'CAMA', 'CASA', 'GATO', 'GALO'])].slice(0, 50);
+  grupo('W06', 'Ler palavras (5, 10, 20 e 50)', ['L32'], [], [
+    ler('Sonda: 5 palavras', P50.slice(0, 5), 'teste', ab(['Q10', 1]), { credLB:true, apoio:'setas' }),
+    ler('Sonda: 50 palavras', P50, 'teste', ab(['Q10', 4]), { credLB:true, apoio:'junto' })
+  ]);
+
+  // ===== Z · Frases e compreensão =====
+  const F3 = ['O SAPO PULA', 'A BOLA ROLA', 'O PATO NADA', 'A FADA VOA', 'O GATO MIA', 'A VACA COME', 'O BOLO CAIU', 'A LUA SUBIU', 'O RATO CORRE', 'A PIPA VOA'];
+  const F3n = ['A MOTO PAROU', 'O GALO CANTA', 'A FOCA NADA', 'O SAPO COME', 'A BOTA CAIU', 'O COCO CAIU'];
+  grupo('Z01', 'Ler grupos de 3 palavras', ['L33'], [], [
+    ler('Linha de base (10 frases)', F3, 'teste', ab(['Q12', 3]), { lb:true, apoio:'setas' }),
+    ler('Ensino de 2 frases', F3.slice(0, 2), 'treino', ab(['Q12', 1]), { apoio:'completo' }),
+    ler('Ensino de 5 frases', F3.slice(0, 5), 'treino', ab(['Q12', 2]), { apoio:'setas' }),
+    ler('Sonda: frases novas sem treino', F3n, 'teste', ab(['Q12', 4]), { credLB:true, apoio:'junto' })
+  ]);
+  const F5 = ['O SAPO PULA NA LAGOA', 'A BOLA DO MENINO CAIU', 'O PATO NADA NO LAGO', 'A VACA COME CAPIM', 'O GATO DORME NA CAMA', 'A MENINA TOMA SUCO', 'O MACACO COME BANANA', 'A FADA TEM UMA VARINHA', 'O CAVALO CORRE MUITO', 'A PIPA SUBIU NO CÉU'];
+  const F5n = ['O RATO COMEU O QUEIJO', 'A MOTO PAROU NA RUA', 'O MENINO BEBE SUCO', 'A VACA DEU LEITE', 'O GALO CANTA CEDO', 'A BONECA ESTÁ NA CAIXA'];
+  grupo('Z02', 'Ler frases de 4 a 6 palavras', ['Z01'], [], [
+    ler('Linha de base (10 frases)', F5, 'teste', ab(['Q13', 3]), { lb:true, apoio:'setas' }),
+    ler('Ensino de 2 frases', F5.slice(0, 2), 'treino', ab(['Q13', 1]), { apoio:'completo' }),
+    ler('Ensino de 5 frases', F5.slice(0, 5), 'treino', ab(['Q13', 2]), { apoio:'setas' }),
+    ler('Sonda: frases novas sem treino', F5n, 'teste', ab(['Q13', 4]), { credLB:true, apoio:'junto' })
+  ]);
+  const comp = (frase, certa, ...erradas) => R(T(frase), T(certa), T(erradas[0]), erradas[1] ? T(erradas[1]) : null, 'Qual palavra completa a frase?', { semFala:true });
+  grupo('Z03', 'Palavra que falta na frase', ['Z01'], [], [
+    lb([comp('O ___ NADA NO LAGO', 'PATO', 'MESA'), comp('A ___ VOA', 'PIPA', 'CAMA'), comp('O ___ MIA', 'GATO', 'PATO', 'RATO'), comp('A ___ ROLA', 'BOLA', 'BOLO', 'BOTA')]),
+    treinoP('Duas palavras bem diferentes', [comp('O ___ NADA NO LAGO', 'PATO', 'MESA'), comp('A ___ VOA', 'PIPA', 'CAMA'), comp('O ___ PULA', 'SAPO', 'SOFÁ'), comp('A ___ DÁ LEITE', 'VACA', 'LUVA'), comp('O ___ CAIU NO CHÃO', 'COPO', 'SOL')], ab(['Q14', 1])),
+    testeP('Três palavras parecidas (sem treino)', [comp('O ___ MIA', 'GATO', 'PATO', 'RATO'), comp('A ___ ROLA', 'BOLA', 'BOLO', 'BOTA'), comp('O ___ CANTA', 'GALO', 'GATO', 'GELO'), comp('A ___ CORTA', 'FACA', 'VACA', 'FADA'), comp('O ___ TEM ASA', 'PATO', 'PRATO', 'MATO'), comp('A ___ BRILHA NO CÉU', 'LUA', 'RUA', 'LUVA')], ab(['Q14', 2]))
+  ]);
+  const faz = (f) => tato(T(f), 'Lê e faz o que está escrito', { semFala:true });
+  const ACOES1 = ['PEGUE O LÁPIS', 'PEGUE A BOLA', 'PEGUE O COPO', 'PEGUE A CANETA', 'MOSTRE A PORTA', 'MOSTRE A JANELA', 'MOSTRE O NARIZ', 'BATA PALMAS', 'BATA NA MESA', 'BATA O PÉ'];
+  const ACOES2 = ['ABRA A PORTA', 'FECHE O LIVRO', 'COLOQUE O COPO NA MESA', 'LEVANTE A MÃO', 'SENTE NA CADEIRA', 'ABRA A MOCHILA', 'FECHE A JANELA', 'LEVANTE O BRAÇO', 'COLOQUE O LÁPIS NA CAIXA', 'MOSTRE O OLHO'];
+  grupo('Z04', 'Ler e fazer ações', ['Z01'], [], [
+    lb([...ACOES1.slice(0, 3), ...ACOES2.slice(0, 3)].map(faz)),
+    treinoP('10 frases com 3 ações', ACOES1.map(faz), ab(['Q15', 1]), [8, 8], 20),
+    testeP('20 frases com 6 ações ou mais (sem treino nas novas)', [...ACOES1, ...ACOES2].map(faz), ab(['Q15', 2]))
+  ]);
+  const FO = (f, cor) => C({ k:'forma', f, cor });
+  const tela = (verbo, f, cor, f2, cor2, f3, cor3) => R(T(`${verbo} ${f === 'estrela' ? 'NA' : 'NO'} ${f.toUpperCase()} ${cor.toUpperCase()}`), FO(f, cor), FO(f2, cor2), FO(f3, cor3), 'Lê e faz', { semFala:true });
+  const T1 = [tela('TOQUE', 'quadrado', 'vermelho', 'círculo', 'vermelho', 'quadrado', 'azul'), tela('TOQUE', 'círculo', 'azul', 'círculo', 'verde', 'triângulo', 'azul'), tela('TOQUE', 'triângulo', 'verde', 'quadrado', 'verde', 'triângulo', 'amarelo'), tela('TOQUE', 'estrela', 'amarelo', 'estrela', 'azul', 'círculo', 'amarelo'), tela('TOQUE', 'quadrado', 'azul', 'quadrado', 'vermelho', 'estrela', 'azul')];
+  const T2 = [tela('APONTE', 'círculo', 'vermelho', 'quadrado', 'vermelho', 'círculo', 'verde'), tela('ESCOLHA', 'triângulo', 'azul', 'triângulo', 'vermelho', 'quadrado', 'azul'), tela('MOSTRE', 'estrela', 'verde', 'estrela', 'amarelo', 'triângulo', 'verde'), tela('APONTE', 'quadrado', 'amarelo', 'círculo', 'amarelo', 'quadrado', 'verde'), tela('ESCOLHA', 'círculo', 'verde', 'círculo', 'azul', 'estrela', 'verde'), tela('MOSTRE', 'triângulo', 'vermelho', 'quadrado', 'vermelho', 'triângulo', 'amarelo')];
+  grupo('Z05', 'Ler e fazer na tela (folha de atividades)', ['Z01'], [], [
+    lb([T1[0], T1[3], T2[1], T2[4]]),
+    treinoP('Uma instrução (TOQUE)', T1, ab(['Q16', 1])),
+    testeP('Instruções novas (APONTE, ESCOLHA, MOSTRE)', T2, ab(['Q16', 2]))
+  ]);
+  const resp = (texto, perg, certa, e1, e2) => R(certa, e1, e2, null, perg, { r:T(texto) });
+  const pergunta = (texto, perg, certa, e1, e2) => Object.assign(R(null, certa, e1, e2, perg), { r:T(texto) });
+  grupo('Z06', 'Ler e responder perguntas', ['Z02'], [], [
+    lb([pergunta('O GATO COMEU O PEIXE.', 'Quem comeu o peixe?', FG('GATO'), FG('PATO'), FG('SAPO')), pergunta('O SAPO PULOU NA LAGOA. ELE COME MOSCA.', 'O que o sapo come?', T('MOSCA'), T('BOLO'), T('SUCO'))]),
+    treinoP('Uma frase e uma pergunta', [pergunta('O GATO COMEU O PEIXE.', 'Quem comeu o peixe?', FG('GATO'), FG('PATO'), FG('SAPO')), pergunta('O PATO NADA NO LAGO.', 'Quem nada no lago?', FG('PATO'), FG('GATO'), FG('CACHORRO')), pergunta('O MENINO CHUTOU A BOLA.', 'O que o menino chutou?', FG('BOLA'), FG('BOLO'), FG('COPO')), pergunta('O CACHORRO DORME NA CAMA.', 'Quem dorme na cama?', FG('CACHORRO'), FG('GATO'), FG('MENINO'))], ab(['Q17', 1])),
+    testeP('Três frases e perguntas (sem treino)', [pergunta('O SAPO PULOU NA LAGOA. ELE É VERDE. ELE COME MOSCA.', 'Quem pulou na lagoa?', FG('SAPO'), FG('GATO'), FG('PATO')), pergunta('O SAPO PULOU NA LAGOA. ELE É VERDE. ELE COME MOSCA.', 'O que ele come?', T('MOSCA'), T('BOLO'), T('SUCO')), pergunta('O SAPO PULOU NA LAGOA. ELE É VERDE. ELE COME MOSCA.', 'De que cor ele é?', T('VERDE'), T('AZUL'), T('ROXO')), pergunta('A MENINA TEM UM GATO. ELE É BRANCO. ELE BEBE LEITE.', 'O que o gato bebe?', T('LEITE'), T('SUCO'), T('CAFÉ')), pergunta('A MENINA TEM UM GATO. ELE É BRANCO. ELE BEBE LEITE.', 'Quem tem um gato?', FG('MENINA'), FG('MENINO'), FG('CACHORRO')), pergunta('A MENINA TEM UM GATO. ELE É BRANCO. ELE BEBE LEITE.', 'De que cor é o gato?', T('BRANCO'), T('PRETO'), T('AMARELO'))], ab(['Q17', 2]))
+  ]);
+
+  // ===== L · passos novos na sequência da Carol =====
+  const ESC = [['MAS', 'MAS'], ['MAS', 'MAR'], ['MES', 'MER'], ['MOR', 'MOR'], ['BIS', 'BIR'], ['LAS', 'LAS']];
+  const ouvSR = (x, y) => R(null, T(x), T(y), null, 'Escuta e mostre a sílaba', { fala:x.toLowerCase() });
+  const extrasL = [
+    { cod:'L27', titulo:'Contraste S × R no fim', passos:[
+      treinoP('2 Iguais ou diferentes? (falado)', ESC.map(([x, y]) => tato(T('👂'), 'Escuta: são iguais ou diferentes?', { semFala:true, dica:`/${x.toLowerCase()}/ – /${y.toLowerCase()}/` })), [], [6, 6], 18),
+      enc('3 Ouvinte: só S, só R, misturado', [et('Só com S', 'treino', [ouvSR('MAS', 'MAR'), ouvSR('MES', 'MER'), ouvSR('MOS', 'MOR')], 6, 6, 18), et('Só com R', 'treino', [ouvSR('MAR', 'MAS'), ouvSR('MER', 'MES'), ouvSR('MOR', 'MOS')], 6, 6, 18), et('S e R misturados', 'treino', [ouvSR('MAS', 'MAR'), ouvSR('MAR', 'MAS'), ouvSR('MIS', 'MIR'), ouvSR('MIR', 'MIS')], 7, 8, 16), et('Teste: ler a sílaba (implicação mútua)', 'teste', ['MAS', 'MAR', 'MES', 'MER'].map(x => tato(T(x), 'Lê para mim')), 5, 6, 6, 2), et('Teste com sílabas novas', 'teste', [ouvSR('PAS', 'PAR'), ouvSR('POR', 'POS'), ouvSR('LAS', 'LAR'), ouvSR('LOR', 'LOS')], 7, 8, 8, 2)]),
+      ler('4 Leitura em blocos de 3 (S, depois R)', ['MAS', 'MES', 'MOS', 'MAR', 'MER', 'MOR'], 'treino', [], { apoio:'setas', ordem:'blocos3' })
+    ]},
+    ...['L32', 'L33', 'L34'].map(c => ({ cod:c, titulo:(SEQ.find(e => e.cod === c) || {}).nome, passos:[ler('2 Ensino das palavras que errar', (SEQ.find(e => e.cod === c) || { itens:[] }).itens, 'treino', [], { apoio:'completo' })] }))
+  ];
+  return { G, extrasL };
+}
+
+// ----- Vínculos, linha de base e pré-requisitos dos programas antigos de leitura (L, F, S) -----
+function metaLeitura(p) {
+  const cod = codDe(p.nome); if (!cod) return null;
+  const L = cod[0], n = +cod.slice(1), i = SEQ.findIndex(e => e.cod === cod);
+  const m = { mat:{ mod:LETRA_MOD_LEIT[L], req:[], itens:[] }, ablls:p.ablls || [], lb:!!p.lb, credLB:!!p.credLB };
+  if (L === 'L') {
+    if (i > 0 && !['L00', 'L01'].includes(cod)) m.mat.req = [SEQ[i - 1].cod];
+    if (/ - Linha de base$/.test(p.nome)) m.lb = true;
+    const nv = { L00:[['Q4', 2]], L01:[['Q4', 3]], L32:[['Q10', 2]], L33:[['Q10', 3]] }[cod];
+    if (nv && (m.lb || /Ensino/.test(p.nome))) m.ablls = nv.map(([it, v]) => ({ it, nv:v }));
+  }
+  if (L === 'F') {
+    const nv = { F01:1, F02:2, F04:3, F07:4 }[cod];
+    if (nv && /1 Sonda/.test(p.nome)) { m.credLB = true; m.ablls = [{ it:'Q5', nv }]; }
+    if (nv && /2 Ensino/.test(p.nome)) m.ablls = [{ it:'Q5', nv }];
+    if (n > 1) m.mat.req = ['F' + String(n - 1).padStart(2, '0')];
+  }
+  if (L === 'S' && n > 1) m.mat.req = ['S' + String(n - 1).padStart(2, '0')];
+  m.protocolos = L === 'S' ? ['Consciência fonológica'] : [...new Set(m.ablls.map(x => 'ABLLS-R ' + x.it))].concat(['VB-MAPP Leitura'], L === 'F' ? ['PEAK-E'] : []);
+  return m;
+}
+async function aplicarMetaLeitura() {
+  let n = 0;
+  for (const p of PROGS.filter(p => /^[LFS]\d\d /.test(p.nome) && !p.metaLeit)) {
+    const m = metaLeitura(p); if (!m) continue;
+    Object.assign(p, m, { metaLeit:true }); await DB.salvar('programas', p); n++;
+  }
+  return n;
+}
+
+// ----- Criação -----
+let criandoLeit = false;
+const _criarSeqH = $('#criarSeq').onclick, _criarFigH = $('#criarFig').onclick;
+async function criarLeitura3() {
+  if (criandoLeit) return; criandoLeit = true; const b = $('#criarLeit'); b.disabled = true; let novos = 0;
+  try {
+    $('#leitMsg').textContent = 'Criando a sequência de sílabas da Carol...'; await _criarSeqH();
+    $('#leitMsg').textContent = 'Criando palavra e figura e sílaba inicial...'; await _criarFigH();
+    const { G, extrasL } = defLeit3();
+    const criarPassos = async (cod, titulo, req, itens, passos) => {
+      const tag = 'Leitura ' + cod; let i = 0;
+      for (const ps of passos) {
+        i++;
+        const nome = cod[0] === 'L' ? `${cod} ${titulo} - ${ps.rot}` : `${cod} ${titulo} - ${i} ${ps.rot}`;
+        const temTeste = ps.tipo === 'encadeado' && ps.etapas.some(E => E.modo === 'teste');
+        const base = { nome, area:'Leitura: ' + (MOD_LEIT.find(m => m.k === LETRA_MOD_LEIT[cod[0]]) || {}).t, mat:{ mod:LETRA_MOD_LEIT[cod[0]], req, itens }, ablls:ps.ablls || [], protocolos:[...new Set((ps.ablls || []).map(x => 'ABLLS-R ' + x.it))].concat(cod[0] === 'V' ? ['Fluência (Carol)'] : ['VB-MAPP Leitura'], temTeste ? ['PEAK-E'] : []), ordem:ps.ordem || 'aleatoria', arranjo:3, apoio:ps.apoio || 'junto', instr:'', metaLeit:true };
+        if (ps.tipo === 'encadeado') {
+          const etapas = [];
+          for (const E of ps.etapas) { const rels = []; for (const r of E.rels) rels.push(await relMat(r, tag)); etapas.push(Object.assign({}, E, { rels })); }
+          novos += await criarPrograma(Object.assign(base, { tipo:'encadeado', fase: etapas[0].modo === 'treino' ? 'treino' : 'teste', etapas, pares:etapas.flatMap(E => E.rels), critA:1, critN:1, max:etapas.reduce((s, E) => s + E.max, 0) * 2 }));
+        } else if (ps.tipo === 'apresentacao') {
+          const pares = []; for (const w of ps.palavras) pares.push({ a: await garantirTexto(w, tag), b:'' });
+          const k = pares.length, teste = ps.fase === 'teste';
+          const crit = ps.fluencia ? [200, 200, 200] : teste ? [k - (k >= 8 ? Math.floor(k / 8) : 0), k, k] : [7, 8, 25];
+          novos += await criarPrograma(Object.assign(base, { tipo:'apresentacao', fase:ps.fase, lb:!!ps.lb, credLB:!!ps.credLB, fluencia:ps.fluencia, instr:'Lê para mim', pares, critA:crit[0], critN:crit[1], max:crit[2] }));
+        } else {
+          const pares = []; for (const r of ps.rels) pares.push(await relMat(r, tag));
+          novos += await criarPrograma(Object.assign(base, { tipo:'par', fase: ps.lb ? 'teste' : (ps.fase || 'treino'), lb:!!ps.lb, credLB:!!ps.credLB, ordem: ps.lb ? 'sequencial' : (ps.ordem || 'aleatoria'), pares, critA:ps.crit[0], critN:ps.crit[1], max:ps.max }));
+        }
+      }
+    };
+    for (const g of G) { $('#leitMsg').textContent = `Criando ${g.cod}...`; await criarPassos(g.cod, g.titulo, g.req, g.itens, g.passos); }
+    for (const x of extrasL) { $('#leitMsg').textContent = `Completando ${x.cod}...`; await criarPassos(x.cod, x.titulo, [], [], x.passos); }
+    await aplicarMetaLeitura();
+  } catch (err) { $('#leitMsg').textContent = 'Erro ao criar: ' + err.message + '. Toque de novo para continuar.'; criandoLeit = false; b.disabled = false; return; }
+  preencherTags(); renderEst();
+  const total = PROGS.filter(p => /^[BLVWFSZ]\d\d /.test(p.nome)).length;
+  $('#leitMsg').innerHTML = (novos ? `<b class="ok">Pronto: ${novos} programas novos.</b> ` : '<b class="ok">Os módulos de leitura já estão criados.</b> ') + `Total na leitura: ${total}.`;
+  criandoLeit = false; b.disabled = false; redesenhar();
+}
+
+// ----- Aba Leitura por módulos -----
+$('#aba-sequencia details.como').innerHTML = `<summary>Como usar</summary>
+  <ol>
+    <li>A base é a <b>sequência fônica da Carol</b> (aba Sílabas): linha de base → ensino de 1 ou 2 sílabas → sonda das outras sem treino. O que ele ler na linha de base já conta como concluído.</li>
+    <li>O app acompanha a <b>derivação</b>: quando ele lê sem treino as sílabas de duas famílias seguidas, o aviso no topo sugere ensinar só o som da consoante na próxima. Se ele não derivar, ensine mais uma sílaba e sonde de novo.</li>
+    <li><b>S × R no fim</b> (L27): falado "iguais ou diferentes?" → ouvinte (só S, só R, misturado) → teste lendo → leitura em blocos de 3 → leitura misturada. Se continuar trocando, marque S e R com cores no material de mesa e retire aos poucos.</li>
+    <li><b>Fluência</b>: leitura cronometrada; você marca ✓ ou ✕ (teclas C e E) e o app calcula corretas e erros por minuto.</li>
+    <li>Nas tentativas de som (/mmm/) e de leitura de frases, a voz do app fica desligada: você faz o som e ele lê sozinho.</li>
+  </ol>
+  <p class="ajuda">Itens e níveis seguem a pontuação da ABLLS-R (Q1–Q17); o conteúdo das tarefas é do app e das supervisões. Figuras: Twemoji (CC BY 4.0) e desenhos do app.</p>
+  <div class="linha"><button class="btn sec" id="criarLeit">Criar os módulos de leitura</button><span class="ajuda" id="leitMsg"></span></div>
+  <button id="criarSeq" hidden></button><button id="criarFig" hidden></button><span id="seqMsg" hidden></span><span id="figMsg" hidden></span>`;
+$('#criarLeit').onclick = async () => { await criarLeitura3(); redesenhar(); };
+$('#criarSeq').onclick = _criarSeqH; $('#criarFig').onclick = _criarFigH;
+function derivacaoFamilias() {
+  // famílias CV (L02–L23 sem contraste): derivou = acertou a sonda sem treino (ou a linha de base inteira)
+  const fams = SEQ.filter(e => /^L(0[2-9]|1\d|2[0-3])$/.test(e.cod) && !e.contraste);
+  return fams.map(e => {
+    const ps = PROGS.filter(p => codDe(p.nome) === e.cod);
+    const sonda = ps.find(p => /Sonda sem treino/.test(p.nome)), lbp = ps.find(p => /Linha de base/.test(p.nome));
+    const ss = sonda ? sessoesDe(sonda) : [], sl = lbp ? sessoesDe(lbp) : [];
+    const deriv = (lbp && dominadoLB(lbp)) || (sonda && ss.some(s => s.total >= sonda.max && s.acertos >= sonda.critA));
+    const falhou = !deriv && sonda && ss.some(s => s.total >= sonda.max);
+    return { cod:e.cod, nome:e.nome, estado: deriv ? 'derivou' : falhou ? 'nao' : (ss.length || sl.length ? 'andamento' : 'nova') };
+  });
+}
+function avisoDerivacao() {
+  const d = derivacaoFamilias(), feitos = d.filter(x => x.estado === 'derivou' || x.estado === 'nao');
+  if (!feitos.length) return '';
+  const ult = feitos.slice(-2), prox = d.find(x => x.estado === 'nova' || x.estado === 'andamento');
+  if (ult.length === 2 && ult.every(x => x.estado === 'derivou')) return `<div class="aviso-deriv ok-d">Ele derivou em <b>${ult.map(x => x.cod).join(' e ')}</b>. ${prox ? `Em <b>${prox.cod} ${esc(prox.nome)}</b>, aplique só a linha de base; se errar, ensine apenas o som da consoante (L01) e sonde de novo.` : ''}</div>`;
+  const u = feitos[feitos.length - 1];
+  if (u.estado === 'nao') return `<div class="aviso-deriv nao-d">Em <b>${u.cod}</b> ele não leu as sílabas da sonda sem treino. Ensine mais uma sílaba da família (vários exemplares) e sonde de novo antes de seguir.</div>`;
+  return `<div class="aviso-deriv">Derivou em ${feitos.filter(x => x.estado === 'derivou').map(x => x.cod).join(', ') || 'nenhuma família ainda'}. Quando derivar em duas seguidas, o app sugere ensinar só o som.</div>`;
+}
+let filtroLeit3 = 'L';
+renderLeitura = function () {
+  if (PROGS.some(p => /^[LFS]\d\d /.test(p.nome) && !p.metaLeit)) { aplicarMetaLeitura().then(() => renderLeitura()); return; }
+  if (['F', 'S'].includes(filtroLeitura)) filtroLeit3 = 'P'; else if (['L', 'L1'].includes(filtroLeitura)) filtroLeit3 = 'L';
+  filtroLeitura = '';
+  const fb = $('#filtrosLeitura');
+  fb.innerHTML = MOD_LEIT.map(m => `<button data-f="${m.k}">${m.t}</button>`).join('') + '<button data-f="Q">ABLLS-R</button>';
+  fb.querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.f === filtroLeit3); b.onclick = () => { filtroLeit3 = b.dataset.f; renderLeitura(); }; });
+  const cont = $('#cardsLeitura');
+  if (filtroLeit3 === 'Q') {
+    cont.innerHTML = painelAbllsG(ABLLS_Q, 'Leitura (Q1–Q17)', 'abllsDataQ');
+    ligarPainelG(cont, 'abllsDataQ', renderLeitura, (c) => { filtroLeit3 = LETRA_MOD_LEIT[c[0]] || 'L'; abertos['lei-' + c] = true; renderLeitura(); });
+    return;
+  }
+  const mod = MOD_LEIT.find(m => m.k === filtroLeit3);
+  const secoes = mod.letras.map(l => [l, grupos(l)]).filter(([, g]) => g.length);
+  if (!secoes.length) { cont.innerHTML = vazioArea(`O módulo ${mod.t} ainda não foi criado para este aprendiz.`, 'criarLeit'); return; }
+  const todos = secoes.flatMap(([, g]) => g);
+  abrirPadrao(todos, k => 'lei-' + k);
+  const feitas = todos.filter(([, arr]) => estadoGrupo(arr) === 'feita').length;
+  const derivTxt = mod.k === 'L' ? derivacaoFamilias() : [];
+  const subt = { W:'Palavras (ABLLS-R)', F:'Palavra e figura (Carol)', S:'Sílaba inicial (Carol)' };
+  cont.innerHTML = `<div class="mod-cab"><div><b>${esc(mod.t)}</b> <span class="chip-ablls">${mod.itens === 'Carol' ? 'Carol' : 'ABLLS-R ' + esc(mod.itens)}</span></div><div class="meta">${esc(mod.d)}</div><div class="barra-prog"><span style="width:${Math.round(100 * feitas / todos.length)}%"></span></div><div class="meta">${feitas} de ${todos.length} etapas concluídas</div></div>` + (mod.k === 'L' ? avisoDerivacao() : '') +
+    secoes.map(([l, lista]) => (secoes.length > 1 ? `<div class="fase-cab"><b>${subt[l] || l}</b></div>` : '') + lista.map(([k, arr]) => {
+      const e = SEQ.find(x => x.cod === k), p0 = arr.find(p => p.mat) || arr[0];
+      const t = tituloGrupo(arr), itensF = (t.match(/\(([^)]*)\)/) || [])[1]?.split(', ') || [];
+      const titulo = e ? e.nome : t.replace(/\s*\([^)]*\)/, '') + (l !== 'L' && itensF.length ? ' · ' + itensF.join(', ') : '');
+      let h = cartaoEtapa('lei-' + k, k, titulo, arr, e ? e.itens : (l === 'F' ? itensF : (p0.mat && p0.mat.itens) || []), e ? e.ensinar : []);
+      const falta = ((p0.mat && p0.mat.req) || []).filter(r => PROGS.some(p => codDe(p.nome) === r) && !grupoFeito(r));
+      const dv = derivTxt.find(x => x.cod === k);
+      const extra = (abllsDoGrupo(arr) ? `<span class="chip-ablls">${abllsDoGrupo(arr)}</span>` : '') + (dv && dv.estado === 'derivou' ? '<span class="chip-deriv">derivou</span>' : dv && dv.estado === 'nao' ? '<span class="chip-bloq">não derivou: ensinar mais 1</span>' : '') + (falta.length && estadoGrupo(arr) !== 'feita' ? `<span class="chip-bloq" title="Pré-requisito sugerido">🔒 depois de ${falta.join(', ')}</span>` : '');
+      h = h.replace('<span class="estado', extra + '<span class="estado');
+      if (falta.length && estadoGrupo(arr) !== 'feita') h = h.replace('class="etapa', 'class="etapa bloq');
+      return h;
+    }).join('')).join('');
+  ligarCartoes(cont);
+};
 
 // ================= Autoteste (?autoteste=1) =================
 function autoteste() {
