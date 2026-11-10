@@ -253,6 +253,42 @@
   .bib-item .nome { font-weight:600; font-size:15px; }
   .bib-item .acoes { display:flex; gap:6px; align-items:center; flex:none; }
   .origem { font-size:11px; font-weight:600; color:var(--suave); text-transform:uppercase; letter-spacing:.4px; }
+  /* ===== Matemática por módulos, toque e botão de ouvir ===== */
+  #bFalarApr { display:none; position:fixed; left:14px; top:12px; z-index:12; width:10vh; height:10vh; min-width:58px; min-height:58px; border-radius:50%; border:none; background:#e8f0fa; font-size:5vh; cursor:pointer; box-shadow:0 4px 14px #1f4e7930; }
+  #bFalarApr.on { display:block; }
+  #bFalarApr:active { transform:scale(.93); }
+  .cartao.pergunta.falavel { cursor:pointer; }
+  #modelo.tato .item.modelo .txt { font-size:11vh; }
+  #modelo.tato .item.modelo .gen-qtd { max-height:40vh; width:22vw; }
+  #modelo.tato .item.modelo .gen-comp { height:34vh; }
+  .item .gen-relogioA { height:24vh; max-width:30vw; }
+  .item.modelo .gen-relogioA, #modelo.tato .gen-relogioA { height:30vh; }
+  .tq-area { display:flex; gap:3vw; align-items:center; justify-content:center; width:96vw; }
+  .prato { min-width:30vw; min-height:32vh; border:4px dashed #9db4d3; border-radius:50% / 42%; background:#f4f8fd; display:flex; flex-wrap:wrap; align-content:center; justify-content:center; gap:1vh; padding:4vh 3vw; transition:background .3s; }
+  .prato.errado { background:#fdecea; border-color:#e7a29a; }
+  .fora { display:flex; flex-wrap:wrap; gap:1.4vh; max-width:56vw; justify-content:center; }
+  .tq { border:none; background:#fff; border-radius:50%; box-shadow:0 3px 10px #1f4e7922; position:relative; padding:.5vh; cursor:pointer; }
+  .tq img { width:100%; height:100%; }
+  .tq.fixo { cursor:default; box-shadow:none; background:transparent; }
+  .tq .n { position:absolute; top:-1vh; right:-1vh; background:var(--azul2); color:#fff; border-radius:50%; min-width:4.4vh; height:4.4vh; font-size:2.8vh; font-weight:700; display:none; align-items:center; justify-content:center; }
+  .tq.marcado .n { display:flex; }
+  .tq.marcado { outline:4px solid var(--azul2); }
+  .campo-tq { display:grid; gap:1.6vh; justify-content:center; }
+  .mini-reset { position:fixed; right:16px; top:14px; z-index:12; width:46px; height:46px; border-radius:50%; border:none; background:#f1f3f6; color:#6b7280; font-size:22px; cursor:pointer; }
+  .pronto { display:block; margin:2.5vh auto 0; font-size:4vh; padding:1.6vh 5vw; border-radius:999px; border:none; background:var(--verde); color:#fff; font-weight:700; cursor:pointer; box-shadow:0 4px 14px #2e8b5740; }
+  .pronto:disabled { opacity:.5; }
+  #comparacoes:has(.tq-area), #comparacoes:has(.campo-tq) { flex-direction:column; }
+  .mod-cab { background:#fff; border:1px solid var(--borda); border-radius:14px; padding:14px 18px; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; }
+  .mod-cab b { font-size:17px; }
+  .barra-prog, .nivel { height:8px; background:var(--cinza); border-radius:99px; overflow:hidden; }
+  .barra-prog span, .nivel span { display:block; height:100%; background:var(--verde); border-radius:99px; }
+  .nivel { width:80px; display:inline-block; vertical-align:middle; margin-right:6px; }
+  .chip-ablls { font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; background:#e8f0fa; color:#2f6db5; white-space:nowrap; }
+  .chip-bloq { font-size:11px; padding:2px 8px; border-radius:999px; background:#fdf4dc; color:#8a5a00; white-space:nowrap; }
+  .etapa.bloq .cab .nome { color:var(--suave); }
+  .etapa .cab { flex-wrap:wrap; }
+  .tab-ablls td, .tab-ablls th { border:none; border-top:1px solid var(--borda); padding:7px 6px; vertical-align:middle; }
+  .tab-ablls select { padding:4px 6px; }
 </style>
 </head>
 <body>
@@ -941,6 +977,7 @@ function proxima() {
     opcoes = Logica.arranjo(correto, pool, tam, pos); S.posHist.push(opcoes.indexOf(correto));
   }
   else if (tp === 'apresentacao') { modelo = rel.a; }
+  else if (tp === 'par' && (rel.tato || rel.toque)) { correto = rel.tato ? null : rel.a; modelo = rel.m || null; }
   else if (tp === 'par') { correto = rel.a; modelo = rel.m || null; const outros = [rel.b, rel.c].filter(Boolean); const pos = Logica.posicao(outros.length + 1, S.posHist); opcoes = Logica.embaralhar(outros); opcoes.splice(pos, 0, rel.a); S.posHist.push(pos); }
   else if (tp === 'estranhamento') { correto = rel.a; const tam = Math.max(2, p.arranjo); const pos = Logica.posicao(tam, S.posHist); opcoes = Array(tam - 1).fill(rel.b); opcoes.splice(pos, 0, rel.a); S.posHist.push(pos); }
   S.atual = { rel, modelo, correto, opcoes, t0: Date.now(), respondida: false, tp };
@@ -1626,7 +1663,7 @@ function renderLeitura() {
 document.querySelectorAll('#filtrosLeitura button').forEach(b => b.onclick = () => { filtroLeitura = b.dataset.f; renderLeitura(); });
 
 // ----- Matemática -----
-let filtroMat = 'N';
+let filtroMat = 'K';
 const TIT_MAT = { M:'Mais e menos', D:'Dinheiro' };
 function renderMatCards() {
   document.querySelectorAll('#filtrosMat button').forEach(b => b.classList.toggle('on', b.dataset.f === filtroMat));
@@ -1702,7 +1739,7 @@ function renderInicio() {
   const areas = [
     { t:'Leitura: sílabas e palavras', ic:'Aa', aba:'sequencia', f:'L', letras:['L'], vazio:'Criar a sequência de sílabas' },
     { t:'Leitura com figuras', ic:'▦', aba:'sequencia', f:'F', letras:['F','S'], vazio:'Criar palavra e figura' },
-    { t:'Matemática', ic:'+−', aba:'matematica', f:'N', letras:['N','C','M','D','H'], vazio:'Criar programas de matemática' },
+    { t:'Matemática', ic:'+−', aba:'matematica', f:'N', letras:['K','N','Q','A','U','H','D'], vazio:'Criar programas de matemática' },
     { t:'Molduras relacionais', ic:'⇄', aba:'molduras', f:'I', letras:['I','P','O','E','G','T'], vazio:'Criar programas das molduras' }
   ];
   $('#cardsInicio').innerHTML = areas.map((a, i) => {
@@ -2417,7 +2454,7 @@ function atualizarTopo() {
 }
 async function abrirAprendiz(id, ir = 'inicio') {
   const a = aprPorId(id); if (!a) return;
-  if (APR_ATUAL !== id) { Object.keys(abertos).forEach(k => delete abertos[k]); filtroLeitura = 'L'; filtroMat = 'N'; filtroMold = 'I'; }
+  if (APR_ATUAL !== id) { Object.keys(abertos).forEach(k => delete abertos[k]); filtroLeitura = 'L'; filtroMat = 'K'; filtroMold = 'I'; }
   APR_ATUAL = id; CFG.aprAtual = id; CFG.aprendiz = a.sigla; Object.assign(CFG, OPC_PADRAO, a.opcoes || {});
   await salvarBruto('config', CFG);
   const [ps, ss] = await Promise.all([DB.todos('programas'), DB.todos('sessoes')]);
@@ -2465,7 +2502,7 @@ const _voltarAtual = () => { const v = $('#aba-estimulos [data-voltar]'); if (v)
 const AREAS_APR = [
   { t:'Leitura', aba:'sequencia', f:'L', letras:['L'] },
   { t:'Leitura com figuras', aba:'sequencia', f:'F', letras:['F','S'] },
-  { t:'Matemática', aba:'matematica', letras:['N','C','M','D','H'] },
+  { t:'Matemática', aba:'matematica', letras:['K','N','Q','A','U','H','D'] },
   { t:'Molduras', aba:'molduras', letras:['I','P','O','E','G','T'] }
 ];
 function comDadosDe(id, ps, ss, fn) {
@@ -2511,7 +2548,7 @@ const lerProt = (s) => String(s || '').split(/[;,\n]/).map(x => x.trim()).filter
 const COLECOES = [
   { id:'L', t:'Leitura: sílabas e palavras', d:'35 etapas progressivas (L00–L34): linha de base, ensino só do que errar e sonda de derivação por família.', prot:['ABLLS-R Q1–Q4', 'ABLLS-R Q (leitura)', 'VB-MAPP Leitura'], botao:'criarSeq', letras:['L'], aba:'sequencia' },
   { id:'F', t:'Leitura com figuras', d:'Palavra ↔ figura (F01–F12) e sílaba inicial (S01–S05), com teste inverso sem treino.', prot:['ABLLS-R Q (leitura)', 'VB-MAPP Leitura', 'PEAK-E'], botao:'criarFig', letras:['F','S'], aba:'sequencia' },
-  { id:'M', t:'Matemática', d:'Número e quantidade, ler e contar, mais e menos, dinheiro e horas.', prot:['ABLLS-R R4', 'ABLLS-R R7', 'ABLLS-R R8', 'ABLLS-R R9–R10', 'ABLLS-R R21', 'ABLLS-R R22–R24', 'VB-MAPP Matemática'], botao:'criarMat', letras:['N','C','M','D','H'], aba:'matematica' },
+  { id:'M', t:'Matemática', d:'7 módulos progressivos cobrindo os itens R1–R29: contagem, número, conceitos, adição, subtração, horas e dinheiro, com linha de base, treino e testes de derivação.', prot:['ABLLS-R R1–R29', 'VB-MAPP Matemática', 'PEAK-E'], botao:'criarMat', letras:['K','N','Q','A','U','H','D'], aba:'matematica' },
   { id:'R', t:'Molduras relacionais (Siri Ming)', d:'Fase 1 não arbitrária e Fase 2 arbitrária, com programas encadeados: treino → manutenção → teste IM → teste IMC.', prot:['PEAK-E', 'PEAK-T', 'VB-MAPP VP-MTS'], botao:'criarMold', letras:['I','P','O','E','G','T'], aba:'molduras' }
 ];
 
@@ -2681,6 +2718,484 @@ carregar = async function () {
   if (qs.get('aprendiz') && APR_ATUAL) mostrar(qs.get('aprendiz'));
   else mostrar('geral');
 };
+
+// ================= Matemática por módulos (compatível com ABLLS-R R1–R29) =================
+// Cada módulo tem etapas (grupos) com linha de base → ensino → testes de derivação. Se acertar a linha de base, a etapa toda conta como concluída.
+const MOD_MAT = [
+  { l:'K', t:'Contagem', itens:'R1–R6 · R14 · R19', d:'Contagem falada, continuar de qualquer número, contar tocando, "me dá N", completar até N e buscar objetos na mesa.' },
+  { l:'N', t:'Número', itens:'R4 · R7 · R8', d:'Rede nome falado ↔ numeral ↔ quantidade: ensina 2 relações e testa as outras. 16–19 e 31–99 saem por derivação.' },
+  { l:'Q', t:'Conceitos', itens:'R9–R13 · R15–R17', d:'Mais, menos, maior, mesma, diferente, todos, alguns e nenhum. Ouvinte primeiro (só um → outro → misturado); tato depois.' },
+  { l:'A', t:'Adição', itens:'R18 · R20 · R25 · R26 · R28', d:'Juntar no concreto → sinal de mais → +1 tirado da contagem → contar a partir do maior → somas até 20, 30 e dezenas.' },
+  { l:'U', t:'Subtração', itens:'R27 · R29', d:'Tirar no concreto → sinal de menos (contrastado com o de mais) → família de fatos tirada da adição.' },
+  { l:'H', t:'Horas', itens:'R21', d:'Rede relógio digital ↔ hora falada ↔ relógio de ponteiros: hora → meia → quartos → minutos.' },
+  { l:'D', t:'Dinheiro', itens:'R22–R24', d:'Moedas pelo nome e pelo valor (o tamanho engana: a de 5 centavos é maior que a de 10), juntar moedas e cédulas.' }
+];
+const MOD_NOME = Object.fromEntries(MOD_MAT.map(m => [m.l, m.t]));
+const ABLLS_R = [['R1','Contar com ajuda',2],['R2','Contar de memória',4],['R3','Contar objetos com ajuda',2],['R4','Contar objetos',4],['R5','Dar N de um conjunto maior',4],['R6','Nomear números em fileira',2],['R7','Nomear números',4],['R8','Número ↔ quantidade',4],['R9','Mais',2],['R10','Menos',2],['R11','Alguns',2],['R12','Todos',2],['R13','Zero / nenhum',2],['R14','Completar uma quantidade',2],['R15','Mesma',2],['R16','Diferente',2],['R17','Maior',2],['R18','Adicionar',2],['R19','Buscar N objetos',4],['R20','Somar',4],['R21','Horas',4],['R22','Moedas pelo nome',2],['R23','Moedas pelo valor',2],['R24','Juntar moedas',4],['R25','Igual',2],['R26','Não é igual',2],['R27','Sinal de menos',2],['R28','Sinal de mais',2],['R29','Subtrair',2]];
+
+// ----- Figuras novas: relógio de ponteiros e cenas de matemática -----
+function svgRelogioA(h) {
+  const [H, M] = String(h).split(':').map(Number), rad = (g) => g * Math.PI / 180;
+  const ah = ((H % 12) + M / 60) * 30, am = M * 6;
+  let tr = '', nums = '';
+  for (let i = 0; i < 60; i++) { const t = rad(i * 6), r1 = i % 5 ? 86 : 80; tr += `<line x1="${(100 + r1 * Math.sin(t)).toFixed(1)}" y1="${(100 - r1 * Math.cos(t)).toFixed(1)}" x2="${(100 + 91 * Math.sin(t)).toFixed(1)}" y2="${(100 - 91 * Math.cos(t)).toFixed(1)}" stroke="#667085" stroke-width="${i % 5 ? 1.2 : 3}"/>`; }
+  for (let i = 1; i <= 12; i++) { const t = rad(i * 30); nums += `<text x="${(100 + 66 * Math.sin(t)).toFixed(1)}" y="${(100 - 66 * Math.cos(t) + 8).toFixed(1)}" font-family="Arial" font-weight="700" font-size="22" text-anchor="middle" fill="#1d2939">${i}</text>`; }
+  const pont = (g, l, w, cor) => `<line x1="100" y1="100" x2="${(100 + l * Math.sin(rad(g))).toFixed(1)}" y2="${(100 - l * Math.cos(rad(g))).toFixed(1)}" stroke="${cor}" stroke-width="${w}" stroke-linecap="round"/>`;
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200"><circle cx="100" cy="100" r="96" fill="#fff" stroke="#1f4e79" stroke-width="6"/>${tr}${nums}${pont(ah, 46, 9, '#1d2939')}${pont(am, 74, 5, '#2f6db5')}<circle cx="100" cy="100" r="7" fill="#1d2939"/></svg>`);
+}
+const MOEDA_MM = { 5:22, 10:20, 25:25, 50:23, 100:27 };
+const MOEDA_COR = { 5:['#b87333','#8a4f1f'], 10:['#d9b44a','#9c7a1c'], 25:['#e0b83c','#9c7a1c'], 50:['#cfd3d8','#7d838c'], 100:['#cfd3d8','#7d838c'] };
+function svgMat(d) {
+  const W = (w, h, c) => svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${c}</svg>`);
+  const bola = (x, y, r, cor = '#e2483d') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${cor}"/><circle cx="${x - r * .3}" cy="${y - r * .3}" r="${r * .26}" fill="#fff" opacity=".45"/>`;
+  let s = (d.sd || 1) * 7919; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  const blocos = (n) => Math.max(1, Math.ceil(n / 10)), altP = (n) => n <= 5 ? 26 : blocos(n) * 52 + (blocos(n) - 1) * 10;
+  const pontos = (n, x0, y0, cor, riscar = 0) => { let c = ''; for (let i = 0; i < n; i++) { const b = Math.floor(i / 10), k = i % 10, lin = Math.floor(k / 5), cl = k % 5, x = x0 + cl * 26 + 13, y = y0 + b * 62 + lin * 26 + 13; const risca = i >= n - riscar; c += risca ? `<circle cx="${x}" cy="${y}" r="10" fill="#d0d5dd"/><path d="M${x - 9} ${y - 9}L${x + 9} ${y + 9}M${x + 9} ${y - 9}L${x - 9} ${y + 9}" stroke="#c0392b" stroke-width="3.5" stroke-linecap="round"/>` : bola(x, y, 10, cor); } return c; };
+  const espalhar = (n, x0, y0, w, h, cor, r = 11) => { const col = Math.max(3, Math.ceil(Math.sqrt(n * 1.8))), lin = Math.ceil(n * 1.8 / col), cw = w / col, ch = h / lin; const cel = Logica.embaralhar([...Array(col * lin).keys()], rnd).slice(0, n); return cel.map(k => bola(x0 + (k % col + .5) * cw + (rnd() - .5) * (cw - 2 * r) * .6, y0 + (Math.floor(k / col) + .5) * ch + (rnd() - .5) * (ch - 2 * r) * .6, r, cor)).join(''); };
+  const seta = (x, y) => `<path d="M${x} ${y}l-12 -16h8v-18h8v18h8z" fill="#2f6db5"/>`;
+  if (d.k === 'conta') {
+    if (d.op === '-') { const h = altP(d.a) + 16; return W(Math.min(d.a, 5) * 26 + 16, h, pontos(d.a, 8, 8, '#2f6db5', d.b)); }
+    const h = Math.max(altP(d.a), altP(d.b)) + 16, wa = Math.min(d.a, 5) * 26, wb = Math.min(d.b, 5) * 26;
+    return W(wa + wb + 86, h, pontos(d.a, 8, 8, '#2f6db5') + `<text x="${wa + 43}" y="${h / 2 + 15}" font-family="Arial" font-weight="900" font-size="44" text-anchor="middle" fill="#1d2939">+</text>` + pontos(d.b, wa + 78, 8, '#e2483d'));
+  }
+  if (d.k === 'grupo') {
+    const on = d.on || Logica.embaralhar([...Array(d.n).keys()], rnd).slice(0, d.cheios);
+    let c = ''; for (let i = 0; i < d.n; i++) { const x = 10 + i * 90 + 40; c += `<ellipse cx="${x}" cy="74" rx="38" ry="13" fill="#f1f3f6" stroke="#98a2b3" stroke-width="3"/>`; if (on.includes(i)) c += bola(x, 52, 18, d.cor || '#e2483d'); }
+    return W(d.n * 90 + 20, 92, c);
+  }
+  if (d.k === 'esp') return W(170, 170, `<rect x="3" y="3" width="164" height="164" rx="16" fill="#fff" stroke="#d0d5dd" stroke-width="3"/>` + espalhar(d.n, 10, 10, 150, 150, d.cor || '#e2483d'));
+  if (d.k === 'dois') {
+    const c = [0, 1].map(i => { const n = i ? d.b : d.a, x = 6 + i * 190; return `<rect x="${x}" y="46" width="170" height="170" rx="16" fill="#fff" stroke="${d.marca === (i ? 'b' : 'a') ? '#2f6db5' : '#d0d5dd'}" stroke-width="${d.marca === (i ? 'b' : 'a') ? 6 : 3}"/>` + espalhar(n, x + 8, 54, 154, 154, '#e2483d', 10); }).join('');
+    return W(372, 222, c + (d.marca ? seta(d.marca === 'a' ? 91 : 281, 40) : ''));
+  }
+  if (d.k === 'bola') { const f = d.f === 'caixa' ? `<rect x="${80 - d.s}" y="${80 - d.s}" width="${2 * d.s}" height="${2 * d.s}" rx="${d.s * .15}" fill="${d.cor || '#2f6db5'}"/>` : bola(80, 80, d.s, d.cor || '#2f6db5'); return W(160, 160, f); }
+  if (d.k === 'bolas') return W(340, 200, d.s.map((r, i) => bola(85 + i * 170, 115, r, d.cor || '#2f6db5')).join('') + (d.marca !== undefined ? seta(85 + d.marca * 170, 30) : ''));
+  if (d.k === 'moedas') {
+    const rs = d.l.map(c => MOEDA_MM[c] * 2.2), gap = 10, w = Math.max(130, rs.reduce((a, r) => a + 2 * r + gap, gap)), h = 130;
+    let x = (w - (rs.reduce((a, r) => a + 2 * r + gap, 0) - gap)) / 2, c = '';
+    d.l.forEach((v, i) => { const r = rs[i], cx = x + r, [f, b] = MOEDA_COR[v]; c += `<circle cx="${cx}" cy="65" r="${r}" fill="${f}" stroke="${b}" stroke-width="3"/>` + (v === 100 ? `<circle cx="${cx}" cy="65" r="${r * .62}" fill="#e0b83c" stroke="#9c7a1c" stroke-width="2"/>` : '') + `<text x="${cx}" y="${65 + r * .2}" font-family="Arial" font-weight="900" font-size="${r * .62}" text-anchor="middle" fill="#3a3a3a">${v === 100 ? '1' : v}</text><text x="${cx}" y="${65 + r * .58}" font-family="Arial" font-size="${r * .2}" text-anchor="middle" fill="#3a3a3a">${v === 100 ? 'REAL' : 'CENTAVOS'}</text>`; x += 2 * r + gap; });
+    return W(w, h, c);
+  }
+  return W(10, 10, '');
+}
+const _visualMat = visual;
+visual = function (e, cls = '') {
+  if (e && e.tipo === 'relogioA') return `<img class="figsvg gen gen-relogioA" src="${svgRelogioA(e.dado)}" alt="${esc(e.nome)}">`;
+  if (e && e.tipo === 'mat') { let d = {}; try { d = JSON.parse(e.dado); } catch (x) {} return `<img class="figsvg gen gen-comp gen-mat-${d.k}" src="${svgMat(d)}" alt="${esc(e.nome)}">`; }
+  return _visualMat(e, cls);
+};
+function nomeCena(d) {
+  const val = (c) => c === 100 ? '1 real' : c + ' centavos';
+  return d.k === 'conta' ? `${d.a} ${d.op === '-' ? 'tira' : 'mais'} ${d.b}` : d.k === 'grupo' ? `${d.cheios} de ${d.n} pratos com bola` : d.k === 'esp' ? `${d.n} bolinhas espalhadas` : d.k === 'dois' ? `${d.a} e ${d.b} bolinhas${d.marca ? ' (seta no ' + (d.marca === 'a' ? '1º' : '2º') + ')' : ''}` : d.k === 'bola' ? `${d.f || 'bola'} tamanho ${d.s}` : d.k === 'bolas' ? `bolas ${d.s.join(' e ')}` : d.k === 'moedas' ? 'moedas: ' + d.l.map(val).join(' + ') : d.k;
+}
+
+// ----- Tentativas de tocar: contar, "me dá N" e completar até N -----
+function montarToque() {
+  const a = S.atual, t = a.rel.toque, total = t.total || t.n, ja = t.ja || 0;
+  const fig = FIGURAS_SVG[t.fig || 'BOLA'];
+  const tam = total > 24 ? 7 : total > 14 ? 8.5 : total > 8 ? 10 : 12;
+  const item = (i, fixo) => `<button class="tq ${fixo ? 'fixo' : ''}" data-i="${i}" style="width:${tam}vh;height:${tam}vh">${fig ? `<img src="${fig}" alt="">` : '●'}<span class="n"></span></button>`;
+  const comp = $('#comparacoes');
+  a.cont = 0;
+  if (t.modo === 'contar') {
+    const col = Math.max(3, Math.ceil(Math.sqrt(total * 1.7))), cel = Math.ceil(total * 1.6 / col) * col;
+    const pos = Logica.embaralhar([...Array(cel).keys()]).slice(0, total);
+    comp.innerHTML = `<div class="campo-tq" style="grid-template-columns:repeat(${col}, ${tam + 1.5}vh)">` + [...Array(cel).keys()].map(k => pos.includes(k) ? item(k) : '<span></span>').join('') + `</div><button class="mini-reset" title="Recomeçar a contagem">↺</button>`;
+    comp.querySelectorAll('.tq').forEach(b => b.onclick = () => { if (a.respondida || b.classList.contains('marcado')) return; a.cont++; b.classList.add('marcado'); b.querySelector('.n').textContent = a.cont; });
+    comp.querySelector('.mini-reset').onclick = () => { if (a.respondida) return; a.cont = 0; comp.querySelectorAll('.tq').forEach(b => { b.classList.remove('marcado'); b.querySelector('.n').textContent = ''; }); };
+    return;
+  }
+  comp.innerHTML = `<div class="tq-area"><div class="prato">${[...Array(ja).keys()].map(i => item('j' + i, true)).join('')}</div><div class="fora">${[...Array(total - ja).keys()].map(i => item(i)).join('')}</div></div><button class="pronto">Pronto ✓</button>`;
+  const prato = comp.querySelector('.prato'), fora = comp.querySelector('.fora');
+  comp.querySelectorAll('.tq:not(.fixo)').forEach(b => b.onclick = () => { if (a.respondida) return; if (b.parentElement === fora) { prato.appendChild(b); b.classList.add('dentro'); } else { fora.appendChild(b); b.classList.remove('dentro'); } });
+  comp.querySelector('.pronto').onclick = () => {
+    if (a.respondida) return;
+    const n = ja + prato.querySelectorAll('.tq:not(.fixo)').length;
+    comp.querySelector('.pronto').disabled = true;
+    registrar(n === t.n ? '+' : '-');
+    const ult = S && S.tent[S.tent.length - 1]; if (ult) ult.escolhido = String(n);
+    if (!semFeedback() && n !== t.n) prato.classList.add('errado');
+  };
+}
+// Botão de ouvir a instrução, grande, para o próprio aprendiz tocar
+$('#sessao').insertAdjacentHTML('beforeend', '<button id="bFalarApr" aria-label="Ouvir a instrução" title="Ouvir a instrução">🔊</button>');
+const falarInstrucao = () => { if (S && S.atual) { const old = CFG.fala; CFG.fala = true; falar(textoInstr(S.prog, S.atual.rel)); CFG.fala = old; } };
+$('#bFalarApr').onclick = (ev) => { ev.stopPropagation(); falarInstrucao(); };
+const _proximaMat = proxima;
+proxima = function () {
+  _proximaMat();
+  if (!S) return;
+  const a = S.atual, ativa = !!(a && !a.respondida && !S.fim);
+  $('#bFalarApr').classList.toggle('on', ativa && !!textoInstr(S.prog, a.rel));
+  if (!ativa) return;
+  const pc = $('#modelo .cartao.pergunta'); if (pc) { pc.classList.add('falavel'); pc.onclick = falarInstrucao; }
+  if (a.rel.toque) montarToque();
+  if (a.rel.tato) $('#modelo').classList.add('tato'); else $('#modelo').classList.remove('tato');
+};
+const _encerrarMat = encerrar;
+encerrar = async function (manual = false) { $('#bFalarApr').classList.remove('on'); return _encerrarMat(manual); };
+
+// ----- Conclusão: linha de base acertada conclui a etapa toda -----
+function dominadoLB(p) { return SESS.some(s => s.progId === p.id && s.total >= p.max && s.acertos >= p.critA); }
+const _feitoMat = feito;
+feito = function (p) {
+  if (p.lb) return SESS.some(s => s.progId === p.id && s.total >= p.max);
+  if (_feitoMat(p)) return true;
+  if (p.mat) { const cod = codDe(p.nome); const l = PROGS.find(x => x.lb && codDe(x.nome) === cod); if (l && dominadoLB(l)) return true; }
+  return false;
+};
+function grupoFeito(cod) { const arr = PROGS.filter(p => codDe(p.nome) === cod); return arr.length > 0 && arr.every(feito); }
+function abllsApp() { const r = {}; for (const p of PROGS) { if (!p.ablls || !p.ablls.length || !feito(p)) continue; p.ablls.forEach(x => { r[x.it] = Math.max(r[x.it] || 0, x.nv); }); } return r; }
+
+// ----- Definição dos módulos -----
+function defMat3() {
+  const G = [];
+  let semente = 11; const rnd = () => { semente = (semente * 16807) % 2147483647; return (semente - 1) / 2147483646; };
+  const T = (v) => ({ txt:String(v) }), Q = (n) => ({ q:n }), C = (d) => ({ cena:d }), DG = (h) => ({ dig:h }), AN = (h) => ({ ana:h }), NT = (v) => ({ nota:v });
+  const outros = (lista, x, k = 2) => Logica.embaralhar(lista.filter(y => JSON.stringify(y) !== JSON.stringify(x)), rnd).slice(0, k);
+  const R = (m, a, b, c, instr) => ({ m, a, b, c, instr });
+  const tato = (m, instr) => ({ m, a:m, tato:true, instr });
+  const toque = (n, instr, modo = 'dar', total = n, ja = 0) => ({ a:T(n), toque:{ modo, n, total, ja }, instr });
+  const et = (nome, modo, rels, critA, critN, max, voltar = 0) => ({ nome, modo, rels, critA, critN, max, voltar });
+  const lb = (rels) => { const n = rels.length, folga = n >= 8 ? Math.floor(n / 8) : 0; return { rot:'Linha de base', lb:true, tipo:'par', rels, crit:[n - folga, n], max:n, ablls:[] }; };
+  const treinoP = (rot, rels, ablls = [], crit = [6, 6], max = 18) => ({ rot, tipo:'par', fase:'treino', rels, crit, max, ablls });
+  const enc = (rot, etapas, ablls = []) => ({ rot, tipo:'encadeado', etapas, ablls });
+  const rede = (treino, im, imc, ablls, rot = 'Ensino e testes') => enc(rot, [et('Treino', 'treino', treino, 6, 6, 18), et('Manutenção sem feedback', 'manut', treino, 6, 8, 8), et('Teste implicação mútua', 'teste', im, 5, 6, 6, 0), et('Teste combinatório', 'teste', imc, 7, 8, 8, 0)], ablls);
+  const ensTeste = (rot, treino, teste, ablls, crit = [5, 6, 6]) => enc(rot, [et('Treino', 'treino', treino, 6, 6, 18), et('Teste com exemplos novos', 'teste', teste, crit[0], crit[1], crit[2], 0)], ablls);
+  const grupo = (cod, titulo, req, itens, passos) => G.push({ cod, titulo, req, itens, passos });
+  const mist = (...l) => Logica.embaralhar(l.flat(), rnd);
+  const ab = (...pares) => pares.map(([it, nv]) => ({ it, nv }));
+
+  // ===== K · Contagem =====
+  grupo('K01', 'Contagem falada', [], [], [
+    lb([tato(T('1, 2, …'), 'Eu começo e você continua: 1, 2…'), tato(T('1 … 10'), 'Conta até 10 para mim'), tato(T('1 … 20'), 'Conta até 20 para mim'), tato(T('1 … 30'), 'Conta até 30 para mim')]),
+    treinoP('Ensino da contagem falada', [tato(T('1, 2, …'), 'Eu começo e você continua: 1, 2…'), tato(T('1 … 10'), 'Conta até 10 para mim'), tato(T('1 … 20'), 'Conta até 20 para mim'), tato(T('1 … 30'), 'Conta até 30 para mim')], ab(['R1', 2], ['R2', 4]), [4, 4], 12)
+  ]);
+  const cont = (s) => tato(T(`${s}, ${s + 1}, …`), `Continua contando do ${s}`);
+  grupo('K02', 'Continuar de qualquer número', ['K01'], [], [lb([6, 11, 15, 18, 24].map(cont)), ensTeste('Ensino e teste', [3, 7, 5, 12, 9].map(cont), [6, 11, 15, 18, 24, 27].map(cont), [])]);
+  const contar = (n) => toque(n, 'Toca em cada um e conta: quantos tem?', 'contar', n);
+  grupo('K03', 'Contar objetos tocando', [], [], [
+    lb([3, 5, 8, 10, 14, 20].map(contar)),
+    treinoP('Até 5', [2, 3, 4, 5].map(contar), ab(['R3', 2], ['R4', 1])),
+    treinoP('Até 10', [6, 7, 8, 9, 10].map(contar), ab(['R4', 2])),
+    treinoP('Até 20', [12, 15, 17, 20].map(contar), ab(['R4', 3]))
+  ]);
+  const dar = (n, de) => toque(n, `Me dá ${n}`, 'dar', de);
+  grupo('K04', 'Me dá N (de um conjunto maior)', ['K03'], [], [
+    lb([dar(3, 6), dar(7, 10), dar(12, 15), dar(18, 22), dar(25, 30)]),
+    treinoP('Até 5 (de 7)', [2, 3, 4, 5].map(n => dar(n, 7)), ab(['R5', 1])),
+    treinoP('Até 10 (de 12)', [6, 7, 8, 9, 10].map(n => dar(n, 12)), ab(['R5', 2])),
+    treinoP('Até 20 (de 24)', [12, 15, 18, 20].map(n => dar(n, 24)), ab(['R5', 3])),
+    treinoP('Até 30 (de 32)', [22, 25, 28, 30].map(n => dar(n, 32)), ab(['R5', 4]))
+  ]);
+  const compl = ([ja, n]) => toque(n, `Tem ${ja}. Põe mais até ficar com ${n}`, 'completar', n + 3, ja);
+  grupo('K05', 'Completar até N', ['K04'], [], [
+    lb([[2, 4], [3, 7], [5, 9]].map(compl)),
+    treinoP('Até 5', [[2, 4], [1, 3], [3, 5], [2, 5]].map(compl), ab(['R14', 1])),
+    treinoP('Até 10', [[4, 7], [5, 9], [3, 8], [6, 10]].map(compl), ab(['R14', 2]))
+  ]);
+  const busca = (n) => tato(T(`Busque ${n}`), `Na mesa: peça para ir buscar ${n} objetos`);
+  grupo('K06', 'Buscar objetos na mesa (R19)', ['K04'], [], [
+    treinoP('Até 2', [1, 2].map(busca), ab(['R19', 1]), [3, 3], 6), treinoP('Até 4', [3, 4].map(busca), ab(['R19', 2]), [3, 3], 6),
+    treinoP('Até 6', [5, 6].map(busca), ab(['R19', 3]), [3, 3], 6), treinoP('Até 10', [8, 10].map(busca), ab(['R19', 4]), [3, 3], 6)
+  ]);
+  grupo('K07', 'Números em fileira', [], [], [
+    lb([tato(T('1 2 3 4 5 6 7 8 9 10'), 'Lê os números da fila')]),
+    treinoP('Ensino', [tato(T('1 2 3 4 5'), 'Lê os números da fila'), tato(T('6 7 8 9 10'), 'Lê os números da fila'), tato(T('1 2 3 4 5 6 7 8 9 10'), 'Lê os números da fila')], ab(['R6', 2]), [3, 3], 9)
+  ]);
+
+  // ===== N · Número (nome falado A, numeral B, quantidade C) =====
+  const redeNum = (cod, titulo, nums, req, ablls, comQtd = true) => {
+    const ds = (x) => outros(nums, x);
+    const AB = (x) => { const [d1, d2] = ds(x); return R(null, T(x), T(d1), T(d2), `Mostre o ${x}`); };
+    const BC = (x) => { const [d1, d2] = ds(x); return R(T(x), Q(x), Q(d1), Q(d2), 'Mostre a quantidade desse número'); };
+    const CB = (x) => { const [d1, d2] = ds(x); return R(Q(x), T(x), T(d1), T(d2), 'Qual é o número dessas bolinhas?'); };
+    const AC = (x) => { const [d1, d2] = ds(x); return R(null, Q(x), Q(d1), Q(d2), `Mostre ${x} bolinhas`); };
+    const tB = (x) => tato(T(x), 'Que número é esse?');
+    const tC = (x) => tato(Q(x), 'Quantas bolinhas? Conta para mim');
+    const tipos = comQtd ? [AB, CB, tB, tC, BC, AC] : [AB, tB];
+    const lbRels = nums.flatMap((x, i) => [tipos[i % tipos.length](x), tipos[(i + 3) % tipos.length](x)]);
+    grupo(cod, titulo, req, nums.map(String), [lb(lbRels), comQtd ? rede(nums.flatMap(x => [AB(x), BC(x)]), nums.map(CB), nums.flatMap(x => [AC(x), tB(x), tC(x)]), ablls) : rede(nums.map(AB), nums.map(tB), nums.flatMap(x => [AB(x), tB(x)]), ablls)]);
+  };
+  redeNum('N01', 'Números de 1 a 5', [1, 2, 3, 4, 5], [], ab(['R8', 1], ['R4', 1]));
+  redeNum('N02', 'Números de 6 a 10', [6, 7, 8, 9, 10], ['N01'], ab(['R8', 2], ['R7', 1], ['R4', 2]));
+  redeNum('N03', 'Números de 11 a 15 (nomes diferentes)', [11, 12, 13, 14, 15], ['N02'], []);
+  redeNum('N04', 'Números de 16 a 20 (sai do dez + seis…)', [16, 17, 18, 19, 20], ['N03'], ab(['R8', 3], ['R7', 2], ['R4', 3]));
+  redeNum('N05', 'Números de 21 a 30', [21, 22, 23, 24, 25, 26, 27, 28, 29, 30], ['N04'], ab(['R8', 4], ['R7', 3]));
+  redeNum('N06', 'Dezenas de 10 a 100', [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], ['N05'], [], false);
+  const diag = [34, 47, 52, 63, 78, 85, 96], novos = [36, 41, 58, 69, 72, 87, 93, 55, 44, 61, 79, 38, 97, 82, 49, 66];
+  const ABm = (x, lista) => { const [d1, d2] = outros(lista, x); return R(null, T(x), T(d1), T(d2), `Mostre o ${x}`); };
+  const tN = (x) => tato(T(x), 'Que número é esse?');
+  grupo('N07', 'Números de 31 a 99 (dezena + unidade)', ['N06'], diag.map(String), [
+    lb(novos.slice(0, 12).map((x, i) => i % 2 ? tN(x) : ABm(x, novos))),
+    rede(diag.flatMap(x => [ABm(x, diag), tN(x)]), novos.slice(0, 8).map(x => ABm(x, novos)), novos.slice(8).map(tN), ab(['R7', 4]), 'Ensino de 7 números e teste dos outros')
+  ]);
+
+  // ===== Q · Conceitos =====
+  const G1 = [[8, 2], [7, 1], [9, 3], [10, 4], [6, 1]], P1 = [[5, 4], [7, 6], [9, 8], [3, 2], [6, 5]], N1 = [[12, 5], [15, 9], [20, 14], [11, 3], [18, 17]];
+  const mais = ([x, y]) => R(null, Q(x), Q(y), null, 'Qual tem MAIS?'), menos = ([x, y]) => R(null, Q(y), Q(x), null, 'Qual tem MENOS?');
+  const tMM = (a, b, marca) => tato(C({ k:'dois', a, b, marca, sd:a * 31 + b }), 'O da seta tem MAIS ou MENOS?');
+  grupo('Q01', 'Mais e menos', [], [], [
+    lb(mist(G1.slice(0, 3).map(mais), G1.slice(2, 5).map(menos), [tMM(8, 3, 'a'), tMM(2, 7, 'a')])),
+    enc('Ouvinte: mais e menos', [et('Só MAIS', 'treino', G1.map(mais), 6, 6, 18), et('Só MENOS', 'treino', G1.map(menos), 6, 6, 18), et('MAIS e MENOS misturados', 'treino', [...G1.map(mais), ...G1.map(menos)], 7, 8, 16), et('Teste diferença pequena', 'teste', [...P1.map(mais), ...P1.map(menos)], 7, 8, 8, 2), et('Teste quantidades novas', 'teste', [...N1.map(mais), ...N1.map(menos)], 7, 8, 8, 2)], ab(['R9', 1], ['R10', 1])),
+    ensTeste('Tato: mais ou menos', [tMM(8, 2, 'a'), tMM(2, 8, 'a'), tMM(9, 3, 'b'), tMM(3, 9, 'b')], [tMM(12, 5, 'a'), tMM(4, 11, 'a'), tMM(15, 6, 'b'), tMM(7, 16, 'b')], ab(['R9', 2], ['R10', 2]))
+  ]);
+  const B = (s, cor = '#2f6db5', f = 'bola') => C({ k:'bola', s, cor, f });
+  const maior = (ss, cor, f) => R(null, B(ss[0], cor, f), B(ss[1], cor, f), ss[2] ? B(ss[2], cor, f) : null, 'Qual é a MAIOR?');
+  const tMa = (s, marca) => tato(C({ k:'bolas', s, marca }), 'A da seta é MAIOR ou MENOR?');
+  grupo('Q02', 'Maior', [], [], [
+    lb([maior([70, 25]), maior([65, 40, 20], '#e2483d'), maior([60, 35], '#2e9b5f', 'caixa'), tMa([70, 30], 0)]),
+    enc('Ouvinte: maior', [et('Diferença grande', 'treino', [maior([70, 25]), maior([65, 20], '#e2483d'), maior([60, 22], '#2e9b5f')], 6, 6, 18), et('Três tamanhos', 'treino', [maior([70, 45, 20]), maior([62, 40, 25], '#e2483d')], 6, 6, 18), et('Teste com caixas e cores novas', 'teste', [maior([60, 35], '#8e5aa8', 'caixa'), maior([55, 40, 20], '#e8822a', 'caixa'), maior([68, 50], '#2e9b5f')], 5, 6, 6, 1)], ab(['R17', 1])),
+    ensTeste('Tato: maior ou menor', [tMa([70, 30], 0), tMa([30, 70], 0), tMa([25, 65], 1), tMa([65, 25], 1)], [tMa([60, 40], 0), tMa([45, 68], 0), tMa([50, 30], 1), tMa([28, 55], 1)], ab(['R17', 2]))
+  ]);
+  const E = (n, sd, cor) => C({ k:'esp', n, sd, cor });
+  const mesma = (n, o, sd) => R(E(n, sd), E(n, sd + 1), E(o, sd + 2), null, 'Mostre o que tem a MESMA quantidade');
+  const difq = (n, o, sd) => R(E(n, sd), E(o, sd + 1), E(n, sd + 2), null, 'Mostre o que tem quantidade DIFERENTE');
+  const tMD = (a, b) => tato(C({ k:'dois', a, b, sd:a * 13 + b }), 'É a MESMA quantidade ou é DIFERENTE?');
+  grupo('Q03', 'Mesma e diferente quantidade', ['Q01'], [], [
+    lb(mist([mesma(3, 6, 1), mesma(5, 2, 4), difq(4, 8, 7), difq(6, 2, 10)], [tMD(4, 4), tMD(3, 6)])),
+    enc('Ouvinte: mesma e diferente', [et('Só MESMA', 'treino', [mesma(3, 6, 1), mesma(5, 2, 4), mesma(4, 8, 7)], 6, 6, 18), et('Só DIFERENTE', 'treino', [difq(3, 7, 10), difq(6, 2, 13), difq(2, 5, 16)], 6, 6, 18), et('Misturado', 'treino', [mesma(4, 1, 19), difq(5, 3, 22), mesma(2, 6, 25), difq(4, 7, 28)], 7, 8, 16), et('Teste quantidades novas', 'teste', [mesma(7, 3, 31), mesma(9, 5, 34), difq(8, 4, 37), difq(6, 10, 40)], 7, 8, 8, 2)], ab(['R15', 1], ['R16', 1])),
+    ensTeste('Tato: mesma ou diferente', [tMD(3, 3), tMD(2, 5), tMD(5, 5), tMD(6, 2)], [tMD(7, 7), tMD(4, 9), tMD(8, 8), tMD(10, 6)], ab(['R15', 2], ['R16', 2]))
+  ]);
+  const GR = (n, cheios, cor = '#e2483d', sd = 1) => C({ k:'grupo', n, cheios, cor, sd });
+  const tal = (n, alvo, cor, sd) => { const m = { NENHUM:GR(n, 0, cor, sd), TODOS:GR(n, n, cor, sd), ALGUNS:GR(n, Math.max(1, Math.floor(n / 2)), cor, sd) }; const r = Object.keys(m).filter(k => k !== alvo); return R(null, m[alvo], m[r[0]], m[r[1]], { NENHUM:'Mostre onde NENHUM prato tem bola', TODOS:'Mostre onde TODOS os pratos têm bola', ALGUNS:'Mostre onde ALGUNS pratos têm bola' }[alvo]); };
+  const tTA = (n, k, sd) => tato(GR(n, k, '#e2483d', sd), 'Quantos pratos têm bola: TODOS, ALGUNS ou NENHUM?');
+  grupo('Q04', 'Todos, alguns e nenhum', ['Q01'], [], [
+    lb(mist([tal(3, 'NENHUM', '#e2483d', 1), tal(4, 'TODOS', '#2f6db5', 2), tal(5, 'ALGUNS', '#2e9b5f', 3)], [tTA(4, 4, 4), tTA(4, 0, 5), tTA(5, 2, 6)])),
+    enc('Ouvinte: todos, alguns, nenhum', [et('Só NENHUM', 'treino', [3, 4, 5].map((n, i) => tal(n, 'NENHUM', '#e2483d', i + 1)), 6, 6, 18), et('Só TODOS', 'treino', [3, 4, 5].map((n, i) => tal(n, 'TODOS', '#e2483d', i + 4)), 6, 6, 18), et('Só ALGUNS', 'treino', [3, 4, 5].map((n, i) => tal(n, 'ALGUNS', '#e2483d', i + 7)), 6, 6, 18), et('Misturado', 'treino', [tal(4, 'NENHUM', '#e2483d', 10), tal(5, 'TODOS', '#e2483d', 11), tal(4, 'ALGUNS', '#e2483d', 12)], 7, 8, 16), et('Teste com cores e quantidades novas', 'teste', [tal(6, 'NENHUM', '#2f6db5', 13), tal(6, 'TODOS', '#2e9b5f', 14), tal(6, 'ALGUNS', '#8e5aa8', 15), tal(3, 'ALGUNS', '#e8822a', 16)], 7, 8, 8, 3)], ab(['R11', 1], ['R12', 1], ['R13', 1])),
+    ensTeste('Tato: todos, alguns ou nenhum', [tTA(3, 3, 1), tTA(4, 0, 2), tTA(4, 2, 3), tTA(5, 5, 4), tTA(5, 1, 5)], [tTA(6, 6, 6), tTA(6, 0, 7), tTA(6, 4, 8), tTA(3, 1, 9)], ab(['R11', 2], ['R12', 2], ['R13', 2]))
+  ]);
+
+  // ===== A · Adição =====
+  const conta = (a, b, op = '+') => C({ k:'conta', a, b, op });
+  const opc = (r) => [r + 1, r > 1 ? r - 1 : r + 2];
+  const figSoma = (a, b) => { const [d1, d2] = opc(a + b); return R(conta(a, b), T(a + b), T(d1), T(d2), `Quanto é ${a} mais ${b}?`); };
+  const simSoma = (a, b) => { const [d1, d2] = opc(a + b); return R(T(`${a} + ${b}`), T(a + b), T(d1), T(d2), `Quanto é ${a} mais ${b}?`); };
+  const S2 = (l, f) => l.map(([a, b]) => f(a, b));
+  const adic = ([ja, k]) => toque(ja + k, `Tem ${ja}. Adicione mais ${k}`, 'completar', ja + k + 3, ja);
+  const tAd = (a, b) => tato(conta(a, b), 'O que aconteceu aqui? (juntou / adicionou)');
+  grupo('A01', 'Adicionar no concreto', ['K05'], [], [
+    lb([adic([2, 1]), adic([3, 2]), adic([5, 3]), tAd(2, 3)]),
+    ensTeste('Adicionar tocando', [[2, 1], [3, 2], [1, 3], [4, 2]].map(adic), [[5, 2], [2, 4], [6, 3], [3, 3]].map(adic), ab(['R18', 1])),
+    ensTeste('Tato: o que aconteceu', [tAd(2, 1), tAd(3, 2), tAd(4, 1)], [tAd(5, 2), tAd(2, 4), tAd(6, 3)], ab(['R18', 2]))
+  ]);
+  const ouvSinal = (s, nome, ds) => R(null, T(s), T(ds[0]), T(ds[1]), `Mostre o sinal de ${nome}`);
+  grupo('A02', 'Sinal de mais', ['A01'], ['+'], [
+    lb([ouvSinal('+', 'MAIS', ['=', '3']), tato(T('+'), 'Que sinal é esse?')]),
+    rede([ouvSinal('+', 'MAIS', ['=', '3']), R(conta(2, 1), T('+'), T('='), T('3'), 'Qual sinal é de JUNTAR?'), R(conta(3, 2), T('+'), T('='), T('5'), 'Qual sinal é de JUNTAR?')], [tato(T('+'), 'Que sinal é esse?')], [R(null, T('2 + 3'), T('2 = 2'), T('5'), 'Mostre a conta de MAIS'), R(null, T('4 + 1'), T('4 = 4'), T('1'), 'Mostre a conta de MAIS'), tato(T('3 + 2'), 'Lê essa conta para mim')], ab(['R28', 2]))
+  ]);
+  grupo('A03', 'Somar 1 (vem da contagem)', ['A02', 'K02', 'N02'], [], [
+    lb(S2([[1, 1], [5, 1], [8, 1], [12, 1], [1, 6]], simSoma)),
+    rede(S2([[2, 1], [4, 1], [6, 1], [3, 1]], figSoma), S2([[1, 1], [5, 1], [7, 1], [8, 1], [9, 1]], simSoma), S2([[1, 5], [1, 7], [12, 1], [19, 1], [25, 1], [29, 1]], simSoma), [], 'Ensino com figuras e testes')
+  ]);
+  grupo('A04', 'Somas até 10 (conta a partir do maior)', ['A03'], [], [
+    lb(S2([[5, 2], [4, 3], [6, 2], [2, 7], [3, 5], [4, 4]], simSoma)),
+    rede(S2([[3, 2], [5, 3], [4, 2], [6, 3]], figSoma), S2([[5, 2], [4, 3], [6, 2], [7, 3], [2, 2]], simSoma), S2([[2, 5], [3, 4], [2, 6], [3, 7], [4, 4], [1, 8]], simSoma), ab(['R20', 1]), 'Ensino com figuras e testes')
+  ]);
+  const dois = (a, b, sd) => C({ k:'dois', a, b, sd });
+  const exI = (x, y, z, sd) => R(null, dois(x, x, sd), dois(y, z, sd + 1), null, 'Mostre onde é IGUAL');
+  const exD = (x, y, z, sd) => R(null, dois(y, z, sd), dois(x, x, sd + 1), null, 'Mostre onde NÃO É IGUAL');
+  grupo('A05', 'Igual e não é igual', ['A02'], ['=', '≠'], [
+    lb([ouvSinal('=', 'IGUAL', ['≠', '+']), ouvSinal('≠', 'NÃO É IGUAL', ['=', '+']), tato(T('='), 'Que sinal é esse?'), tato(T('≠'), 'Que sinal é esse?'), exI(3, 2, 5, 1), exD(4, 4, 6, 3)]),
+    rede([ouvSinal('=', 'IGUAL', ['≠', '+']), ouvSinal('≠', 'NÃO É IGUAL', ['=', '+'])], [tato(T('='), 'Que sinal é esse?'), tato(T('≠'), 'Que sinal é esse?')], [exI(3, 3, 5, 5), exI(5, 2, 5, 7), exD(4, 4, 6, 9), exD(2, 1, 3, 11), R(null, T('4 = 4'), T('4 ≠ 4'), null, 'Mostre a conta CERTA'), R(null, T('3 ≠ 5'), T('3 = 5'), null, 'Mostre a conta CERTA')], ab(['R25', 2], ['R26', 2]))
+  ]);
+  grupo('A06', 'Somas até 20', ['A04', 'N04'], [], [
+    lb(S2([[9, 6], [11, 4], [13, 5], [8, 7], [4, 12], [6, 9]], simSoma)),
+    rede(S2([[8, 3], [9, 4], [7, 5], [12, 3]], figSoma), S2([[9, 6], [11, 4], [13, 5], [8, 7], [14, 3], [6, 9]], simSoma), S2([[4, 12], [5, 13], [3, 15], [7, 8], [2, 16]], simSoma), ab(['R20', 2]), 'Ensino com figuras e testes')
+  ]);
+  grupo('A07', 'Somas até 30', ['A06', 'N05'], [], [
+    lb(S2([[16, 7], [22, 5], [18, 9], [5, 20], [23, 6]], simSoma)),
+    rede(S2([[17, 5], [21, 4], [19, 6]], figSoma), S2([[16, 7], [22, 5], [18, 9], [23, 6], [24, 4]], simSoma), S2([[5, 20], [7, 18], [9, 19], [6, 21]], simSoma), ab(['R20', 3]), 'Ensino com figuras e testes')
+  ]);
+  grupo('A08', 'Somas com dezenas (até 99)', ['A07', 'N07'], [], [
+    lb(S2([[40, 50], [20, 60], [23, 4], [61, 8], [32, 20]], simSoma)),
+    rede(S2([[10, 10], [20, 10], [30, 20], [10, 40]], simSoma), S2([[40, 50], [20, 60], [30, 30], [50, 40], [60, 20]], simSoma), S2([[40, 5], [23, 4], [61, 8], [32, 20], [45, 30], [52, 7]], simSoma), ab(['R20', 4]), 'Ensino com dezenas e teste do resto')
+  ]);
+
+  // ===== U · Subtração =====
+  const figSub = (a, b) => { const r = a - b, [d1, d2] = opc(r); return R(conta(a, b, '-'), T(r), T(d1), T(d2), `Tinha ${a}, tirei ${b}. Quantos sobraram?`); };
+  const simSub = (a, b) => { const r = a - b, [d1, d2] = opc(r); return R(T(`${a} − ${b}`), T(r), T(d1), T(d2), `Quanto é ${a} menos ${b}?`); };
+  const tTi = (a, b) => tato(conta(a, b, '-'), 'O que aconteceu aqui? (tirou)');
+  grupo('U01', 'Tirar no concreto', ['Q01', 'A03'], [], [
+    lb([figSub(5, 2), figSub(7, 3), figSub(4, 1), tTi(6, 2)]),
+    ensTeste('Quantos sobraram', S2([[5, 2], [4, 1], [6, 3], [3, 1]], figSub), S2([[7, 2], [8, 3], [5, 4], [9, 4]], figSub), ab(['R29', 1])),
+    ensTeste('Tato: o que aconteceu', [tTi(5, 2), tTi(4, 1), tTi(6, 3)], [tTi(7, 2), tTi(8, 3), tTi(9, 4)], ab(['R29', 2]))
+  ]);
+  grupo('U02', 'Sinal de menos (contraste com o de mais)', ['U01', 'A02'], ['−', '+'], [
+    lb([ouvSinal('−', 'MENOS', ['+', '=']), ouvSinal('+', 'MAIS', ['−', '=']), tato(T('−'), 'Que sinal é esse?')]),
+    enc('Ensino e testes', [et('Treino só MENOS', 'treino', [ouvSinal('−', 'MENOS', ['+', '=']), R(conta(5, 2, '-'), T('−'), T('+'), T('='), 'Qual sinal é de TIRAR?')], 6, 6, 18), et('MAIS e MENOS em blocos', 'treino', [ouvSinal('−', 'MENOS', ['+', '=']), ouvSinal('+', 'MAIS', ['−', '='])], 7, 8, 16), et('Manutenção sem feedback', 'manut', [ouvSinal('−', 'MENOS', ['+', '=']), ouvSinal('+', 'MAIS', ['−', '=']), R(conta(4, 1, '-'), T('−'), T('+'), T('='), 'Qual sinal é de TIRAR?')], 6, 8, 8), et('Teste implicação mútua', 'teste', [tato(T('−'), 'Que sinal é esse?')], 5, 6, 6, 0), et('Teste combinatório', 'teste', [R(null, T('5 − 2'), T('5 + 2'), T('5'), 'Mostre a conta de MENOS'), R(null, T('3 + 1'), T('3 − 1'), T('3'), 'Mostre a conta de MAIS'), tato(T('6 − 2'), 'Lê essa conta para mim')], 7, 8, 8, 0)], ab(['R27', 2]))
+  ]);
+  grupo('U03', 'Família de fatos (vem da adição)', ['U02', 'A04'], [], [
+    lb(S2([[5, 2], [7, 3], [6, 1], [8, 5], [10, 1]], simSub)),
+    rede(S2([[4, 1], [6, 1], [9, 1]], figSub), S2([[3, 1], [7, 1], [10, 1], [5, 1]], simSub), S2([[5, 2], [5, 3], [7, 4], [7, 3], [8, 5], [6, 2]], simSub), [], 'Ensino do −1 e teste da família')
+  ]);
+
+  // ===== H · Horas (digital B, falado A, ponteiros C) =====
+  const fala = (h) => { const [H, M] = h.split(':'), hh = +H; return M === '00' ? `${hh} ${hh === 1 ? 'hora' : 'horas'}` : M === '30' ? `${hh} e meia` : `${hh} e ${+M}`; };
+  const redeHora = (cod, titulo, hs, extra, req, ablls) => {
+    const ds = (h) => outros([...hs, ...extra], h);
+    const AB = (h) => { const [d1, d2] = ds(h); return R(null, DG(h), DG(d1), DG(d2), `Mostre ${fala(h)}`); };
+    const CB = (h) => { const [d1, d2] = ds(h); return R(AN(h), DG(h), DG(d1), DG(d2), 'Qual relógio marca a mesma hora?'); };
+    const BC = (h) => { const [d1, d2] = ds(h); return R(DG(h), AN(h), AN(d1), AN(d2), 'Qual relógio marca a mesma hora?'); };
+    const AC = (h) => { const [d1, d2] = ds(h); return R(null, AN(h), AN(d1), AN(d2), `Mostre ${fala(h)}`); };
+    const tB = (h) => tato(DG(h), 'Que horas são?'), tC = (h) => tato(AN(h), 'Que horas são?');
+    grupo(cod, titulo, req, hs.map(fala), [lb(hs.flatMap(h => [tB(h), tC(h)])), rede(hs.flatMap(h => [AB(h), CB(h)]), hs.map(BC), hs.flatMap(h => [AC(h), tC(h)]), ablls)]);
+  };
+  redeHora('H01', 'Hora inteira', ['7:00', '9:00', '12:00', '3:00'], [], ['N03'], ab(['R21', 1]));
+  redeHora('H02', 'Meia hora', ['9:30', '7:30', '2:30', '11:30'], ['9:00', '7:00'], ['H01'], ab(['R21', 2]));
+  redeHora('H03', 'Quinze e quarenta e cinco', ['9:15', '9:45', '4:15', '6:45'], ['9:30', '4:30'], ['H02'], ab(['R21', 3]));
+  const hT = ['8:05', '3:20', '10:40', '6:55'], hN = ['1:10', '4:25', '7:35', '2:50', '11:05', '5:40'];
+  const dsH = (h) => outros([...hT, ...hN], h);
+  grupo('H04', 'Minutos (de 5 em 5)', ['H03', 'N07'], [], [
+    lb([tato(T('5, 10, 15, …'), 'Conta de 5 em 5 até 60'), ...hN.slice(0, 4).map(h => tato(AN(h), 'Que horas são?'))]),
+    enc('Ensino e teste com horários novos', [et('Treino', 'treino', [tato(T('5, 10, 15, …'), 'Conta de 5 em 5 até 60'), ...hT.map(h => { const [d1, d2] = dsH(h); return R(AN(h), DG(h), DG(d1), DG(d2), 'Qual relógio marca a mesma hora?'); })], 6, 6, 18), et('Teste horários novos', 'teste', hN.map(h => tato(AN(h), 'Que horas são?')), 5, 6, 6, 0)], ab(['R21', 4]))
+  ]);
+
+  // ===== D · Dinheiro =====
+  const MO = (c) => C({ k:'moedas', l:[c] }), MOS = (l) => C({ k:'moedas', l });
+  const val = (c) => c === 100 ? '1 real' : c > 100 ? `1 real e ${c - 100} centavos` : `${c} centavos`;
+  const ouvM = (c, lista) => { const [d1, d2] = outros(lista, c); return R(null, MO(c), MO(d1), d2 !== undefined ? MO(d2) : null, `Mostre a moeda de ${val(c)}`); };
+  const tM = (c) => tato(MO(c), 'Que moeda é essa?');
+  const M4 = [100, 50, 25, 10];
+  grupo('D01', 'Nome das moedas', ['N02'], ['1 real', '50', '25', '10', '5'], [
+    lb([...M4.map(c => ouvM(c, M4)), tM(100), tM(25)]),
+    ensTeste('Duas moedas', [100, 50].map(c => ouvM(c, [100, 50])), [tM(100), tM(50)], ab(['R22', 1])),
+    ensTeste('Quatro moedas', M4.map(c => ouvM(c, M4)), [...M4.map(tM), ouvM(5, [5, 10, 25])], ab(['R22', 2]), [7, 8, 8])
+  ]);
+  const quanto = (c) => { const [d1, d2] = outros(M4, c); return R(MO(c), T(val(c)), T(val(d1)), T(val(d2)), 'Quanto vale essa moeda?'); };
+  const qual = (c) => { const [d1, d2] = outros(M4, c); return R(T(val(c)), MO(c), MO(d1), MO(d2), 'Qual moeda vale isso?'); };
+  const valeMais = ([a, b]) => R(null, MO(a), MO(b), null, 'Qual moeda vale MAIS?');
+  grupo('D02', 'Valor das moedas', ['D01', 'N06'], [], [
+    lb([quanto(25), quanto(50), qual(10), valeMais([10, 5]), valeMais([50, 25])]),
+    rede(M4.map(quanto), M4.map(qual), [[10, 5], [25, 10], [50, 25], [100, 50], [25, 5]].map(valeMais), ab(['R23', 2]), 'Ensino do valor e testes (inclui 5 × 10)')
+  ]);
+  const soma = (l) => l.reduce((a, b) => a + b, 0);
+  const quantoDa = (l) => { const s = soma(l), ds = outros([5, 10, 15, 20, 25, 30, 40, 50, 75, 100].filter(v => Math.abs(v - s) <= 25), s); return R(MOS(l), T(val(s)), T(val(ds[0])), T(val(ds[1] ?? (s >= 100 ? 50 : s + 5))), 'Quanto dá junto?'); };
+  const junta = (alvo, certo, e1, e2) => R(null, MOS(certo), MOS(e1), MOS(e2), `Qual junta ${val(alvo)}?`);
+  grupo('D03', 'Juntar moedas', ['D02', 'A04'], [], [
+    lb([quantoDa([5, 5]), quantoDa([10, 10, 5]), quantoDa([25, 25]), quantoDa([50, 50])]),
+    ensTeste('Até 25 centavos', [quantoDa([5, 5]), quantoDa([10, 5]), quantoDa([10, 10, 5])], [quantoDa([5, 5, 5, 5, 5]), quantoDa([10, 5, 5, 5]), junta(25, [10, 10, 5], [10, 10], [5, 5])], ab(['R24', 1], ['R24', 2])),
+    ensTeste('Até 1 real', [quantoDa([25, 25]), quantoDa([50, 50]), quantoDa([10, 10, 10, 10, 10])], [quantoDa([25, 25, 25, 25]), quantoDa([50, 25, 25]), quantoDa([25, 10, 10, 5]), junta(50, [25, 25], [25, 10], [10, 10, 10]), junta(100, [50, 50], [50, 25], [25, 25, 25])], ab(['R24', 3], ['R24', 4]), [7, 8, 8])
+  ]);
+  const N4 = [2, 5, 10, 20, 50, 100];
+  const ouvN = (v) => { const [d1, d2] = outros(N4, v); return R(null, NT(v), NT(d1), NT(d2), `Mostre a nota de ${v} reais`); };
+  grupo('D04', 'Cédulas (uso funcional)', ['N05'], ['2', '5', '10', '20', '50', '100'], [
+    lb([ouvN(10), ouvN(50), tato(NT(20), 'Que nota é essa?'), R(null, NT(50), NT(20), null, 'Qual vale MAIS?')]),
+    rede([2, 5, 10, 20].map(ouvN), [2, 5, 10, 20].map(v => tato(NT(v), 'Que nota é essa?')), [ouvN(50), ouvN(100), ...[[50, 20], [100, 50], [20, 10], [10, 5]].map(([a, b]) => R(null, NT(a), NT(b), null, 'Qual vale MAIS?'))], [])
+  ]);
+  return G;
+}
+
+// ----- Criação dos programas -----
+async function idMat(x, tag) {
+  if (!x) return '';
+  if (x.txt !== undefined) return garantirTexto(x.txt, tag);
+  if (x.q !== undefined) return garantirGerado('qtd', x.q, qtdNome(x.q), tag);
+  if (x.dig) return garantirGerado('relogio', x.dig, 'relógio digital ' + x.dig, tag);
+  if (x.ana) return garantirGerado('relogioA', x.ana, 'relógio de ponteiros ' + x.ana, tag);
+  if (x.nota) return garantirGerado('nota', x.nota, notaNome(x.nota), tag);
+  if (x.cena) return garantirGerado('mat', JSON.stringify(x.cena), nomeCena(x.cena), tag);
+  return '';
+}
+async function relMat(r, tag) {
+  const o = { m: await idMat(r.m, tag), a: await idMat(r.a, tag), b: await idMat(r.b, tag), c: await idMat(r.c, tag), instr: r.instr || '' };
+  if (!o.b) o.b = o.a;
+  if (r.tato) o.tato = true;
+  if (r.toque) o.toque = r.toque;
+  return o;
+}
+let criandoMat3 = false;
+async function criarMatematica3() {
+  if (criandoMat3) return; criandoMat3 = true; const b = $('#criarMat'); b.disabled = true; let novos = 0;
+  try {
+    const defs = defMat3();
+    const nomes = new Set(); defs.forEach(g => g.passos.forEach((ps, i) => nomes.add(`${g.cod} ${g.titulo} - ${i + 1} ${ps.rot}`)));
+    const antigos = PROGS.filter(p => /^[NCMDH]\d\d /.test(p.nome) && !p.mat && !nomes.has(p.nome));
+    if (antigos.length && confirm(`Substituir ${antigos.length} programas antigos de matemática pela versão por módulos? As sessões já registradas continuam no histórico.`)) {
+      for (const p of antigos) await DB.apagar('programas', p.id);
+      PROGS = PROGS.filter(p => !antigos.includes(p));
+    }
+    for (const g of defs) {
+      $('#matMsg').textContent = `Criando ${g.cod}...`; const tag = 'Matemática ' + g.cod; let i = 0;
+      for (const ps of g.passos) {
+        i++;
+        const nome = `${g.cod} ${g.titulo} - ${i} ${ps.rot}`;
+        const temTeste = ps.tipo === 'encadeado' && ps.etapas.some(E => E.modo === 'teste');
+        const protocolos = g.cod === 'D04' ? ['Currículo funcional'] : [...new Set((ps.ablls || []).map(x => 'ABLLS-R ' + x.it))].concat(['VB-MAPP Matemática'], temTeste ? ['PEAK-E'] : []);
+        const base = { nome, area:'Matemática: ' + MOD_NOME[g.cod[0]], mat:{ mod:g.cod[0], req:g.req, itens:g.itens }, ablls:ps.ablls || [], protocolos, ordem:'aleatoria', arranjo:3, apoio:'junto', instr:'' };
+        if (ps.tipo === 'encadeado') {
+          const etapas = [];
+          for (const E of ps.etapas) { const rels = []; for (const r of E.rels) rels.push(await relMat(r, tag)); etapas.push(Object.assign({}, E, { rels })); }
+          const todas = etapas.flatMap(E => E.rels), max = etapas.reduce((s, E) => s + E.max, 0) * 2;
+          novos += await criarPrograma(Object.assign(base, { tipo:'encadeado', fase: etapas[0].modo === 'treino' ? 'treino' : 'teste', etapas, pares:todas, critA:1, critN:1, max }));
+        } else {
+          const pares = []; for (const r of ps.rels) pares.push(await relMat(r, tag));
+          novos += await criarPrograma(Object.assign(base, { tipo:'par', fase: ps.lb ? 'teste' : (ps.fase || 'treino'), lb: !!ps.lb, ordem: ps.lb ? 'sequencial' : 'aleatoria', pares, critA:ps.crit[0], critN:ps.crit[1], max:ps.max }));
+        }
+      }
+    }
+  } catch (err) { $('#matMsg').textContent = 'Erro ao criar: ' + err.message + '. Toque de novo para continuar.'; criandoMat3 = false; b.disabled = false; return; }
+  preencherTags(); renderEst();
+  const total = PROGS.filter(p => p.mat).length;
+  $('#matMsg').innerHTML = (novos ? `<b class="ok">Pronto: ${novos} programas criados agora.</b> ` : '<b class="ok">Os módulos de matemática já estão criados.</b> ') + `Total: ${total}.`;
+  criandoMat3 = false; b.disabled = false; redesenhar();
+}
+
+// ----- Aba Matemática por módulos -----
+$('#aba-matematica details.como').innerHTML = `<summary>Como usar</summary>
+  <ol>
+    <li>Cada etapa começa pela <b>linha de base</b> (sem feedback). Se ele acertar, a etapa toda já conta como concluída e não precisa de ensino.</li>
+    <li>Se errar, aplique <b>Ensino e testes</b>: treino → manutenção sem feedback → teste de implicação mútua → teste combinatório. O app avança sozinho; se falhar num teste, volta ao treino uma vez e depois indica MET.</li>
+    <li>O cadeado 🔒 mostra o pré-requisito sugerido. Você pode aplicar mesmo assim.</li>
+    <li>Nas tentativas de tocar, ele mesmo arrasta as bolas para o prato e toca em <b>Pronto</b>. No "conta tocando" e nas respostas faladas, você marca ✓ ou ✕.</li>
+    <li>Em <b>ABLLS-R</b> lance a pontuação da linha de base; o app mostra o nível que ele já atingiu em cada item.</li>
+  </ol>
+  <p class="ajuda">Itens e níveis seguem a pontuação da ABLLS-R (R1–R29); o conteúdo das tarefas é do app. Figuras desenhadas pelo app e Twemoji (CC BY 4.0).</p>
+  <div class="linha"><button class="btn sec" id="criarMat">Criar os módulos de matemática</button><span class="ajuda" id="matMsg"></span></div>`;
+$('#criarMat').onclick = async () => { await criarMatematica3(); redesenhar(); };
+function abllsDoGrupo(arr) { const s = new Set(); arr.forEach(p => (p.ablls || []).forEach(x => s.add(x.it))); return [...s].sort((a, b) => +a.slice(1) - +b.slice(1)).join(' · '); }
+renderMatCards = function () {
+  const fb = $('#filtrosMat');
+  if (!MOD_MAT.some(m => m.l === filtroMat) && filtroMat !== 'R') filtroMat = 'K';
+  fb.innerHTML = MOD_MAT.map(m => `<button data-f="${m.l}">${m.t}</button>`).join('') + '<button data-f="R">ABLLS-R</button>';
+  fb.querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.f === filtroMat); b.onclick = () => { filtroMat = b.dataset.f; renderMatCards(); }; });
+  const cont = $('#cardsMat');
+  if (filtroMat === 'R') { cont.innerHTML = painelAblls(); ligarPainelAblls(); return; }
+  const mod = MOD_MAT.find(m => m.l === filtroMat);
+  const lista = grupos(filtroMat).filter(([, arr]) => arr.some(p => p.mat));
+  if (!lista.length) { cont.innerHTML = vazioArea('Os módulos de matemática ainda não foram criados para este aprendiz.', 'criarMat'); return; }
+  abrirPadrao(lista, k => 'mat-' + k);
+  const feitas = lista.filter(([, arr]) => estadoGrupo(arr) === 'feita').length;
+  cont.innerHTML = `<div class="mod-cab"><div><b>${esc(mod.t)}</b> <span class="chip-ablls">ABLLS-R ${esc(mod.itens)}</span></div><div class="meta">${esc(mod.d)}</div><div class="barra-prog"><span style="width:${Math.round(100 * feitas / lista.length)}%"></span></div><div class="meta">${feitas} de ${lista.length} etapas concluídas</div></div>` +
+    lista.map(([k, arr]) => {
+      const p0 = arr.find(p => p.mat) || arr[0], falta = ((p0.mat && p0.mat.req) || []).filter(r => !grupoFeito(r));
+      let h = cartaoEtapa('mat-' + k, k, tituloGrupo(arr), arr, (p0.mat && p0.mat.itens) || []);
+      const extra = (abllsDoGrupo(arr) ? `<span class="chip-ablls">${abllsDoGrupo(arr)}</span>` : '') + (falta.length && estadoGrupo(arr) !== 'feita' ? `<span class="chip-bloq" title="Pré-requisito sugerido">🔒 depois de ${falta.join(', ')}</span>` : '');
+      h = h.replace('<span class="estado', extra + '<span class="estado');
+      if (falta.length && estadoGrupo(arr) !== 'feita') h = h.replace('class="etapa', 'class="etapa bloq');
+      return h;
+    }).join('');
+  ligarCartoes(cont);
+};
+function painelAblls() {
+  const a = aprPorId(APR_ATUAL), lbs = (a && a.ablls) || {}, app = abllsApp(), fonte = {};
+  PROGS.forEach(p => (p.ablls || []).forEach(x => { (fonte[x.it] = fonte[x.it] || new Set()).add(codDe(p.nome)); }));
+  const linhas = ABLLS_R.map(([it, nome, max]) => {
+    const lb = lbs[it], ap = app[it] || 0, at = Math.max(lb ?? 0, ap);
+    return `<tr><td><b>${it}</b></td><td>${esc(nome)}</td><td><select data-lb="${it}"><option value="">–</option>${Array.from({ length: max + 1 }, (_, v) => `<option value="${v}" ${lb === v ? 'selected' : ''}>${v}</option>`).join('')}</select> <span class="meta">/${max}</span></td><td>${ap ? `<b class="ok">${ap}</b>/${max}` : '<span class="meta">–</span>'}</td><td style="min-width:110px"><div class="nivel"><span style="width:${Math.round(100 * at / max)}%"></span></div><span class="meta">${at}/${max}</span></td><td class="meta">${[...(fonte[it] || [])].sort().map(c => `<a href="#" data-ir-mod="${c[0]}">${c}</a>`).join(', ')}</td></tr>`;
+  }).join('');
+  const total = ABLLS_R.reduce((s, x) => s + x[2], 0), soma = (f) => ABLLS_R.reduce((s, [it]) => s + f(it), 0);
+  const tLb = soma(it => lbs[it] ?? 0), tAt = soma(it => Math.max(lbs[it] ?? 0, app[it] || 0));
+  return `<div class="card"><div class="linha" style="justify-content:space-between"><h2 style="margin:0">ABLLS-R · Matemática (R1–R29)</h2><label>Data da linha de base<input type="date" id="abllsData" value="${esc((a && a.abllsData) || '')}"></label></div>
+    <p class="ajuda">Linha de base: lance a pontuação da avaliação. App: nível que ele já mostrou aqui (passou no teste da etapa ou acertou a linha de base). Atual = o maior dos dois. Total: linha de base ${tLb}/${total} · atual ${tAt}/${total}. Os dados ficam só neste aparelho.</p>
+    <table class="tab-ablls"><tr><th>Item</th><th>Habilidade</th><th>Linha de base</th><th>App</th><th>Atual</th><th>Etapas</th></tr>${linhas}</table></div>`;
+}
+function ligarPainelAblls() {
+  const a = aprPorId(APR_ATUAL); if (!a) return;
+  $('#cardsMat').querySelectorAll('[data-lb]').forEach(s => s.onchange = async () => { a.ablls = a.ablls || {}; if (s.value === '') delete a.ablls[s.dataset.lb]; else a.ablls[s.dataset.lb] = +s.value; await salvarAprs(); renderMatCards(); });
+  $('#abllsData').onchange = async () => { a.abllsData = $('#abllsData').value; await salvarAprs(); };
+  $('#cardsMat').querySelectorAll('[data-ir-mod]').forEach(l => l.onclick = (ev) => { ev.preventDefault(); filtroMat = l.dataset.irMod; renderMatCards(); });
+}
 
 // ================= Autoteste (?autoteste=1) =================
 function autoteste() {
