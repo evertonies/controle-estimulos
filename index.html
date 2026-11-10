@@ -304,6 +304,14 @@
   .aviso-deriv { background:#fff; border:1px solid var(--borda); border-left:5px solid var(--azul2); border-radius:12px; padding:11px 14px; margin:0 0 12px; font-size:14px; line-height:1.5; }
   .aviso-deriv.ok-d { border-left-color:var(--verde); } .aviso-deriv.nao-d { border-left-color:#e6a700; }
   .chip-deriv { font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; background:var(--ok-bg); color:var(--verde); white-space:nowrap; }
+  /* ===== Linguagem ===== */
+  .item.vis { cursor:default; }
+  .slots.fig { gap:1.4vw; }
+  .slot.fig { width:16vh; height:16vh; border:3px dashed #98a2b3; border-radius:14px; font-size:3vh; color:#98a2b3; align-items:center; overflow:hidden; }
+  .slot.fig img, .tile.fig img { max-width:100%; max-height:100%; }
+  .tile.fig { width:16vh; height:16vh; padding:1vh; }
+  .cartao.pergunta.espera { font-size:6vh; color:var(--suave); }
+  #comparacoes:has(.slots.fig) { flex-direction:column; }
 </style>
 </head>
 <body>
@@ -3626,6 +3634,479 @@ renderLeitura = function () {
       return h;
     }).join('')).join('');
   ligarCartoes(cont);
+};
+
+// Banco de itens da Linguagem e pictogramas ARASAAC (Sergio Palao, Governo de Aragão, CC BY-NC-SA)
+const LING = {"classes":{"animal":["animal","animais","o"],"fruta":["fruta","frutas","a"],"comida":["comida","comidas","a"],"bebida":["bebida","bebidas","a"],"roupa":["roupa","roupas","a"],"movel":["móvel","móveis","o"],"utensilio":["coisa de cozinha","coisas de cozinha","a"],"higiene":["coisa de higiene","coisas de higiene","a"],"escolar":["material escolar","materiais escolares","o"],"veiculo":["veículo","veículos","o"],"brinquedo":["brinquedo","brinquedos","o"],"aparelho":["aparelho","aparelhos","o"]},"itens":[["cachorro","o","animal","","tem rabo","casa","osso"],["gato","o","animal","","tem rabo","casa",""],["cavalo","o","animal","","tem rabo","fazenda",""],["vaca","a","animal","","tem chifre","fazenda","leite"],["galinha","a","animal","","tem penas","fazenda","ovo"],["peixe","o","animal","","tem escamas","",""],["pássaro","o","animal","","tem asas","",""],["porco","o","animal","","tem rabo","fazenda",""],["macaco","o","animal","","tem rabo","","banana"],["leão","o","animal","","tem juba","",""],["banana","a","fruta","comer","é amarela","mercado","macaco"],["maçã","a","fruta","comer","é vermelha","mercado",""],["laranja","a","fruta","comer","é redonda","mercado",""],["uva","a","fruta","comer","","mercado",""],["morango","o","fruta","comer","é vermelho","mercado",""],["melancia","a","fruta","comer","é grande","mercado",""],["abacaxi","o","fruta","comer","tem coroa","mercado",""],["pera","a","fruta","comer","","mercado",""],["pão","o","comida","comer","","padaria","queijo"],["arroz","o","comida","comer","","mercado","feijão"],["feijão","o","comida","comer","","mercado","arroz"],["ovo","o","comida","comer","","mercado","galinha"],["bolo","o","comida","comer","é doce","padaria",""],["pizza","a","comida","comer","é redonda","",""],["sorvete","o","comida","comer","é gelado","",""],["queijo","o","comida","comer","","mercado","pão"],["água","a","bebida","beber","","","copo"],["suco","o","bebida","beber","","","copo"],["leite","o","bebida","beber","","mercado","vaca"],["café","o","bebida","beber","é quente","","xícara"],["camisa","a","roupa","vestir","tem botões","quarto",""],["calça","a","roupa","vestir","","quarto",""],["meia","a","roupa","calçar","","quarto","sapato"],["sapato","o","roupa","calçar","","quarto","meia"],["boné","o","roupa","usar na cabeça","","",""],["casaco","o","roupa","vestir","é quente","quarto",""],["short","o","roupa","vestir","","quarto",""],["vestido","o","roupa","vestir","","quarto",""],["cadeira","a","movel","sentar","tem pernas","sala","mesa"],["mesa","a","movel","","tem pernas","sala","cadeira"],["cama","a","movel","dormir","","quarto","travesseiro"],["sofá","o","movel","sentar","","sala",""],["armário","o","movel","guardar","tem portas","quarto",""],["prato","o","utensilio","comer","é redondo","cozinha","garfo"],["copo","o","utensilio","beber","","cozinha","suco"],["colher","a","utensilio","comer","","cozinha",""],["garfo","o","utensilio","comer","","cozinha","faca"],["faca","a","utensilio","cortar","","cozinha","garfo"],["panela","a","utensilio","cozinhar","","cozinha","fogão"],["escova de dente","a","higiene","escovar os dentes","","banheiro","pasta de dente"],["pasta de dente","a","higiene","escovar os dentes","","banheiro","escova de dente"],["sabonete","o","higiene","tomar banho","","banheiro","toalha"],["toalha","a","higiene","secar","","banheiro","sabonete"],["pente","o","higiene","pentear o cabelo","","banheiro",""],["xampu","o","higiene","lavar o cabelo","","banheiro",""],["papel higiênico","o","higiene","limpar","","banheiro",""],["lápis","o","escolar","escrever","","escola","caderno"],["caneta","a","escolar","escrever","","escola",""],["tesoura","a","escolar","cortar","","escola","papel"],["borracha","a","escolar","apagar","","escola","lápis"],["caderno","o","escolar","escrever","","escola","lápis"],["livro","o","escolar","ler","","escola",""],["mochila","a","escolar","carregar as coisas","","escola",""],["cola","a","escolar","colar","","escola",""],["carro","o","veiculo","passear","tem rodas","",""],["ônibus","o","veiculo","passear","tem rodas","",""],["bicicleta","a","veiculo","pedalar","tem rodas","parque",""],["moto","a","veiculo","passear","tem rodas","",""],["avião","o","veiculo","voar","tem asas","",""],["barco","o","veiculo","navegar","","",""],["trem","o","veiculo","viajar","","",""],["caminhão","o","veiculo","carregar as coisas","tem rodas","",""],["bola","a","brinquedo","chutar","é redonda","parque",""],["boneca","a","brinquedo","brincar","","",""],["pipa","a","brinquedo","soltar no céu","","parque",""],["videogame","o","brinquedo","jogar","tem tela","sala",""],["quebra-cabeça","o","brinquedo","montar","","",""],["celular","o","aparelho","telefonar","tem tela","",""],["televisão","a","aparelho","assistir","tem tela","sala",""],["computador","o","aparelho","digitar","tem tela","",""],["relógio","o","aparelho","ver as horas","tem ponteiros","",""],["geladeira","a","aparelho","gelar a comida","é gelada","cozinha",""]],"extras":["osso","travesseiro","papel","xícara","fogão","privada","chuveiro","balanço","escorregador"],"lugares":[["cozinha","a","na","cozinhar"],["banheiro","o","no","tomar banho"],["quarto","o","no","dormir"],["sala","a","na","assistir televisão"],["escola","a","na","estudar"],["mercado","o","no","comprar comida"],["padaria","a","na","comprar pão"],["parque","o","no","brincar"],["hospital","o","no","cuidar da saúde"]],"profissoes":[["professor","o","ensina os alunos","escola"],["médico","o","cuida dos doentes","hospital"],["bombeiro","o","apaga o fogo",""],["policial","o","prende o ladrão",""],["dentista","o","cuida dos dentes",""],["cozinheiro","o","faz a comida","cozinha"],["motorista","o","dirige o ônibus",""],["padeiro","o","faz o pão","padaria"]],"emocoes":[["feliz","alegre"],["triste","triste"],["bravo","zangado"],["com medo","medo"],["surpreso","surpreso"]],"acoes":[["comer","comendo"],["beber","bebendo"],["dormir","dormindo"],["correr","correndo"],["pular","pulando"],["sentar","sentando"],["ler","lendo"],["escrever","escrevendo"],["cortar","cortando"],["lavar as mãos","lavando as mãos"],["escovar os dentes","escovando os dentes"],["tomar banho","tomando banho"],["cozinhar","cozinhando"],["chutar","chutando"],["nadar","nadando"],["andar de bicicleta","andando de bicicleta"],["abraçar","abraçando"],["chorar","chorando"],["rir","rindo"],["cantar","cantando"],["desenhar","desenhando"],["varrer","varrendo"],["dirigir","dirigindo"],["telefonar","falando ao telefone"],["abrir","abrindo"],["fechar","fechando"],["empurrar","empurrando"],["andar","andando"],["jogar bola","jogando bola"],["assistir televisão","assistindo televisão"]],"preps":[["em cima","em cima"],["embaixo","embaixo"],["dentro","dentro"],["fora","fora"],["ao lado","ao lado"],["atrás","atrás"],["na frente","na frente"]],"opostos":[["aberto","fechado"],["cheio","vazio"],["quente","frio"],["limpo","sujo"],["molhado","seco"],["novo","velho"],["alto","baixo"]],"rotinas":[["lavar as mãos",["abrir a torneira","ensaboar","enxaguar as mãos","secar as mãos"]],["escovar os dentes",["pegar a escova de dente","pôr pasta de dente","escovar os dentes","enxaguar a boca"]],["tomar banho",["tirar a roupa","entrar no chuveiro","ensaboar o corpo","secar o corpo","vestir"]]]};
+const ARASAAC_IDS = {"cachorro":[2517,7202],"gato":[2406,7114],"cavalo":[2294,9200],"vaca":[2609],"galinha":[2403],"peixe":[2520],"pássaro":[2490,26270],"porco":[2327,24972],"macaco":[2477,34421],"leão":[2449,25187],"banana":[2530,9054],"maçã":[2462],"laranja":[2483,2888],"uva":[3247,34120],"morango":[2400],"melancia":[2557],"abacaxi":[2525,2625],"pera":[2561],"pão":[2494,10230],"arroz":[6911,25556],"feijão":[3294,8337],"ovo":[2427,38868],"bolo":[2502,2579],"pizza":[2527,12311],"sorvete":[39483,39482],"queijo":[2541,4881],"água":[2248],"suco":[4732,11405],"leite":[2445,4769],"café":[2296,24479],"camisa":[2308,13640],"calça":[2565,37817],"meia":[2298,8339],"sapato":[32923,8720],"boné":[2411,36577],"casaco":[2242,2319],"vestido":[2613,34737],"cadeira":[3155,4960],"mesa":[3129,6562],"cama":[2304,6954],"sofá":[2571,25479],"armário":[2258,6909],"prato":[2532,8364],"copo":[2610,4768],"colher":[2362],"garfo":[2588],"faca":[3237,4931],"panela":[9086,9087],"escova de dente":[38813],"pasta de dente":[11961,30614],"sabonete":[2964,25171],"toalha":[2593,4758],"pente":[2852],"xampu":[2699],"papel higiênico":[2862,37261],"lápis":[2440,4951],"caneta":[2282,10313],"tesoura":[2591,4964],"borracha":[2409],"caderno":[2359,4678],"livro":[2450,25191],"mochila":[2475,4696],"cola":[37499],"carro":[2339,3206],"ônibus":[26654,38090],"bicicleta":[2277,6935],"moto":[2480,5084],"avião":[2264,6924],"barco":[2273,4920],"trem":[2603,7282],"caminhão":[2306,6956],"bola":[2269,3241],"boneca":[2482,3063],"pipa":[2350,29943],"quebra-cabeça":[34518],"celular":[2586,25269],"televisão":[25498,9802],"computador":[2487,7190],"relógio":[2549,5561],"geladeira":[3272,4876],"osso":[2972],"travesseiro":[2250],"papel":[2398],"xícara":[2581],"fogão":[2341],"privada":[2430],"chuveiro":[2370],"balanço":[36101],"escorregador":[4759],"cozinha":[10752,10753],"banheiro":[5921,27475],"quarto":[5988],"sala":[6211],"escola":[3082,6454],"mercado":[3389,11457],"padaria":[2864,3361],"parque":[39574],"hospital":[3116,6523],"professor":[2457,6556],"médico":[2467,6561],"bombeiro":[2664,6066],"policial":[2824,37367],"dentista":[2733,11229],"cozinheiro":[6985,10348],"motorista":[3019,6459],"padeiro":[3358,6577],"alegre":[3250,6892],"triste":[2606,7286],"zangado":[2374,7039],"medo":[10261,38417],"surpreso":[2574,7260],"comer":[2349,4593],"beber":[2276,6061],"dormir":[2369,6479],"correr":[2719,6465],"pular":[2804,6607],"sentar":[38036,37104],"ler":[2447,7141],"escrever":[2380,8107],"cortar":[2547,2720],"lavar as mãos":[2443,6547],"escovar os dentes":[2326,6971],"tomar banho":[2271,2371],"cozinhar":[2342,6984],"chutar":[5961,15463],"nadar":[6568,24903],"andar de bicicleta":[5517,6045],"abraçar":[6023,34369],"chorar":[3239,7147],"rir":[13354,30393],"cantar":[2315,6960],"desenhar":[8088,21800],"varrer":[2658,6059],"dirigir":[2712,6458],"telefonar":[4662,4691],"abrir":[2637,6875],"fechar":[2697,6973],"empurrar":[4638,6485],"andar":[2432,3251],"jogar bola":[6537,21460],"assistir televisão":[2782,6626],"em cima":[5388],"embaixo":[5437],"dentro":[5439],"fora":[5475],"ao lado":[5367],"atrás":[5443],"na frente":[5438],"aberto":[4549],"fechado":[4596],"cheio":[4688],"vazio":[4767],"quente":[4583],"frio":[4652],"limpo":[4680],"sujo":[4750],"molhado":[4697],"seco":[4741],"novo":[4705],"velho":[4770],"alto":[4557],"baixo":[4571],"abrir a torneira":[11737],"ensaboar":[2443],"enxaguar as mãos":[6547],"secar as mãos":[2566],"pegar a escova de dente":[2694],"pôr pasta de dente":[2858],"enxaguar a boca":[8559],"tirar a roupa":[11232],"entrar no chuveiro":[2370],"ensaboar o corpo":[2964],"secar o corpo":[22105],"vestir":[2781],"short":[13638],"videogame":[37464,2354]};
+// ================= Linguagem: C (receptiva) + G (nomeação) + H (intraverbal), com B (desempenho visual) como base =================
+const lstAbl = (s) => s.split(';').map(x => { const [it, nome, max] = x.split('|'); return [it, nome, +max]; });
+const ABLLS_B = lstAbl('B1|Quebra-cabeça de 1 peça|4;B2|Jogo de encaixe|4;B3|Objetos idênticos|4;B4|Objeto com figura|2;B5|Figuras idênticas|4;B6|Figura com objeto|2;B7|Emparelhar com fluência|2;B8|Separar não idênticos|4;B9|Blocos sobre o cartão|4;B10|Quebra-cabeça com conectores|4;B11|Quebra-cabeça de bordas retas|4;B12|Blocos a partir do desenho|4;B13|Padrão seguindo modelo|4;B14|Quebra-cabeça de várias peças|4;B15|Quebra-cabeça sem moldura|4;B16|Figuras associadas|4;B17|Separar pela função|4;B18|Separar por característica|4;B19|Separar por categoria|4;B20|Replicar sequência com atraso|4;B21|Achar a amostra com atraso|4;B22|Continuar um padrão|4;B23|Replicar objeto 3D|2;B24|Emparelhamento dependente|2;B25|Seriação|4;B26|Sequência de figuras|4;B27|Labirinto|2');
+const ABLLS_C = lstAbl('C1|Responder ao nome|2;C2|Ação divertida no contexto|4;C3|Olhar o reforçador|2;C4|Tocar o reforçador|2;C5|Tocar item familiar|2;C6|Ação divertida fora do contexto|4;C7|Instruções na rotina|4;C8|Entregar objeto pedido|2;C9|Ação motora simples|4;C10|Item × distração|2;C11|Reforçador entre 2|2;C12|Um de 2 reforçadores|2;C13|Um de 2 objetos|4;C14|Uma de 2 figuras|4;C15|Partes do próprio corpo|4;C16|Um de 6 objetos|4;C17|Uma de 6 figuras|4;C18|Aprende seleção sem treino intensivo|2;C19|Seleção em sucessão rápida|2;C20|Instruções variadas|2;C21|Partes do corpo em outros|4;C22|Peças da própria roupa|2;C23|Partes de itens|4;C24|Selecionar adjetivos|4;C25|Seguir o olhar|2;C26|Seguir gestos|4;C27|Ir até uma pessoa|2;C28|Entregar item a alguém|4;C29|Buscar item com alguém|4;C30|Ir até alguém e fazer ação|4;C31|Respostas motoras variadas|4;C32|Ação com objeto|2;C33|Várias ações com objetos|4;C34|Ação de faz de conta|2;C35|Figuras de ações|4;C36|Selecionar por associação|4;C37|Selecionar pela função|4;C38|Selecionar por característica|4;C39|Selecionar por categoria|4;C40|Dois itens de um conjunto|2;C41|Dois itens em ordem|2;C42|Membros da comunidade|4;C43|Localizar em figura complexa|2;C44|Localizar por partes|2;C45|Sons do ambiente|4;C46|Todos os exemplares|4;C47|Item com duas características|4;C48|Conjunto com uma característica|4;C49|Conjunto com duas características|4;C50|Instrução em sequência|2;C51|Preposições|4;C52|Pronomes|4;C53|Local ou atividade em cena|2;C54|Emoções|4;C55|Igual e diferente|2;C56|Não exemplares|4;C57|Interações sociais|4');
+const ABLLS_G = lstAbl('G1|Nomear reforçadores|4;G2|Nomear objetos|4;G3|Nomear pessoas|4;G4|Nomear figuras|4;G5|Partes do corpo|4;G6|Peças de roupa|2;G7|Ações ao vivo|4;G8|Figuras de ações|4;G9|Nomear com fluência|2;G10|Nomear sem treino intensivo|2;G11|Nomear com frase|2;G12|Partes ou características|4;G13|Adjetivos|4;G14|Por associação|4;G15|Item dada a função|4;G16|Item dada a característica|4;G17|Item dada a categoria|4;G18|Dois objetos|4;G19|Duas figuras|4;G20|Dois itens com frase|2;G21|Verbo + substantivo|4;G22|Substantivo + adjetivo|4;G23|Sim / não|2;G24|Função do item|4;G25|Classe do item|4;G26|Discriminar a pergunta|2;G27|Classe de um grupo|4;G28|Partes que faltam ou erradas|2;G29|Exclusão (negação)|4;G30|Problemas óbvios|2;G31|Membros da comunidade|4;G32|Itens distantes|2;G33|Sons do ambiente|4;G34|Frases com verbo ou adjetivo|2;G35|Preposições|4;G36|Frases com preposição|2;G37|Pronomes|4;G38|Frases com pronome|2;G39|Descrever cena|2;G40|Partes de uma cena|2;G41|Advérbios|4;G42|Emoções de outros|4;G43|Eventos internos|4;G44|Três componentes|4;G45|Três componentes em frase|2;G46|Interações sociais|4;G47|Nomear espontaneamente|2');
+const ABLLS_H = lstAbl('H1|Completar canções|4;H2|Completar frases divertidas|4;H3|Sinais|4;H4|Sons de animais|4;H5|Informação pessoal|4;H6|Completar sobre atividades|4;H7|Associações|4;H8|Item dada a função|4;H9|Função dado o item|4;H10|"O que" sobre a casa|4;H11|"O que" sobre funções|4;H12|"Onde" sobre itens|4;H13|"Onde" sobre atividades|4;H14|Item dada a classe|4;H15|Vários de uma categoria|4;H16|Característica dado o item|4;H17|Item dada a característica|4;H18|Classe dado o item|4;H19|Itens já vistos|4;H20|Atividades já vistas|4;H21|Pessoas já vistas|4;H22|Comentários sobre figuras|4;H23|"O que" na comunidade|4;H24|O que fazer na comunidade|4;H25|"Onde" na comunidade|4;H26|Várias respostas sobre a comunidade|4;H27|Classe dados os membros|4;H28|"Quem / de quem"|4;H29|"Quando"|4;H30|Discriminar perguntas|2;H31|"Qual"|4;H32|"Como"|4;H33|"Por que"|4;H34|Passos de uma rotina|4;H35|Dizer a tarefa pelos passos|4;H36|Item por várias pistas|4;H37|Sim / não sem o item|4;H38|Dois critérios|4;H39|Três critérios|4;H40|Descrever itens|2;H41|Antes e depois|4;H42|Passado e futuro|4;H43|Conversa|2;H44|Perguntas novas|4;H45|Eventos atuais|4;H46|Várias respostas sobre eventos|4;H47|Discussão em grupo|2;H48|Contar experiências|2;H49|Conversar espontaneamente|2');
+const MOD_LING = [
+  { k:'X', t:'Base visual', letras:['X'], itens:'B5 · B7 · B8 · B21 · H19', d:'Emparelhar igual (2 → 4 → 8 opções), exemplares diferentes, fluência e achar depois de esconder. É a base não arbitrária: ele deve dominar rápido.' },
+  { k:'J', t:'Nomes', letras:['J'], itens:'C14 · C17 · C18 · G4 · G9 · G10', d:'Por categoria, 5 itens por vez: treina o ouvinte ("mostre") e testa o tato sem treino, depois com uma figura nova. O app mede quanto ele precisa de treino (C18) e se nomeia sem treino (G10).' },
+  { k:'Y', t:'Ações', letras:['Y'], itens:'C35 · G8 · G21', d:'Mesmo esquema dos nomes, com figuras de ações; no fim, verbo + objeto.' },
+  { k:'R', t:'Função, característica, classe', letras:['R'], itens:'B16–B19 · C36–C39 · G14–G17 · G24–G29 · H7–H9 · H11 · H14–H18 · H27 · H36 · H37', d:'Núcleo da derivação: separar vendo (não arbitrário) → selecionar ouvindo (treino) → nomear e responder sem figura (testes). Uma relação treinada pontua vários itens.' },
+  { k:'M', t:'Lugares, pessoas, emoções e rotinas', letras:['M'], itens:'C42 · C53 · C54 · G31 · G42 · H10–H13 · H23–H25 · H28 · H34 · H35 · H41 · B26', d:'"Está dentro de" (hierarquia): o que tem no lugar ↔ onde fica. Profissão ↔ o que faz. Rotinas em sequência: antes e depois.' },
+  { k:'C', t:'Adjetivos e posição', letras:['C'], itens:'C24 · C47 · C51 · G13 · G22 · G35 · G36', d:'Cores, tamanhos, formas e opostos; duas características juntas; posição (em cima, embaixo, dentro...). Conversa com as Molduras de comparação, oposição e espaço.' }
+];
+const LETRA_MOD_LING = { X:'X', J:'J', Y:'Y', R:'R', M:'M', C:'C' };
+
+// ----- Exemplares: fotos enviadas pelo terapeuta (mesmo nome do item) vêm primeiro; depois os pictogramas ARASAAC -----
+function exemplaresDe(termo) {
+  const t = termo.trim().toLowerCase();
+  const user = EST.filter(e => e.tipo === 'img' && !e.lingAuto && e.nome.trim().toLowerCase() === t).map(e => ({ id:e.id }));
+  return [...user, ...(ARASAAC_IDS[termo] || []).map(a => ({ a }))];
+}
+async function garantirExemplar(termo, i, tag) {
+  const lista = exemplaresDe(termo);
+  if (!lista.length) return garantirTexto(termo.toUpperCase(), tag);
+  const k = i === -1 ? lista.length - 1 : Math.min(i, lista.length - 1), x = lista[k];
+  if (x.id) return x.id;
+  const dado = `img/a/${x.a}.png`;
+  let e = EST.find(s => s.tipo === 'img' && s.dado === dado), mudou = false;
+  if (!e) { e = { id: uid(), tipo:'img', nome:`${termo} · figura ${k + 1}`, dado, tags:[], lingAuto:true, item:termo, fonte:'ARASAAC' }; EST.push(e); mudou = true; }
+  if (!(e.tags || []).includes(tag)) { e.tags = (e.tags || []).concat(tag); mudou = true; }
+  if (mudou) await DB.salvar('estimulos', e);
+  return e.id;
+}
+const idLing = (x, tag) => x && x.ex !== undefined ? garantirExemplar(x.ex, x.i || 0, tag) : idMat(x, tag);
+async function relLing(r, tag) {
+  const o = { m: await idLing(r.m, tag), a: await idLing(r.a, tag), b: await idLing(r.b, tag), c: await idLing(r.c, tag), instr: r.instr || '' };
+  if (r.r) o.r = await idLing(r.r, tag);
+  if (r.mostrar) { o.mostrar = []; for (const x of r.mostrar) o.mostrar.push(await idLing(x, tag)); if (!o.a) o.a = o.mostrar[0]; }
+  if (r.ordenar) { o.ordenar = []; for (const x of r.ordenar) o.ordenar.push(await idLing(x, tag)); o.a = o.ordenar[0]; }
+  if (!o.b) o.b = o.a;
+  for (const k of ['tato', 'fala', 'semFala', 'dica', 'atraso']) if (r[k]) o[k] = r[k];
+  return o;
+}
+
+// ----- Telas novas: figuras à vista no tato, ordenar figuras e atraso -----
+function mostrarFiguras(ids) { $('#comparacoes').innerHTML = ids.map(id => `<div class="item vis">${visual(estPorId(id))}</div>`).join(''); }
+function montarOrdem() {
+  const a = S.atual, ordem = a.rel.ordenar, comp = $('#comparacoes');
+  const emb = Logica.embaralhar(ordem.map((id, i) => i));
+  comp.innerHTML = `<div class="slots fig">${ordem.map((_, i) => `<span class="slot fig"><b>${i + 1}</b></span>`).join('')}</div><div class="tiles fig">${emb.map(i => `<button class="tile fig" data-i="${i}">${visual(estPorId(ordem[i]))}</button>`).join('')}</div><button class="mini-reset" title="Recomeçar">↺</button>`;
+  const slots = [...comp.querySelectorAll('.slot')]; let pos = 0; const feita = [];
+  comp.querySelectorAll('.tile').forEach(b => b.onclick = () => {
+    if (a.respondida || pos >= ordem.length || b.disabled) return;
+    slots[pos].innerHTML = b.innerHTML; feita.push(+b.dataset.i); pos++; b.disabled = true;
+    if (pos === ordem.length) { const certo = feita.every((v, i) => v === i); registrar(certo ? '+' : '-'); const ult = S && S.tent[S.tent.length - 1]; if (ult) ult.escolhido = feita.map(v => v + 1).join('-'); if (!semFeedback()) comp.querySelector('.slots').classList.add(certo ? 'ok' : 'erro'); }
+  });
+  comp.querySelector('.mini-reset').onclick = () => { if (a.respondida) return; pos = 0; feita.length = 0; slots.forEach((s, i) => s.innerHTML = `<b>${i + 1}</b>`); comp.querySelectorAll('.tile').forEach(b => b.disabled = false); };
+}
+function aplicarAtraso(seg) {
+  const a = S.atual, mod = $('#modelo'), comp = $('#comparacoes');
+  const mid = a.modelo || a.rel.m; if (!mid) return;
+  a.bloq = true; comp.style.visibility = 'hidden';
+  mod.innerHTML = `<div class="cartao pergunta pq">Olhe bem!</div><div class="item modelo">${visual(estPorId(mid))}</div>`;
+  S.timers = S.timers || [];
+  S.timers.push(setTimeout(() => { if (S && S.atual === a) mod.innerHTML = `<div class="cartao pergunta espera">⏳ Espere...</div>`; }, 2500));
+  S.timers.push(setTimeout(() => { if (S && S.atual === a) { mod.innerHTML = `<div class="cartao pergunta pq">${a.rel.tato ? 'O que você viu?' : 'Qual você viu?'}</div>`; comp.style.visibility = ''; a.bloq = false; a.t0 = Date.now(); } }, 2500 + seg * 1000));
+}
+const _proximaLing = proxima;
+proxima = function () {
+  if (!S) return;
+  _proximaLing();
+  if (!S) return;
+  const a = S.atual; if (!a || a.respondida || S.fim) return;
+  $('#comparacoes').style.visibility = '';
+  if (a.rel.mostrar && a.rel.tato) mostrarFiguras(a.rel.mostrar);
+  if (a.rel.ordenar) montarOrdem();
+  const at = a.rel.atraso || S.prog.atraso; if (at) aplicarAtraso(at);
+};
+
+// ----- Definição dos módulos -----
+function defLing() {
+  const G = [], D = LING, CL = D.classes;
+  let semente = 31; const rnd = () => { semente = (semente * 16807) % 2147483647; return (semente - 1) / 2147483646; };
+  const EX = (t, i = 0) => ({ ex:t, i }), NOVO = (t) => ({ ex:t, i:-1 }), T = (v) => ({ txt:String(v) }), C = (d) => ({ cena:d });
+  const OUVIDO = T('👂');
+  const embar = (l) => Logica.embaralhar(l, rnd);
+  const outros = (lista, x, k = 2) => embar(lista.filter(y => y !== x)).slice(0, k);
+  const R = (m, a, b, c, instr, extra = {}) => Object.assign({ m, a, b, c, instr }, extra);
+  const tato = (m, instr, extra = {}) => Object.assign({ m, a:m, tato:true, instr }, extra);
+  const iv = (pergunta) => tato(OUVIDO, 'Escuta e responde', { fala:pergunta });
+  const ouv = (alvo, d1, d2, fala) => R(null, alvo, d1, d2, 'Escuta e mostre', { fala });
+  const et = (nome, modo, rels, critA, critN, max, voltar = 0) => ({ nome, modo, rels, critA, critN, max, voltar });
+  const lb = (rels) => { const n = rels.length, folga = n >= 8 ? Math.floor(n / 8) : 0; return { rot:'Linha de base', lb:true, tipo:'par', rels, crit:[n - folga, n], max:n, ablls:[] }; };
+  const treinoP = (rot, rels, ablls = [], crit = [6, 6], max = 18, extra = {}) => Object.assign({ rot, tipo:'par', fase:'treino', rels, crit, max, ablls }, extra);
+  const testeP = (rot, rels, ablls = [], extra = {}) => { const n = rels.length, folga = n >= 8 ? Math.floor(n / 8) : 0; return Object.assign({ rot, tipo:'par', fase:'teste', rels, crit:[n - folga, n], max:n, ablls, credLB:true }, extra); };
+  const enc = (rot, etapas, ablls = []) => ({ rot, tipo:'encadeado', etapas, ablls });
+  const rede = (treino, im, imc, ablls, rot = 'Ensino e testes') => enc(rot, [et('Treino (ouvinte)', 'treino', treino, 6, 6, 18), et('Manutenção sem feedback', 'manut', treino, 6, 8, 8), et('Teste implicação mútua', 'teste', im, 5, 6, 6, 0), et('Teste combinatório', 'teste', imc, 7, 8, 8, 0)], ablls);
+  const grupo = (cod, titulo, req, itens, passos) => G.push({ cod, titulo, req, itens, passos });
+  const ab = (...pares) => pares.filter(Boolean).map(([it, nv]) => ({ it, nv }));
+  const nv = (k, ...cortes) => cortes.reduce((v, c, i) => k >= c ? i + 1 : v, 0);
+  const it = Object.fromEntries(D.itens.map(([n, g, c, f, ca, l, as]) => [n, { n, g, c, f, ca, l, as }]));
+  const art = (x) => (it[x] ? it[x].g : 'o');
+  const cod2 = (L, n) => L + String(n).padStart(2, '0');
+
+  // ===== X · Base visual =====
+  const base10 = ['cachorro', 'banana', 'camisa', 'carro', 'bola', 'copo', 'cadeira', 'lápis', 'pão', 'relógio'];
+  const ident = (lista) => lista.map(t => ({ a:EX(t), b:EX(t) }));
+  grupo('X01', 'Figuras iguais (2 → 4 → 8 opções)', [], [], [
+    { rot:'Linha de base (8 opções)', lb:true, tipo:'mts', fase:'teste', pares:ident(base10), arranjo:8, instr:'Onde vai?', crit:[9, 10], max:10, ablls:[] },
+    { rot:'Duas opções', tipo:'mts', fase:'treino', pares:ident(base10.slice(0, 5)), arranjo:2, instr:'Onde vai?', crit:[6, 6], max:18, ablls:ab(['B5', 2]) },
+    { rot:'Quatro opções', tipo:'mts', fase:'treino', pares:ident(base10), arranjo:4, instr:'Onde vai?', crit:[7, 8], max:20, ablls:ab(['B5', 3]) },
+    { rot:'Oito opções', tipo:'mts', fase:'teste', pares:ident(base10), arranjo:8, instr:'Onde vai?', crit:[9, 10], max:10, ablls:ab(['B5', 4]), credLB:true }
+  ]);
+  const doisEx = D.itens.map(x => x[0]).filter(t => (ARASAAC_IDS[t] || []).length > 1).slice(0, 12);
+  grupo('X02', 'Figuras diferentes do mesmo item', ['X01'], [], [
+    { rot:'Linha de base', lb:true, tipo:'mts', fase:'teste', pares:doisEx.slice(0, 8).map(t => ({ a:EX(t, 0), b:EX(t, 1) })), arranjo:3, instr:'Onde vai?', crit:[7, 8], max:8, ablls:[] },
+    { rot:'Ensino', tipo:'mts', fase:'treino', pares:doisEx.map(t => ({ a:EX(t, 0), b:EX(t, 1) })), arranjo:3, instr:'Onde vai?', crit:[7, 8], max:20, ablls:ab(['B8', 2]) }
+  ]);
+  grupo('X03', 'Emparelhar com fluência', ['X01'], [], [{ rot:'Cronometrado (30 s)', tipo:'mts', fase:'teste', pares:ident(base10), arranjo:4, instr:'Onde vai?', crit:[200, 200], max:200, fluencia:{ seg:30, meta:20, maxErros:2 }, ablls:ab(['B7', 2]) }]);
+  grupo('X04', 'Achar depois de esconder', ['X01'], [], [
+    { rot:'3 segundos, 3 figuras', tipo:'mts', fase:'treino', pares:ident(base10), arranjo:3, instr:'Qual você viu?', crit:[6, 6], max:18, atraso:3, ablls:ab(['B21', 2]) },
+    { rot:'5 segundos, 5 figuras', tipo:'mts', fase:'teste', pares:ident(base10), arranjo:5, instr:'Qual você viu?', crit:[9, 10], max:10, atraso:5, ablls:ab(['B21', 4]), credLB:true }
+  ]);
+  grupo('X05', 'O que você viu? (falar depois)', ['X04'], [], [treinoP('Falar depois de 5 segundos', base10.slice(0, 6).map(t => tato(EX(t), 'O que você viu?', { atraso:5 })), ab(['H19', 1]))]);
+
+  // ===== J · Nomes por categoria =====
+  const porClasse = {}; D.itens.forEach(([n, , c]) => (porClasse[c] = porClasse[c] || []).push(n));
+  let nJ = 0, acum = 0;
+  for (const [c, lista] of Object.entries(porClasse)) {
+    const partes = lista.length > 7 ? [lista.slice(0, Math.ceil(lista.length / 2)), lista.slice(Math.ceil(lista.length / 2))] : [lista];
+    partes.forEach((set, pi) => {
+      nJ++; acum += set.length;
+      const dist = (x) => outros(set, x);
+      const o = (x, ex = EX) => { const [d1, d2] = dist(x); return ouv(ex(x), ex(d1), ex(d2), `Mostre ${art(x)} ${x}`); };
+      const tN = (x, ex = EX) => tato(ex(x), 'O que é isso?');
+      const ablls = ab(['C14', nv(acum, 2, 10, 25, 50)], ['C17', nv(acum, 5, 10, 50)], ['G4', nv(acum, 5, 10, 50)], c === 'roupa' && ['G6', 2]).filter(x => x.nv > 0);
+      grupo(cod2('J', nJ), `${CL[c][1][0].toUpperCase() + CL[c][1].slice(1)}${partes.length > 1 ? ' ' + (pi + 1) : ''}`, nJ > 1 ? [cod2('J', nJ - 1)] : [], set, [
+        lb(set.flatMap(x => [o(x), tN(x)])),
+        rede(set.map(x => o(x)), set.map(x => tN(x)), set.flatMap(x => [o(x, NOVO), tN(x, NOVO)]), ablls)
+      ]);
+    });
+  }
+  const conhecidos = [...porClasse.animal.slice(0, 4), ...porClasse.fruta.slice(0, 3), ...porClasse.roupa.slice(0, 3)];
+  grupo('J30', 'Fluência: mostrar e nomear', ['J03'], [], [
+    treinoP('Mostrar em sequência (30 s)', conhecidos.map(x => { const [d1, d2] = outros(conhecidos, x); return ouv(EX(x), EX(d1), EX(d2), `Mostre ${art(x)} ${x}`); }), ab(['C19', 2]), [200, 200], 200, { fase:'teste', fluencia:{ seg:30, meta:20, maxErros:2 } }),
+    treinoP('Nomear em sequência (15 s)', conhecidos.map(x => tato(EX(x), 'O que é isso?')), ab(['G9', 2]), [200, 200], 200, { fase:'teste', fluencia:{ seg:15, meta:40, maxErros:2 } })
+  ]);
+  grupo('J31', 'Nomear com frase ("É um...", "Eu vejo...")', ['J03'], [], [treinoP('Com ajuda', conhecidos.map(x => tato(EX(x), 'Fala com frase: "É um..." ou "Eu vejo..."')), ab(['G11', 1]))]);
+
+  // ===== Y · Ações =====
+  const AC = D.acoes; let acY = 0;
+  for (let s = 0; s < AC.length; s += 5) {
+    const set = AC.slice(s, s + 5), inf = set.map(x => x[0]); acY += set.length;
+    const ger = Object.fromEntries(set);
+    const o = (x, ex = EX) => { const [d1, d2] = outros(inf, x); return ouv(ex(x), ex(d1), ex(d2), `Mostre quem está ${ger[x]}`); };
+    const tA = (x, ex = EX) => tato(ex(x), 'O que ele está fazendo?');
+    const k = s / 5 + 1;
+    grupo(cod2('Y', k), `Ações ${k}`, k > 1 ? [cod2('Y', k - 1)] : ['J02'], set.map(x => x[1]), [
+      lb(inf.flatMap(x => [o(x), tA(x)])),
+      rede(inf.map(x => o(x)), inf.map(x => tA(x)), inf.flatMap(x => [o(x, NOVO), tA(x, NOVO)]), ab(['C35', nv(acY, 2, 5, 10, 20)], ['G8', nv(acY, 2, 5, 10, 20)]))
+    ]);
+  }
+  const vObj = ['comer', 'beber', 'ler', 'escrever', 'cortar', 'chutar', 'dirigir', 'telefonar', 'assistir televisão', 'escovar os dentes'];
+  grupo('Y10', 'Verbo + objeto ("come pão", "chuta a bola")', ['Y02'], [], [
+    lb(vObj.slice(0, 4).map(x => tato(EX(x), 'O que ele está fazendo? Fala a ação e a coisa'))),
+    treinoP('Ensino com 5 ações', vObj.slice(0, 5).map(x => tato(EX(x), 'O que ele está fazendo? Fala a ação e a coisa')), ab(['G21', 2])),
+    testeP('Teste com ações novas', vObj.slice(5).map(x => tato(EX(x), 'O que ele está fazendo? Fala a ação e a coisa')), ab(['G21', 3]))
+  ]);
+
+  // ===== R · Função, característica, classe =====
+  const CLS = Object.fromEntries(Object.entries(CL).map(([k, [s, p, g]]) => [k, { s, p, g }]));
+  const gruposClasse = [['animal', 'roupa', 'comida'], ['fruta', 'veiculo', 'movel'], ['escolar', 'higiene', 'utensilio'], ['bebida', 'brinquedo', 'aparelho']];
+  gruposClasse.forEach((cls, gi) => {
+    const k = gi + 1, itens = cls.flatMap(c => porClasse[c].slice(0, 2)), clsDe = (x) => it[x].c;
+    const deOutra = (x, n = 2) => embar(itens.filter(y => clsDe(y) !== clsDe(x))).slice(0, n);
+    const na = (x) => { const par = itens.find(y => y !== x && clsDe(y) === clsDe(x)), [d1, d2] = deOutra(x); return R(EX(x), EX(par, 1), EX(d1), EX(d2), 'Onde vai? (mesmo grupo)'); };
+    const sel = (x) => { const [d1, d2] = deOutra(x), cs = CLS[clsDe(x)]; return ouv(EX(x), EX(d1), EX(d2), `Mostre ${cs.g === 'a' ? 'a' : 'o'} ${cs.s}`); };
+    const g25 = (x) => tato(EX(x), `${art(x).toUpperCase()} ${x} é um tipo de quê?`, { fala:`${art(x)} ${x} é um tipo de quê?` });
+    const h18 = (x) => iv(`${art(x)} ${x} é um tipo de...`);
+    const g17 = (x) => { const [d1, d2] = deOutra(x); return tato(null, `Qual destes é ${CLS[clsDe(x)].s}? Fala o nome`, { mostrar:embar([EX(x), EX(d1), EX(d2)]) }); };
+    const h14 = (c) => iv(`Fala um tipo de ${CLS[c].s}`);
+    const h27 = (c) => { const [x, y] = porClasse[c].slice(2, 4).length === 2 ? porClasse[c].slice(2, 4) : porClasse[c].slice(0, 2); return iv(`${x} e ${y} são...`); };
+    const g27 = (c) => tato(null, 'O que são estes? Fala o grupo', { mostrar:porClasse[c].slice(0, 3).map(x => EX(x)) });
+    grupo(cod2('R', k), `Classe: ${cls.map(c => CLS[c].p).join(', ')}`, k > 1 ? [cod2('R', k - 1)] : ['J04'], cls.map(c => CLS[c].p), [
+      lb(itens.flatMap((x, i) => [i % 2 ? sel(x) : g25(x), i % 2 ? h18(x) : na(x)])),
+      treinoP('Separar vendo os grupos', itens.map(na), ab(['B19', k])),
+      rede(itens.map(sel), itens.map(g25), [...itens.map(h18), ...itens.slice(0, 3).map(g17), ...cls.map(h14), ...cls.map(h27), g27(cls[0])], ab(['C39', k], ['G25', nv(k, 1, 2, 3, 4)], ['G17', k], ['H18', nv(k * 6, 2, 5, 10, 20)], ['H14', nv(k * 3, 2, 5, 10)], ['H27', nv(k * 3, 1, 5, 10)], ['G27', nv(k, 1, 3)])),
+      treinoP('Falar vários de um grupo', cls.map(c => iv(`Fala três ${CLS[c].p}`)), ab(['H15', nv(k * 3, 2, 5, 10)]), [3, 3], 9)
+    ]);
+  });
+  const porFunc = {}; D.itens.forEach(([n, , , f]) => { if (f) (porFunc[f] = porFunc[f] || []).push(n); });
+  const funcs = Object.entries(porFunc).filter(([f]) => !['comer', 'beber', 'vestir'].includes(f) || true);
+  const fGrupos = [['cortar', 'escrever', 'sentar'], ['calçar', 'secar', 'apagar'], ['dormir', 'ler', 'voar'], ['cozinhar', 'telefonar', 'ver as horas']].map(g => g.filter(f => porFunc[f]));
+  fGrupos.forEach((fs, gi) => {
+    const k = gi + 1, itens = fs.flatMap(f => porFunc[f].slice(0, 2)), fDe = (x) => it[x].f;
+    const deOutra = (x, n = 2) => embar(itens.filter(y => fDe(y) !== fDe(x))).slice(0, n);
+    const na = (x) => { const par = itens.find(y => y !== x && fDe(y) === fDe(x)); if (!par) return null; const [d1, d2] = deOutra(x); return R(EX(x), EX(par), EX(d1), EX(d2), 'Onde vai? (serve para a mesma coisa)'); };
+    const sel = (x) => { const [d1, d2] = deOutra(x); return ouv(EX(x), EX(d1), EX(d2), `Mostre o que você usa para ${fDe(x)}`); };
+    const g24 = (x) => tato(EX(x), `Para que serve ${art(x) === 'a' ? 'a' : 'o'} ${x}?`, { fala:`Para que serve ${art(x)} ${x}?` });
+    const g15 = (x) => { const [d1, d2] = deOutra(x); return tato(null, `O que você usa para ${fDe(x)}? Fala o nome`, { mostrar:embar([EX(x), EX(d1), EX(d2)]) }); };
+    const h11 = (x) => iv(`O que você usa para ${fDe(x)}?`);
+    const h9 = (x) => iv(`${art(x)} ${x} serve para...`);
+    const nas = itens.map(na).filter(Boolean);
+    grupo(cod2('R', 10 + k), `Função: ${fs.join(', ')}`, k > 1 ? [cod2('R', 10 + k - 1)] : ['R01'], fs, [
+      lb(itens.flatMap((x, i) => [i % 2 ? sel(x) : g24(x), i % 2 ? h11(x) : h9(x)])),
+      ...(nas.length ? [treinoP('Separar vendo (serve para a mesma coisa)', nas, ab(['B17', nv(k, 1, 2, 3, 4)]))] : []),
+      rede(itens.map(sel), itens.map(g24), [...itens.map(h11), ...itens.map(h9), ...itens.slice(0, 3).map(g15)], ab(['C37', nv(k * 6, 2, 5, 25)], ['G24', nv(k * 6, 2, 5, 10, 25)], ['G15', nv(k * 6, 2, 5, 10, 25)], ['H8', nv(k * 6, 2, 5, 10, 20)], ['H9', nv(k * 6, 2, 5, 10, 20)], ['H11', nv(k * 6, 5, 10, 25, 50)]))
+    ]);
+  });
+  const porCar = {}; D.itens.forEach(([n, , , , ca]) => { if (ca) (porCar[ca] = porCar[ca] || []).push(n); });
+  const cGrupos = [['tem rabo', 'tem rodas', 'tem asas'], ['tem tela', 'é redonda', 'tem pernas']].map(g => g.filter(c => porCar[c]));
+  cGrupos.forEach((cs, gi) => {
+    const k = gi + 1, itens = cs.flatMap(c => porCar[c].slice(0, 2)), cDe = (x) => it[x].ca;
+    const deOutra = (x, n = 2) => embar(itens.filter(y => cDe(y) !== cDe(x))).slice(0, n);
+    const na = (x) => { const par = itens.find(y => y !== x && cDe(y) === cDe(x)); if (!par) return null; const [d1, d2] = deOutra(x); return R(EX(x), EX(par), EX(d1), EX(d2), 'Onde vai? (tem a mesma coisa)'); };
+    const sel = (x) => { const [d1, d2] = deOutra(x); return ouv(EX(x), EX(d1), EX(d2), `Mostre o que ${cDe(x)}`); };
+    const g16 = (x) => { const [d1, d2] = deOutra(x); return tato(null, `Qual ${cDe(x)}? Fala o nome`, { mostrar:embar([EX(x), EX(d1), EX(d2)]) }); };
+    const h17 = (x) => iv(`Uma coisa que ${cDe(x)} é...`);
+    const h16 = (x) => { const [v, ...resto] = cDe(x).split(' '); return iv(`${art(x)} ${x} ${v}...`); };
+    const g12 = (x) => tato(EX(x), `O que ${art(x) === 'a' ? 'a' : 'o'} ${x} tem? Fala as partes`, { fala:`O que ${art(x)} ${x} tem?` });
+    grupo(cod2('R', 20 + k), `Característica: ${cs.join(', ')}`, k > 1 ? [cod2('R', 20 + k - 1)] : ['R01'], cs, [
+      lb(itens.flatMap((x, i) => [i % 2 ? sel(x) : g16(x), h17(x)])),
+      treinoP('Separar vendo (tem a mesma coisa)', itens.map(na).filter(Boolean), ab(['B18', nv(k, 1, 2)])),
+      rede(itens.map(sel), itens.map(g16), [...itens.map(h17), ...itens.map(h16), ...itens.slice(0, 2).map(g12)], ab(['C38', nv(k * 6, 2, 5)], ['G16', nv(k * 6, 2, 5, 10)], ['H17', nv(k * 6, 2, 5, 10)], ['H16', nv(k * 6, 2, 5, 10)], ['G12', nv(k, 1, 2)]))
+    ]);
+  });
+  const pares = D.itens.filter(([n, , , , , , as]) => as && (it[as] || ARASAAC_IDS[as])).map(([n, , , , , , as]) => [n, as]);
+  const pUnicos = []; pares.forEach(([x, y]) => { if (!pUnicos.some(([a, b]) => (a === y && b === x))) pUnicos.push([x, y]); });
+  [pUnicos.slice(0, 6), pUnicos.slice(6, 12)].forEach((ps, gi) => {
+    const k = gi + 1, todos = ps.map(p => p[1]);
+    const na = ([x, y]) => { const [d1, d2] = outros(todos, y); return R(EX(x), EX(y), EX(d1), EX(d2), 'Onde vai?'); };
+    const sel = ([x, y]) => { const [d1, d2] = outros(todos, y); return R(EX(x), EX(y), EX(d1), EX(d2), 'O que combina com isso?', { fala:`O que combina com ${art(x)} ${x}?` }); };
+    const g14 = ([x, y]) => { const [d1, d2] = outros(todos, y); return tato(EX(x), 'O que vai com isso? Fala o nome', { mostrar:embar([EX(y), EX(d1), EX(d2)]) }); };
+    const h7 = ([x]) => iv(`O que vai com ${art(x)} ${x}?`);
+    grupo(cod2('R', 30 + k), `Associação: ${ps.map(p => p.join(' e ')).join(', ')}`, k > 1 ? [cod2('R', 30 + k - 1)] : ['J04'], [], [
+      lb(ps.flatMap((p, i) => [i % 2 ? sel(p) : na(p), h7(p)])),
+      treinoP('Combinar vendo', ps.map(na), ab(['B16', nv(k * 6, 5, 10)])),
+      rede(ps.map(sel), ps.map(g14), ps.map(h7), ab(['C36', nv(k * 6, 5, 10)], ['G14', nv(k * 6, 0, 10)], ['H7', nv(k * 6, 5, 10)]))
+    ]);
+  });
+  const amostra = ['cachorro', 'tesoura', 'carro', 'banana', 'cama', 'lápis'];
+  const pistas = (x) => { const o = it[x], cs = CLS[o.c]; return iv(`É ${cs.g === 'a' ? 'uma' : 'um'} ${cs.s}${o.ca ? ', ' + o.ca : ''}${o.f ? ', serve para ' + o.f : ''}. O que é?`); };
+  const perguntas = (x) => { const o = it[x]; return [tato(EX(x), 'O que é isso?'), tato(EX(x), 'É um tipo de quê?'), ...(o.f ? [tato(EX(x), 'Para que serve?')] : []), ...(o.l ? [tato(EX(x), 'Onde fica?')] : [])]; };
+  const naoE = (c) => { const [a1, a2] = porClasse[c], fora = embar(Object.keys(porClasse).filter(k => k !== c))[0]; return R(null, EX(porClasse[fora][0]), EX(a1), EX(a2), 'Escuta e mostre', { fala:`Mostre o que NÃO é ${CLS[c].s}` }); };
+  const simNao = [['O cachorro voa?', 'não'], ['A tesoura corta?', 'sim'], ['O carro tem rodas?', 'sim'], ['A banana é um animal?', 'não'], ['Você dorme na cama?', 'sim'], ['O peixe anda?', 'não']];
+  grupo('R40', 'Juntando tudo: pistas, perguntas misturadas, negação e sim/não', ['R01', 'R11', 'R21'], [], [
+    lb([pistas('tesoura'), ...perguntas('cachorro').slice(0, 2), naoE('animal'), iv(simNao[0][0])]),
+    testeP('Adivinhar pelas pistas', amostra.map(pistas), ab(['H36', 2])),
+    testeP('Perguntas misturadas sobre o mesmo item', embar(amostra.slice(0, 3).flatMap(perguntas)), ab(['G26', 2], ['H30', 1])),
+    testeP('O que NÃO é...', ['animal', 'fruta', 'roupa', 'veiculo', 'escolar', 'movel'].map(naoE), ab(['C56', 2])),
+    testeP('Sim ou não', simNao.map(([q, r]) => Object.assign(iv(q), { dica:`${q} → ${r}` })), ab(['H37', 1], ['G23', 1]))
+  ]);
+
+  // ===== M · Lugares, pessoas, emoções e rotinas =====
+  const lugar = Object.fromEntries(D.lugares.map(([n, g, prep, faz]) => [n, { n, g, prep, faz }]));
+  const lugGrupo = (k, titulo, ls, req, abl) => {
+    const itensL = ls.flatMap(l => D.itens.filter(x => x[5] === l).slice(0, 2).map(x => x[0]));
+    const lDe = (x) => it[x].l;
+    const selItem = (x) => { const [d1, d2] = embar(itensL.filter(y => lDe(y) !== lDe(x))); return ouv(EX(x), EX(d1), EX(d2), `Mostre o que fica ${lugar[lDe(x)].prep} ${lDe(x)}`); };
+    const ondeSel = (x) => { const [d1, d2] = outros(ls, lDe(x)); return ouv(EX(lDe(x)), EX(d1), EX(d2 || d1), `Onde fica ${art(x)} ${x}?`); };
+    const selLugar = (l) => { const [d1, d2] = outros(ls, l); return ouv(EX(l), EX(d1), EX(d2 || d1), `Mostre ${lugar[l].g} ${l}`); };
+    grupo(cod2('M', k), titulo, req, ls, [
+      lb([...ls.map(selLugar), ...itensL.slice(0, 3).map(x => iv(`Onde fica ${art(x)} ${x}?`)), iv(`O que tem ${lugar[ls[0]].prep} ${ls[0]}?`)]),
+      treinoP('Mostrar o lugar', ls.map(selLugar), ab(['C53', nv(ls.length, 2, 4)])),
+      rede(itensL.map(selItem), itensL.map(ondeSel), [...itensL.map(x => iv(`Onde fica ${art(x)} ${x}?`)), ...ls.map(l => iv(`O que tem ${lugar[l].prep} ${l}?`)), ...ls.map(l => iv(`Onde você vai para ${lugar[l].faz}?`)), ...ls.map(l => iv(`O que você faz ${lugar[l].prep} ${l}?`))], abl)
+    ]);
+  };
+  lugGrupo(1, 'Lugares da casa', ['cozinha', 'banheiro', 'quarto', 'sala'], ['R01'], ab(['H10', 1], ['H12', 1], ['H13', 1]));
+  lugGrupo(2, 'Lugares da comunidade', ['escola', 'mercado', 'padaria', 'parque'], ['M01'], ab(['H23', 2], ['H24', 2], ['H25', 1], ['H12', 2], ['H13', 2]));
+  const PR = D.profissoes.map(p => p[0]), prof = Object.fromEntries(D.profissoes.map(([n, g, f, l]) => [n, { n, g, f, l }]));
+  const oP = (x, ex = EX) => { const [d1, d2] = outros(PR, x); return ouv(ex(x), ex(d1), ex(d2), `Mostre o ${x}`); };
+  grupo('M10', 'Profissões', ['J04'], PR, [
+    lb(PR.flatMap((x, i) => [i % 2 ? oP(x) : tato(EX(x), 'Quem é ele?'), iv(`Quem ${prof[x].f}?`)])),
+    rede(PR.map(x => oP(x)), PR.map(x => tato(EX(x), 'Quem é ele?')), [...PR.map(x => iv(`Quem ${prof[x].f}?`)), ...PR.slice(0, 4).map(x => { const [d1, d2] = outros(PR, x); return ouv(EX(x), EX(d1), EX(d2), `Mostre quem ${prof[x].f}`); }), ...PR.slice(0, 3).map(x => oP(x, NOVO))], ab(['C42', 4], ['G31', 4], ['H28', 2]))
+  ]);
+  const EM = D.emocoes;
+  const oE = (x, ex = EX) => { const t = EM.find(e => e[0] === x)[1], [d1, d2] = outros(EM.map(e => e[0]), x).map(y => EM.find(e => e[0] === y)[1]); return ouv(ex(t), ex(d1), ex(d2), `Mostre quem está ${x}`); };
+  const tE = (x, ex = EX) => tato(ex(EM.find(e => e[0] === x)[1]), 'Como ele está se sentindo?');
+  grupo('M20', 'Emoções', ['J02'], EM.map(e => e[0]), [
+    lb(EM.flatMap(([x]) => [oE(x), tE(x)])),
+    rede(EM.map(([x]) => oE(x)), EM.map(([x]) => tE(x)), EM.flatMap(([x]) => [oE(x, NOVO), tE(x, NOVO)]), ab(['C54', 4], ['G42', 3]))
+  ]);
+  D.rotinas.forEach(([nome, passos], ri) => {
+    const k = 30 + ri + 1;
+    const antes = passos.slice(1).map((p, i) => { const outrosP = passos.filter(q => q !== passos[i]); return ouv(EX(passos[i]), EX(outrosP[1] || outrosP[0]), EX(outrosP[2] || outrosP[0]), `O que vem antes de ${p}?`); });
+    grupo(cod2('M', k), `Rotina: ${nome}`, k > 31 ? [cod2('M', k - 1)] : ['Y02'], passos, [
+      lb([{ ordenar:passos.map(p => EX(p)), instr:'Coloque na ordem' }, tato(OUVIDO, 'Escuta e responde', { fala:`Como você faz para ${nome}? Fala os passos` })]),
+      treinoP('Colocar as figuras na ordem', [{ ordenar:passos.map(p => EX(p)), instr:'Coloque na ordem' }], ab(['B26', nv(ri + 1, 1, 2)]), [3, 3], 8),
+      testeP('Falar os passos, antes e depois, e dizer a tarefa', [iv(`Como você faz para ${nome}? Fala os passos`), ...antes.slice(0, 2), iv(`Eu ${passos.slice(0, 3).join(', ')}... o que estou fazendo?`)], ab(['H34', passos.length >= 5 ? 3 : 2], ['H41', nv(ri + 1, 1, 2)], ['H35', nv(ri + 1, 0, 2)]))
+    ]);
+  });
+
+  // ===== C · Adjetivos e posição =====
+  const FO = (f, cor) => C({ k:'forma', f, cor }), BO = (s, cor = '#2f6db5') => C({ k:'bola', s, cor });
+  const CORES4 = ['vermelho', 'azul', 'verde', 'amarelo'];
+  const parAdj = (aStim, bStim, fala) => R(null, aStim, bStim, null, 'Escuta e mostre', { fala });
+  grupo('C01', 'Cores', ['X01'], CORES4, [
+    lb(CORES4.flatMap(c => [parAdj(FO('círculo', c), FO('círculo', outros(CORES4, c)[0]), `Mostre o ${c}`), tato(FO('quadrado', c), 'Que cor é essa?')])),
+    rede(CORES4.map(c => parAdj(FO('círculo', c), FO('círculo', outros(CORES4, c)[0]), `Mostre o ${c}`)), CORES4.map(c => tato(FO('círculo', c), 'Que cor é essa?')), CORES4.flatMap(c => [parAdj(FO('estrela', c), FO('estrela', outros(CORES4, c)[0]), `Mostre a estrela ${c === 'vermelho' ? 'vermelha' : c === 'amarelo' ? 'amarela' : c}`), tato(FO('triângulo', c), 'Que cor é essa?')]), ab(['C24', 1], ['G13', 1]))
+  ]);
+  grupo('C02', 'Grande e pequeno', ['C01'], ['grande', 'pequeno'], [
+    lb([parAdj(BO(70), BO(25), 'Mostre a bola grande'), parAdj(BO(22, '#e2483d'), BO(68, '#e2483d'), 'Mostre a bola pequena'), tato(BO(70, '#2e9b5f'), 'Ela é grande ou pequena?')]),
+    rede([parAdj(BO(70), BO(25), 'Mostre a bola grande'), parAdj(BO(24), BO(70), 'Mostre a bola pequena'), parAdj(BO(66, '#e2483d'), BO(22, '#e2483d'), 'Mostre a bola grande'), parAdj(BO(20, '#e2483d'), BO(66, '#e2483d'), 'Mostre a bola pequena')], [tato(BO(70), 'Ela é grande ou pequena?'), tato(BO(22), 'Ela é grande ou pequena?')], [parAdj(BO(64, '#8e5aa8'), BO(28, '#8e5aa8'), 'Mostre a bola grande'), parAdj(BO(26, '#e8822a'), BO(62, '#e8822a'), 'Mostre a bola pequena'), tato(BO(66, '#2e9b5f'), 'Ela é grande ou pequena?'), tato(BO(24, '#e8822a'), 'Ela é grande ou pequena?')], ab(['C24', 2], ['G13', 2]))
+  ]);
+  const FORMAS = ['círculo', 'quadrado', 'triângulo', 'estrela'];
+  grupo('C03', 'Formas', ['C02'], FORMAS, [
+    lb(FORMAS.flatMap(f => [parAdj(FO(f, 'azul'), FO(outros(FORMAS, f)[0], 'azul'), `Mostre o ${f === 'estrela' ? 'a estrela' : f}`.replace('o a ', 'a ')), tato(FO(f, 'verde'), 'Que forma é essa?')])),
+    rede(FORMAS.map(f => parAdj(FO(f, 'azul'), FO(outros(FORMAS, f)[0], 'azul'), f === 'estrela' ? 'Mostre a estrela' : `Mostre o ${f}`)), FORMAS.map(f => tato(FO(f, 'azul'), 'Que forma é essa?')), FORMAS.flatMap(f => [parAdj(FO(f, 'amarelo'), FO(outros(FORMAS, f)[0], 'amarelo'), f === 'estrela' ? 'Mostre a estrela' : `Mostre o ${f}`), tato(FO(f, 'vermelho'), 'Que forma é essa?')]), ab(['C24', 3], ['G13', 3]))
+  ]);
+  const OP = D.opostos;
+  grupo('C04', 'Opostos (aberto, cheio, quente...)', ['C03'], OP.map(o => o.join('/')), [
+    lb(OP.flatMap(([x, y]) => [parAdj(EX(x), EX(y), `Mostre o que está ${x}`), tato(EX(y), 'Como ele está?')])),
+    rede(OP.flatMap(([x, y]) => [parAdj(EX(x), EX(y), `Mostre o que está ${x}`), parAdj(EX(y), EX(x), `Mostre o que está ${y}`)]), OP.map(([x]) => tato(EX(x), 'Como ele está?')), OP.map(([, y]) => tato(EX(y), 'Como ele está?')), ab(['C24', 4], ['G13', 4]))
+  ]);
+  const combos = [['vermelho', 70, 'a bola vermelha grande'], ['vermelho', 24, 'a bola vermelha pequena'], ['azul', 70, 'a bola azul grande'], ['azul', 24, 'a bola azul pequena'], ['verde', 68, 'a bola verde grande'], ['verde', 22, 'a bola verde pequena']];
+  const hx = { vermelho:'#e2483d', azul:'#2f6db5', verde:'#2e9b5f' };
+  const c47 = ([cor, s, txt]) => { const outraCor = cor === 'vermelho' ? 'azul' : 'vermelho', outroS = s > 40 ? 24 : 70; return R(null, BO(s, hx[cor]), BO(outroS, hx[cor]), BO(s, hx[outraCor]), 'Escuta e mostre', { fala:`Mostre ${txt}` }); };
+  grupo('C05', 'Duas características juntas', ['C02'], [], [
+    lb(combos.slice(0, 3).map(c47).concat(combos.slice(3, 5).map(([cor, s]) => tato(BO(s, hx[cor]), 'Fala a cor e o tamanho da bola')))),
+    treinoP('Selecionar (cor + tamanho)', combos.map(c47), ab(['C47', 2])),
+    testeP('Nomear (bola + cor + tamanho)', combos.map(([cor, s]) => tato(BO(s, hx[cor]), 'Fala a cor e o tamanho da bola')), ab(['G22', 2], ['G44', 1]))
+  ]);
+  const PP = D.preps.map(p => p[0]);
+  const oPr = (p) => { const [d1, d2] = outros(PP, p); return ouv(EX(p), EX(d1), EX(d2), `Mostre onde a bola está ${p}`); };
+  grupo('C10', 'Posição (em cima, embaixo, dentro...)', ['C02'], PP, [
+    lb(PP.flatMap((p, i) => [i % 2 ? oPr(p) : tato(EX(p), 'Onde está a bola?')])),
+    rede(PP.map(oPr), PP.map(p => tato(EX(p), 'Onde está a bola?')), PP.map(p => tato(EX(p), 'Onde está a bola? Fala com frase: "A bola está..."')), ab(['C51', 4], ['G35', 3], ['G36', 1]))
+  ]);
+  return G;
+}
+
+// ----- Criação genérica (par, encadeado, mts) -----
+let criandoLing = false;
+async function criarLinguagem() {
+  if (criandoLing) return; criandoLing = true; const b = $('#criarLing'); b.disabled = true; let novos = 0;
+  try {
+    for (const g of defLing()) {
+      $('#lingMsg').textContent = `Criando ${g.cod}...`; const tag = 'Linguagem ' + g.cod; let i = 0;
+      for (const ps of g.passos) {
+        i++;
+        const nome = `${g.cod} ${g.titulo} - ${i} ${ps.rot}`;
+        const temTeste = ps.tipo === 'encadeado' && ps.etapas.some(E => E.modo === 'teste');
+        const base = { nome, area:'Linguagem: ' + MOD_LING.find(m => m.k === LETRA_MOD_LING[g.cod[0]]).t, mat:{ mod:'ling', req:g.req, itens:g.itens }, ablls:ps.ablls || [], protocolos:[...new Set((ps.ablls || []).map(x => 'ABLLS-R ' + x.it))].concat(['VB-MAPP'], temTeste ? ['PEAK-E'] : []), ordem:'aleatoria', arranjo:ps.arranjo || 3, apoio:'junto', instr:ps.instr || '', lb:!!ps.lb, credLB:!!ps.credLB, fluencia:ps.fluencia, atraso:ps.atraso };
+        if (ps.tipo === 'encadeado') {
+          const etapas = [];
+          for (const E of ps.etapas) { const rels = []; for (const r of E.rels) rels.push(await relLing(r, tag)); etapas.push(Object.assign({}, E, { rels })); }
+          novos += await criarPrograma(Object.assign(base, { tipo:'encadeado', fase: etapas[0].modo === 'treino' ? 'treino' : 'teste', etapas, pares:etapas.flatMap(E => E.rels), critA:1, critN:1, max:etapas.reduce((s, E) => s + E.max, 0) * 2 }));
+        } else if (ps.tipo === 'mts') {
+          const pares = []; for (const p of ps.pares) pares.push({ a: await idLing(p.a, tag), b: await idLing(p.b, tag) });
+          novos += await criarPrograma(Object.assign(base, { tipo:'mts', fase:ps.fase, pares, critA:ps.crit[0], critN:ps.crit[1], max:ps.max }));
+        } else {
+          const pares = []; for (const r of ps.rels) pares.push(await relLing(r, tag));
+          novos += await criarPrograma(Object.assign(base, { tipo:'par', fase: ps.lb ? 'teste' : (ps.fase || 'treino'), ordem: ps.lb ? 'sequencial' : 'aleatoria', pares, critA:ps.crit[0], critN:ps.crit[1], max:ps.max }));
+        }
+      }
+    }
+  } catch (err) { $('#lingMsg').textContent = 'Erro ao criar: ' + err.message + '. Toque de novo para continuar.'; criandoLing = false; b.disabled = false; return; }
+  preencherTags(); renderEst();
+  const total = PROGS.filter(p => p.mat && p.mat.mod === 'ling').length;
+  $('#lingMsg').innerHTML = (novos ? `<b class="ok">Pronto: ${novos} programas criados agora.</b> ` : '<b class="ok">A linguagem já está criada.</b> ') + `Total: ${total}.`;
+  criandoLing = false; b.disabled = false; redesenhar();
+}
+
+// ----- C18 e G10 calculados pelo app (aprendizagem rápida e nomeação sem treino nos conjuntos de nomes) -----
+const _abllsAppLing = abllsApp;
+abllsApp = function () {
+  const r = _abllsAppLing();
+  let rapido = 0, semTreino = 0, conjuntos = 0;
+  PROGS.filter(p => /^J\d\d /.test(p.nome) && p.tipo === 'encadeado').forEach(p => {
+    const s = sessoesDe(p).find(x => x.etapas && x.etapas.length); if (!s) return; conjuntos++;
+    const tr = s.etapas.find(l => l.modo === 'treino'), im = s.etapas.find(l => /implicação/.test(l.nome));
+    if (tr && tr.ok && tr.total <= 10) rapido++;
+    if (im && im.ok && !s.etapas.some(l => l.obs === 'voltou ao treino')) semTreino++;
+  });
+  if (rapido) r.C18 = Math.max(r.C18 || 0, rapido >= 3 ? 2 : 1);
+  if (semTreino) r.G10 = Math.max(r.G10 || 0, semTreino >= 3 ? 2 : 1);
+  return r;
+};
+
+// ----- Aba Linguagem -----
+document.querySelector('nav').insertBefore(Object.assign(document.createElement('button'), { textContent:'Linguagem', onclick: () => mostrar('linguagem') }), document.querySelector('nav [data-aba="molduras"]'));
+document.querySelector('nav button:not([data-aba])').dataset.aba = 'linguagem';
+$('#aba-molduras').insertAdjacentHTML('beforebegin', `<section id="aba-linguagem" style="display:none">
+  <div class="cab-pag"><h1 class="titulo-pag">Linguagem</h1></div>
+  <details class="como"><summary>Como usar</summary>
+    <ol>
+      <li>Ordem dos protocolos: <b>separar vendo</b> (não arbitrário, área B) → <b>selecionar ouvindo</b> (C, é o que se treina) → <b>nomear</b> (G) e <b>responder sem figura</b> (H), que são testados sem treino.</li>
+      <li>Cada etapa começa pela linha de base. O que ele já faz fica concluído; ensine só o que errar.</li>
+      <li>Nos testes com <b>figura nova</b>, o app usa um exemplar que não apareceu no treino. Para usar fotos reais, envie em Mais → Estímulos imagens com o <b>mesmo nome do item</b> (ex.: "copo") antes de criar: elas entram como primeiro exemplar.</li>
+      <li>Nas perguntas sem figura (👂), você faz a pergunta (ou toca em 🔊) e marca ✓ ou ✕ pela resposta falada.</li>
+      <li>Itens de mesa e de ambiente natural (quebra-cabeças, seguir instruções na sala, conversa) você pontua no painel ABLLS-R, coluna "Mesa".</li>
+    </ol>
+    <p class="ajuda">Pictogramas: Sergio Palao, ARASAAC (Governo de Aragão), licença CC BY-NC-SA. Itens e níveis seguem a pontuação da ABLLS-R; o conteúdo das tarefas é do app.</p>
+    <div class="linha"><button class="btn sec" id="criarLing">Criar os módulos de linguagem</button><span class="ajuda" id="lingMsg"></span></div>
+  </details>
+  <div class="filtros" id="filtrosLing"></div>
+  <div id="cardsLing"></div>
+</section>`);
+ABAS.push('linguagem');
+$('#criarLing').onclick = async () => { await criarLinguagem(); redesenhar(); };
+let filtroLing = 'J', areaAblLing = 'C';
+function renderLinguagem() {
+  const fb = $('#filtrosLing');
+  fb.innerHTML = MOD_LING.map(m => `<button data-f="${m.k}">${m.t}</button>`).join('') + '<button data-f="ABL">ABLLS-R</button>';
+  fb.querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.f === filtroLing); b.onclick = () => { filtroLing = b.dataset.f; renderLinguagem(); }; });
+  const cont = $('#cardsLing');
+  if (filtroLing === 'ABL') {
+    const L = { B:[ABLLS_B, 'B. Desempenho visual'], C:[ABLLS_C, 'C. Linguagem receptiva'], G:[ABLLS_G, 'G. Nomeação'], H:[ABLLS_H, 'H. Intraverbal'] }[areaAblLing];
+    cont.innerHTML = `<div class="filtros">${['B', 'C', 'G', 'H'].map(x => `<button data-abl="${x}" class="${x === areaAblLing ? 'on' : ''}">${x}</button>`).join('')}</div>` + painelAbllsG(L[0], L[1], 'abllsData' + areaAblLing);
+    cont.querySelectorAll('[data-abl]').forEach(b => b.onclick = () => { areaAblLing = b.dataset.abl; renderLinguagem(); });
+    ligarPainelG(cont, 'abllsData' + areaAblLing, renderLinguagem, (c) => { filtroLing = LETRA_MOD_LING[c[0]] || 'J'; abertos['lin-' + c] = true; renderLinguagem(); });
+    return;
+  }
+  const mod = MOD_LING.find(m => m.k === filtroLing);
+  const lista = grupos(mod.k).map(([k, arr]) => [k, arr.filter(p => p.mat && p.mat.mod === 'ling')]).filter(([, arr]) => arr.length);
+  if (!lista.length) { cont.innerHTML = vazioArea(`O módulo ${mod.t} ainda não foi criado para este aprendiz.`, 'criarLing'); return; }
+  abrirPadrao(lista, k => 'lin-' + k);
+  const feitas = lista.filter(([, arr]) => estadoGrupo(arr) === 'feita').length;
+  cont.innerHTML = `<div class="mod-cab"><div><b>${esc(mod.t)}</b> <span class="chip-ablls">ABLLS-R ${esc(mod.itens)}</span></div><div class="meta">${esc(mod.d)}</div><div class="barra-prog"><span style="width:${Math.round(100 * feitas / lista.length)}%"></span></div><div class="meta">${feitas} de ${lista.length} etapas concluídas</div></div>` +
+    lista.map(([k, arr]) => {
+      const p0 = arr.find(p => p.mat) || arr[0], falta = ((p0.mat && p0.mat.req) || []).filter(r => PROGS.some(p => codDe(p.nome) === r) && !grupoFeito(r));
+      let h = cartaoEtapa('lin-' + k, k, tituloGrupo(arr), arr, (p0.mat && p0.mat.itens) || []);
+      const extra = (abllsDoGrupo(arr) ? `<span class="chip-ablls">${abllsDoGrupo(arr)}</span>` : '') + (falta.length && estadoGrupo(arr) !== 'feita' ? `<span class="chip-bloq" title="Pré-requisito sugerido">🔒 depois de ${falta.join(', ')}</span>` : '');
+      h = h.replace('<span class="estado', extra + '<span class="estado');
+      if (falta.length && estadoGrupo(arr) !== 'feita') h = h.replace('class="etapa', 'class="etapa bloq');
+      return h;
+    }).join('');
+  ligarCartoes(cont);
+}
+const _mostrarLing = mostrar;
+mostrar = function (aba) { _mostrarLing(aba); if (aba === 'linguagem') renderLinguagem(); };
+const _redesenharLing = redesenhar;
+redesenhar = function () { _redesenharLing(); if (abaAtual === 'linguagem') renderLinguagem(); };
+const _renderInicioLing = renderInicio;
+renderInicio = function () {
+  _renderInicioLing();
+  const e = etapaAtual(['X', 'J', 'Y', 'R', 'M', 'C']);
+  const sub = e ? `${e.cod} · ${esc(tituloGrupo(e.arr))}` : 'Ainda sem programas';
+  const prox = e ? `<button class="btn continuar" data-cont="${e.prox.id}">▶ ${esc(rotuloPasso(e.prox))}</button>` : '<span class="meta">Adicione pela biblioteca (Mais → Biblioteca de programas)</span>';
+  $('#cardsInicio').insertAdjacentHTML('beforeend', `<div class="area" id="areaLing"><span class="ic">💬</span><b>Linguagem</b><span>${sub}</span>${prox}</div>`);
+  $('#areaLing').onclick = () => mostrar('linguagem');
+  const bc = $('#areaLing [data-cont]'); if (bc) bc.onclick = (ev) => { ev.stopPropagation(); const p = PROGS.find(x => x.id === bc.dataset.cont); if (p) iniciar(p); };
+};
+AREAS_APR.push({ t:'Linguagem', aba:'linguagem', letras:['X', 'J', 'Y', 'R', 'M', 'C'] });
+COLECOES.push({ id:'G', t:'Linguagem (ABLLS-R C + G + H, base B)', d:'Base visual, nomes, ações, função/característica/classe, lugares, profissões, emoções, rotinas, adjetivos e posição. Treina o ouvinte e testa nomeação e intraverbal sem treino. Pictogramas ARASAAC.', prot:['ABLLS-R B', 'ABLLS-R C', 'ABLLS-R G', 'ABLLS-R H', 'VB-MAPP', 'PEAK-E'], botao:'criarLing', letras:['X', 'J', 'Y', 'R', 'M', 'C'], aba:'linguagem' });
+const credTxt = $('#cardCreditos p'); if (credTxt) credTxt.insertAdjacentHTML('beforeend', ' Pictogramas: <b>Sergio Palao, ARASAAC</b> (Governo de Aragão), licença <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.pt_BR" target="_blank" rel="noopener">CC BY-NC-SA</a>.');
+
+// ----- Painel ABLLS-R com coluna "Mesa" (pontuação dada pelo terapeuta em tarefas fora do app) -----
+painelAbllsG = function (lista, titulo, chaveData) {
+  const a = aprPorId(APR_ATUAL), lbs = (a && a.ablls) || {}, mesa = (a && a.abllsMesa) || {}, app = abllsApp(), fonte = {};
+  PROGS.forEach(p => (p.ablls || []).forEach(x => { (fonte[x.it] = fonte[x.it] || new Set()).add(codDe(p.nome)); }));
+  const sel = (attr, it, v, max) => `<select ${attr}="${it}"><option value="">–</option>${Array.from({ length: max + 1 }, (_, k) => `<option value="${k}" ${v === k ? 'selected' : ''}>${k}</option>`).join('')}</select>`;
+  const linhas = lista.map(([it, nome, max]) => {
+    const lb = lbs[it], ms = mesa[it], ap = app[it] || 0, at = Math.max(lb ?? 0, ap, ms ?? 0), f = [...(fonte[it] || [])].sort();
+    return `<tr><td><b>${it}</b></td><td>${esc(nome)}</td><td>${sel('data-lb', it, lb, max)}</td><td>${ap ? `<b class="ok">${ap}</b>/${max}` : '<span class="meta">–</span>'}</td><td>${sel('data-mesa', it, ms, max)}</td><td style="min-width:110px"><div class="nivel"><span style="width:${Math.round(100 * at / max)}%"></span></div><span class="meta">${at}/${max}</span></td><td class="meta">${f.length ? f.map(c => `<a href="#" data-ir-cod="${c}">${c}</a>`).join(', ') : 'mesa'}</td></tr>`;
+  }).join('');
+  const total = lista.reduce((s, x) => s + x[2], 0), soma = (fn) => lista.reduce((s, [it]) => s + fn(it), 0);
+  const tLb = soma(it => lbs[it] ?? 0), tAt = soma(it => Math.max(lbs[it] ?? 0, app[it] || 0, mesa[it] ?? 0));
+  return `<div class="card"><div class="linha" style="justify-content:space-between"><h2 style="margin:0">ABLLS-R · ${esc(titulo)}</h2><label>Data da linha de base<input type="date" id="abllsData" value="${esc((a && a[chaveData]) || '')}"></label></div>
+    <p class="ajuda">Linha de base: pontuação da avaliação. App: nível que ele já mostrou aqui. Mesa: pontuação que você deu em tarefas fora do app (itens marcados "mesa"). Atual = o maior dos três. Total: linha de base ${tLb}/${total} · atual ${tAt}/${total}. Os dados ficam só neste aparelho.</p>
+    <table class="tab-ablls"><tr><th>Item</th><th>Habilidade</th><th>Linha de base</th><th>App</th><th>Mesa</th><th>Atual</th><th>Etapas</th></tr>${linhas}</table></div>`;
+};
+const _ligarPainelGLing = ligarPainelG;
+ligarPainelG = function (cont, chaveData, rerender, irCod) {
+  _ligarPainelGLing(cont, chaveData, rerender, irCod);
+  const a = aprPorId(APR_ATUAL); if (!a) return;
+  cont.querySelectorAll('[data-mesa]').forEach(s => s.onchange = async () => { a.abllsMesa = a.abllsMesa || {}; if (s.value === '') delete a.abllsMesa[s.dataset.mesa]; else a.abllsMesa[s.dataset.mesa] = +s.value; await salvarAprs(); rerender(); });
 };
 
 // ================= Autoteste (?autoteste=1) =================
