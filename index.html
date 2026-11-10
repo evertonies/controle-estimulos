@@ -233,11 +233,32 @@
   .cartao.regra { padding:1.2vh 2vw; }
   .cartao.regra .gen-regra { max-height:12vh; width:auto; max-width:86vw; }
   .chip-teste { background:var(--erro-bg); color:var(--vermelho); border-radius:6px; padding:1px 6px; font-weight:600; font-size:11px; }
+  /* ===== Área geral e vários aprendizes ===== */
+  #bGeral { padding:7px 12px; font-size:13px; }
+  body.modo-geral nav, body.modo-geral #aprendizTopo, body.modo-geral #bGeral { display:none; }
+  #aprendizTopo { cursor:pointer; font-size:14px; font-weight:700; padding:5px 12px; }
+  .area.apr .ic { font-size:15px; }
+  .area.novo { border-style:dashed; align-items:center; justify-content:center; text-align:center; color:var(--azul2); min-height:150px; }
+  .area.novo .ic { background:var(--acento-bg); }
+  .mini { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-top:1px solid var(--borda); }
+  .mini:first-of-type { margin-top:4px; }
+  .mini .t { flex:1; color:var(--texto); }
+  .mini .t i { font-style:normal; color:var(--suave); }
+  .mini .play { width:32px; height:32px; font-size:13px; }
+  .prot { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; margin:2px 3px 0 0; background:var(--cinza); color:var(--suave); }
+  .prot.ablls { background:#e8f0fa; color:#2f6db5; } .prot.peak { background:#f3e8f8; color:#7b3f9a; } .prot.vbmapp { background:#e7f5ec; color:#2e7d4f; }
+  .bib-item { display:flex; gap:12px; align-items:flex-start; padding:13px 16px; border-top:1px solid var(--borda); }
+  .bib-item:first-child { border-top:none; }
+  .bib-item .txt { flex:1; }
+  .bib-item .nome { font-weight:600; font-size:15px; }
+  .bib-item .acoes { display:flex; gap:6px; align-items:center; flex:none; }
+  .origem { font-size:11px; font-weight:600; color:var(--suave); text-transform:uppercase; letter-spacing:.4px; }
 </style>
 </head>
 <body>
 <header>
   <div class="marca"><img src="icone-192.png" alt="">Estímulos</div>
+  <button id="bGeral" class="btn sec" title="Voltar para a área geral">⌂ Área geral</button>
   <nav>
     <button data-aba="inicio" class="ativo">Aplicar</button>
     <button data-aba="sequencia">Leitura</button>
@@ -249,6 +270,48 @@
 </header>
 
 <main>
+  <!-- ÁREA GERAL -->
+  <section id="aba-geral" style="display:none">
+    <h1 class="titulo-pag">Área geral</h1>
+    <h2 class="sub">Aprendizes</h2>
+    <div class="grade-areas" id="cardsAprendizes"></div>
+    <h2 class="sub">Banco de programas e dados</h2>
+    <div class="grade-areas">
+      <button class="area" data-ir="biblioteca"><span class="ic">▤</span><b>Biblioteca de programas</b><span id="metaBib">Coleções do app, programas personalizados e vínculos com ABLLS-R, PEAK e VB-MAPP</span></button>
+      <button class="area" data-ir="estimulos"><span class="ic">▣</span><b>Estímulos</b><span>Imagens, textos e figuras, compartilhados por todos os aprendizes</span></button>
+      <button class="area" data-ir="geraldados"><span class="ic">⚙</span><b>Cópia de segurança</b><span>Levar tudo para outro aparelho e créditos das figuras</span></button>
+    </div>
+  </section>
+
+  <!-- BIBLIOTECA -->
+  <section id="aba-biblioteca" style="display:none">
+    <button class="voltar" id="voltarBib">‹ Voltar</button>
+    <h1 class="titulo-pag">Biblioteca de programas</h1>
+    <p class="meta" style="margin:-8px 0 14px">Modelos que podem ir para qualquer aprendiz. Ao adicionar, o aprendiz recebe uma cópia própria: o progresso e as sessões de um não mexem nos do outro.</p>
+    <div class="linha" style="margin-bottom:12px">
+      <label>Adicionar para<select id="bibDestino"></select></label>
+      <label style="flex:1">Buscar<input type="text" id="bibBusca" placeholder="nome, área ou protocolo (ex.: R8, PEAK-T, Leitura)"></label>
+    </div>
+    <div class="filtros" id="filtrosBib"><button data-f="" class="on">Todos</button><button data-f="col">Coleções do app</button><button data-f="pers">Personalizados</button><button data-f="ABLLS">ABLLS-R</button><button data-f="PEAK">PEAK</button><button data-f="VB-MAPP">VB-MAPP</button><button data-f="outros">Outros</button></div>
+    <div id="bibMsg" class="ajuda" style="margin:0 0 10px"></div>
+    <div id="bibLista"></div>
+    <details class="como" style="margin-top:14px">
+      <summary>Como criar um programa personalizado</summary>
+      <ol>
+        <li>Entre no aprendiz → Mais → Todos os programas → <b>+ Novo programa</b> (ou edite um que já existe).</li>
+        <li>Preencha <b>Protocolos / currículos</b> com os itens que ele atende (ex.: ABLLS-R Q8; PEAK-DT 4A; VB-MAPP Ouvinte 7).</li>
+        <li>Marque <b>Guardar também na biblioteca</b>. Ou, em qualquer programa, toque em ⋯ → <b>Salvar na biblioteca</b>.</li>
+      </ol>
+      <p class="ajuda">Os vínculos das coleções do app são sugestões por área do protocolo (ex.: ABLLS-R R8, PEAK-T). Confira com o protocolo do aprendiz; o app não reproduz o conteúdo dos protocolos.</p>
+    </details>
+  </section>
+
+  <!-- CÓPIA DE SEGURANÇA (área geral) -->
+  <section id="aba-geraldados" style="display:none">
+    <button class="voltar" data-geral>‹ Área geral</button>
+    <div id="lugarCopia"></div>
+  </section>
+
   <!-- INÍCIO -->
   <section id="aba-inicio">
     <h1 class="titulo-pag">O que vamos aplicar hoje?</h1>
@@ -346,8 +409,9 @@
     <div class="grade-areas">
       <button class="area" data-ir="programas"><span class="ic">≡</span><b>Todos os programas</b><span>Lista completa, criar e editar programas</span></button>
       <button class="area" data-ir="historico"><span class="ic">◷</span><b>Histórico</b><span>Sessões registradas e exportar para Excel</span></button>
-      <button class="area" data-ir="estimulos"><span class="ic">▣</span><b>Estímulos</b><span>Imagens, textos e figuras</span></button>
-      <button class="area" data-ir="dados"><span class="ic">⚙</span><b>Dados e opções</b><span>Aprendiz, cópia de segurança, opções da sessão</span></button>
+      <button class="area" data-ir="biblioteca"><span class="ic">▤</span><b>Biblioteca de programas</b><span>Adicionar programas prontos ou personalizados a este aprendiz</span></button>
+      <button class="area" data-ir="estimulos"><span class="ic">▣</span><b>Estímulos</b><span>Imagens, textos e figuras (compartilhados)</span></button>
+      <button class="area" data-ir="dados"><span class="ic">⚙</span><b>Opções do aprendiz</b><span>Sigla, opções da sessão deste aprendiz</span></button>
     </div>
   </section>
   <!-- PROGRAMAS -->
@@ -403,6 +467,10 @@
         <label>em seguidas<input type="number" id="pCritN" min="1" value="8" style="width:70px"></label>
         <label>Máximo de tentativas<input type="number" id="pMax" min="1" value="25" style="width:80px"></label>
       </div>
+      <div class="linha" style="margin-top:10px">
+        <label style="flex:1">Protocolos / currículos (separe com ;)<input type="text" id="pProt" placeholder="ex.: ABLLS-R Q8; PEAK-DT 4A; VB-MAPP Ouvinte 7"></label>
+        <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="pBib"> Guardar também na biblioteca</label>
+      </div>
       <p class="ajuda">Padrão dos protocolos da Siri Ming (vol. 2): 7 corretas em 8 seguidas, encerrar com 25 tentativas. Avaliação do vol. 1: treino 6 seguidas, teste de IM 5/6, teste de IMC 7/8.</p>
 
       <h2>Relações (cada linha é uma tentativa possível)</h2>
@@ -436,12 +504,12 @@
 
   <!-- DADOS -->
   <section id="aba-dados" style="display:none">
-    <div class="card">
+    <div class="card" id="cardSigla">
       <h2>Aprendiz</h2>
       <div class="linha"><label>Sigla do aprendiz<input type="text" id="aprendiz" placeholder="ex.: MHOM"></label><button class="btn sec" id="salvarAprendiz">Salvar</button></div>
       <p class="ajuda">Use só a sigla. Os dados ficam guardados apenas neste navegador e neste aparelho.</p>
     </div>
-    <div class="card">
+    <div class="card" id="cardCopia">
       <h2>Cópia de segurança</h2>
       <div class="linha">
         <button class="btn" id="backup">Baixar cópia (estímulos, programas e sessões)</button>
@@ -449,7 +517,7 @@
       </div>
       <p class="ajuda">Use a cópia para levar tudo para outro computador ou tablet, ou para não perder os dados se o navegador for limpo.</p>
     </div>
-    <div class="card">
+    <div class="card" id="cardCreditos">
       <h2>Créditos</h2>
       <p style="font-size:13px;line-height:1.5">Figuras: <b>Twemoji</b>, © Twitter, Inc. e outros colaboradores, licenciadas sob <a href="https://creativecommons.org/licenses/by/4.0/deed.pt_BR" target="_blank" rel="noopener">CC BY 4.0</a>. Projeto mantido em <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">github.com/jdecked/twemoji</a>. As figuras foram usadas sem alterações.</p>
     </div>
@@ -460,6 +528,12 @@
       <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="optSom" checked> Som de acerto no treino</label>
       <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px">Quadro de pontos (estrelas no treino): <input type="number" id="optPontos" min="0" max="20" value="10" style="width:70px"> <span class="ajuda">0 = desligado. Ao completar, aparece a tela de prêmio.</span></label>
       <label style="flex-direction:row;align-items:center;gap:8px;margin-top:6px"><input type="checkbox" id="optFigura" checked> Na leitura, mostrar a figura com o mesmo nome depois do acerto (treino)</label>
+      <p class="ajuda">Estas opções valem só para este aprendiz.</p>
+    </div>
+    <div class="card" id="cardExcluirApr">
+      <h2>Excluir aprendiz</h2>
+      <p class="ajuda" style="margin:0 0 10px">Apaga deste aparelho os programas e as sessões deste aprendiz. Os estímulos e a biblioteca continuam. Baixe antes a cópia de segurança.</p>
+      <button class="btn perigo" id="excluirApr">Excluir este aprendiz</button>
     </div>
   </section>
 </main>
@@ -1441,7 +1515,7 @@ $('#restaurar').onchange = async (ev) => {
 
 async function carregar() {
   [EST, PROGS, SESS] = await Promise.all([DB.todos('estimulos'), DB.todos('programas'), DB.todos('sessoes')]);
-  const c = (await DB.todos('config'))[0]; if (c) CFG = Object.assign(CFG, c);
+  const c = (await DB.todos('config')).find(x => x.id === 'cfg'); if (c) CFG = Object.assign(CFG, c);
   $('#aprendiz').value = CFG.aprendiz || ''; $('#aprendizTopo').textContent = CFG.aprendiz ? 'Aprendiz: ' + CFG.aprendiz : '';
   $('#optFala').checked = !!CFG.fala; $('#optToque').checked = CFG.toque !== false; $('#optSom').checked = CFG.som !== false; $('#optPontos').value = CFG.pontos ?? 10; $('#optFigura').checked = CFG.figura !== false;
   preencherTags(); renderEst(); renderProgs();
@@ -2297,6 +2371,316 @@ criarMolduras = async function () {
 };
 $('#criarMold').onclick = criarMolduras;
 TIPO_NOME.encadeado = 'Encadeado (treino → teste)';
+
+// ================= Área geral: vários aprendizes e biblioteca de programas =================
+// Cada programa e cada sessão pertence a um aprendiz (aprendizId). Modelos da biblioteca têm modelo:true.
+// PROGS e SESS guardam só o aprendiz aberto; o resto fica no banco do aparelho.
+let APRS = [], APR_ATUAL = null, MODELOS = [];
+const aprPorId = (id) => APRS.find(a => a.id === id);
+const OPC_PADRAO = { fala:false, toque:true, som:true, pontos:10, figura:true };
+const salvarBruto = DB.salvar;
+DB.salvar = (loja, obj) => {
+  if ((loja === 'programas' || loja === 'sessoes') && obj && !obj.modelo && !obj.aprendizId && APR_ATUAL) obj.aprendizId = APR_ATUAL;
+  return salvarBruto(loja, obj);
+};
+async function salvarAprs() { await salvarBruto('config', { id:'aprendizes', lista: APRS }); }
+function opcoesDoCfg() { return { fala:!!CFG.fala, toque:CFG.toque !== false, som:CFG.som !== false, pontos:CFG.pontos ?? 10, figura:CFG.figura !== false }; }
+function filtrarAtual(ps, ss) {
+  MODELOS = ps.filter(p => p.modelo);
+  PROGS = ps.filter(p => !p.modelo && APR_ATUAL && p.aprendizId === APR_ATUAL);
+  SESS = ss.filter(s => APR_ATUAL && s.aprendizId === APR_ATUAL);
+}
+async function prepararAprendizes() {
+  const cfgs = await DB.todos('config'); const reg = cfgs.find(x => x.id === 'aprendizes');
+  APRS = reg && Array.isArray(reg.lista) ? reg.lista : [];
+  const [ps, ss] = await Promise.all([DB.todos('programas'), DB.todos('sessoes')]);
+  const orfP = ps.filter(p => !p.modelo && !p.aprendizId), orfS = ss.filter(s => !s.aprendizId);
+  // Dados de antes desta versão (ou de cópia antiga): vão para o aprendiz da sigla salva
+  if (orfP.length || orfS.length) {
+    const sigla = (CFG.aprendiz || '').trim() || (orfS.find(s => s.aprendiz)?.aprendiz) || 'Aprendiz 1';
+    let a = APRS.find(x => x.sigla.toLowerCase() === sigla.toLowerCase());
+    if (!a) { a = { id: uid(), sigla, criado: Date.now(), opcoes: opcoesDoCfg() }; APRS.push(a); await salvarAprs(); }
+    for (const p of orfP) { p.aprendizId = a.id; await salvarBruto('programas', p); }
+    for (const s of orfS) { s.aprendizId = a.id; await salvarBruto('sessoes', s); }
+    if (!CFG.aprAtual) CFG.aprAtual = a.id;
+  }
+  APR_ATUAL = aprPorId(CFG.aprAtual) ? CFG.aprAtual : null;
+  if (APR_ATUAL) { const a = aprPorId(APR_ATUAL); CFG.aprendiz = a.sigla; if (a.opcoes) Object.assign(CFG, a.opcoes); }
+  filtrarAtual(ps, ss);
+}
+function atualizarTopo() {
+  const a = aprPorId(APR_ATUAL);
+  $('#aprendizTopo').textContent = a ? a.sigla : '';
+  $('#aprendizTopo').title = 'Trocar de aprendiz';
+  $('#aprendiz').value = a ? a.sigla : '';
+  $('#optFala').checked = !!CFG.fala; $('#optToque').checked = CFG.toque !== false; $('#optSom').checked = CFG.som !== false; $('#optPontos').value = CFG.pontos ?? 10; $('#optFigura').checked = CFG.figura !== false;
+}
+async function abrirAprendiz(id, ir = 'inicio') {
+  const a = aprPorId(id); if (!a) return;
+  if (APR_ATUAL !== id) { Object.keys(abertos).forEach(k => delete abertos[k]); filtroLeitura = 'L'; filtroMat = 'N'; filtroMold = 'I'; }
+  APR_ATUAL = id; CFG.aprAtual = id; CFG.aprendiz = a.sigla; Object.assign(CFG, OPC_PADRAO, a.opcoes || {});
+  await salvarBruto('config', CFG);
+  const [ps, ss] = await Promise.all([DB.todos('programas'), DB.todos('sessoes')]);
+  filtrarAtual(ps, ss); atualizarTopo(); renderProgs();
+  if (ir) mostrar(ir);
+}
+async function novoAprendiz() {
+  const s = prompt('Sigla do novo aprendiz (não use o nome completo):'); if (s === null) return;
+  const sigla = s.trim().toUpperCase(); if (!sigla) return;
+  if (APRS.some(a => a.sigla.toLowerCase() === sigla.toLowerCase())) return alert('Já existe um aprendiz com essa sigla.');
+  const a = { id: uid(), sigla, criado: Date.now(), opcoes: Object.assign({}, OPC_PADRAO) };
+  APRS.push(a); await salvarAprs(); await abrirAprendiz(a.id);
+}
+
+// ----- Navegação: área geral × área do aprendiz -----
+['geral','biblioteca','geraldados'].forEach(a => ABAS.push(a));
+const ABAS_GERAL = ['geral','geraldados'], ABAS_NEUTRAS = ['estimulos','biblioteca'];
+let origemNeutra = 'geral';
+const _mostrarApr = mostrar;
+mostrar = function (aba) {
+  fecharMenu();
+  if (!ABAS_GERAL.includes(aba) && !ABAS_NEUTRAS.includes(aba) && !APR_ATUAL) aba = 'geral';
+  if (ABAS_NEUTRAS.includes(aba) && !ABAS_NEUTRAS.includes(abaAtual)) origemNeutra = document.body.classList.contains('modo-geral') || !APR_ATUAL ? 'geral' : 'mais';
+  if (ABAS_GERAL.includes(aba)) document.body.classList.add('modo-geral');
+  else if (!ABAS_NEUTRAS.includes(aba)) document.body.classList.remove('modo-geral');
+  _mostrarApr(aba);
+  if (ABAS_NEUTRAS.includes(aba)) document.querySelectorAll('nav button').forEach(x => x.classList.toggle('ativo', x.dataset.aba === 'mais' && origemNeutra === 'mais'));
+  if (aba === 'geral') renderGeral();
+  if (aba === 'biblioteca') renderBiblioteca();
+  if (aba === 'estimulos') renderEst();
+  if (aba === 'dados') atualizarTopo();
+};
+$('#bGeral').onclick = () => mostrar('geral');
+$('#aprendizTopo').onclick = () => mostrar('geral');
+document.querySelectorAll('#aba-geral [data-ir], #aba-mais [data-ir]').forEach(b => b.onclick = () => mostrar(b.dataset.ir));
+document.querySelectorAll('[data-geral]').forEach(b => b.onclick = () => mostrar('geral'));
+const voltarEst = $('#aba-estimulos [data-voltar]'); if (voltarEst) voltarEst.onclick = () => mostrar(origemNeutra);
+$('#voltarBib').onclick = () => mostrar(origemNeutra);
+$('#lugarCopia').append($('#cardCopia'), $('#cardCreditos'));
+const _redesenharApr = redesenhar;
+redesenhar = function () { _redesenharApr(); if (abaAtual === 'geral') renderGeral(); if (abaAtual === 'biblioteca') renderBiblioteca(); };
+const _voltarAtual = () => { const v = $('#aba-estimulos [data-voltar]'); if (v) v.textContent = origemNeutra === 'geral' ? '‹ Área geral' : '‹ Mais'; $('#voltarBib').textContent = origemNeutra === 'geral' ? '‹ Área geral' : '‹ Mais'; };
+
+// ----- Página da área geral -----
+const AREAS_APR = [
+  { t:'Leitura', aba:'sequencia', f:'L', letras:['L'] },
+  { t:'Leitura com figuras', aba:'sequencia', f:'F', letras:['F','S'] },
+  { t:'Matemática', aba:'matematica', letras:['N','C','M','D','H'] },
+  { t:'Molduras', aba:'molduras', letras:['I','P','O','E','G','T'] }
+];
+function comDadosDe(id, ps, ss, fn) {
+  const P = PROGS, Sx = SESS;
+  PROGS = ps.filter(p => !p.modelo && p.aprendizId === id); SESS = ss.filter(s => s.aprendizId === id);
+  try { return fn(); } finally { PROGS = P; SESS = Sx; }
+}
+async function renderGeral() {
+  _voltarAtual();
+  const [ps, ss] = await Promise.all([DB.todos('programas'), DB.todos('sessoes')]);
+  MODELOS = ps.filter(p => p.modelo);
+  const cards = APRS.slice().sort((a, b) => a.sigla.localeCompare(b.sigla)).map(a => comDadosDe(a.id, ps, ss, () => {
+    const ult = SESS.slice().sort((x, y) => y.inicio - x.inicio)[0];
+    const conc = PROGS.filter(feito).length;
+    const linhas = AREAS_APR.map(ar => { const e = etapaAtual(ar.letras); if (!e) return ''; return `<div class="mini"><span class="t"><i>${ar.t} ·</i> ${esc(e.cod)} ${esc(rotuloPasso(e.prox))}</span><button class="play" data-apr="${a.id}" data-play="${e.prox.id}" aria-label="Aplicar">▶</button></div>`; }).join('');
+    const meta = PROGS.length ? `${PROGS.length} programas · ${conc} concluídos${ult ? ' · última sessão ' + new Date(ult.inicio).toLocaleDateString('pt-BR') : ''}` : 'Sem programas ainda: adicione pela biblioteca';
+    return `<div class="area apr" data-abrir="${a.id}"><span class="ic">${esc(a.sigla.slice(0, 2))}</span><b>${esc(a.sigla)}</b><span>${meta}</span>${linhas}<button class="btn continuar" data-abrir="${a.id}">Abrir</button></div>`;
+  }));
+  cards.push(`<button class="area novo" id="bNovoApr"><span class="ic">+</span><b>Novo aprendiz</b><span>Cada aprendiz tem seus próprios programas e sessões</span></button>`);
+  $('#cardsAprendizes').innerHTML = cards.join('');
+  $('#cardsAprendizes').querySelectorAll('[data-abrir]').forEach(c => c.onclick = (ev) => { ev.stopPropagation(); abrirAprendiz(c.dataset.abrir); });
+  $('#cardsAprendizes').querySelectorAll('[data-play]').forEach(b => b.onclick = async (ev) => { ev.stopPropagation(); await abrirAprendiz(b.dataset.apr); const p = PROGS.find(x => x.id === b.dataset.play); if (p) iniciar(p); });
+  $('#bNovoApr').onclick = novoAprendiz;
+  $('#metaBib').textContent = `${COLECOES.length} coleções do app e ${MODELOS.length} programa${MODELOS.length === 1 ? '' : 's'} personalizado${MODELOS.length === 1 ? '' : 's'} · vínculos com ABLLS-R, PEAK e VB-MAPP`;
+}
+
+// ----- Vínculos com protocolos e currículos (sugestões por área; o usuário pode editar) -----
+function protPadrao(p) {
+  const m = (p.nome || '').match(/^([A-Z])(\d\d) /); if (!m) return [];
+  const L = m[1], n = +m[2], inv = /inverso|IM\b|IMC/.test(p.nome);
+  if (L === 'L') return n <= 1 ? ['ABLLS-R Q1–Q4', 'VB-MAPP Leitura'] : ['ABLLS-R Q (leitura)', 'VB-MAPP Leitura'];
+  if (L === 'F' || L === 'S') return ['ABLLS-R Q (leitura)', 'VB-MAPP Leitura'].concat(inv ? ['PEAK-E'] : []);
+  const mat = { N:['ABLLS-R R8'], C:['ABLLS-R R4', 'ABLLS-R R7'], M:['ABLLS-R R9–R10'], D:['ABLLS-R R22–R24'], H:['ABLLS-R R21'] }[L];
+  if (mat) return mat.concat(['VB-MAPP Matemática'], inv ? ['PEAK-E'] : []);
+  if ('IPOEGT'.includes(L)) return n < 10 ? ['PEAK-T', 'VB-MAPP VP-MTS'] : ['PEAK-E', 'PEAK-T'];
+  return [];
+}
+const protDe = (p) => (p.protocolos && p.protocolos.length) ? p.protocolos : protPadrao(p);
+const familiaProt = (t) => /^ABLLS/i.test(t) ? 'ABLLS' : /^PEAK/i.test(t) ? 'PEAK' : /^VB-?MAPP/i.test(t) ? 'VB-MAPP' : 'outros';
+const protHtml = (lista) => lista.map(t => `<span class="prot ${{ ABLLS:'ablls', PEAK:'peak', 'VB-MAPP':'vbmapp' }[familiaProt(t)] || ''}">${esc(t)}</span>`).join('');
+const lerProt = (s) => String(s || '').split(/[;,\n]/).map(x => x.trim()).filter(Boolean);
+
+const COLECOES = [
+  { id:'L', t:'Leitura: sílabas e palavras', d:'35 etapas progressivas (L00–L34): linha de base, ensino só do que errar e sonda de derivação por família.', prot:['ABLLS-R Q1–Q4', 'ABLLS-R Q (leitura)', 'VB-MAPP Leitura'], botao:'criarSeq', letras:['L'], aba:'sequencia' },
+  { id:'F', t:'Leitura com figuras', d:'Palavra ↔ figura (F01–F12) e sílaba inicial (S01–S05), com teste inverso sem treino.', prot:['ABLLS-R Q (leitura)', 'VB-MAPP Leitura', 'PEAK-E'], botao:'criarFig', letras:['F','S'], aba:'sequencia' },
+  { id:'M', t:'Matemática', d:'Número e quantidade, ler e contar, mais e menos, dinheiro e horas.', prot:['ABLLS-R R4', 'ABLLS-R R7', 'ABLLS-R R8', 'ABLLS-R R9–R10', 'ABLLS-R R21', 'ABLLS-R R22–R24', 'VB-MAPP Matemática'], botao:'criarMat', letras:['N','C','M','D','H'], aba:'matematica' },
+  { id:'R', t:'Molduras relacionais (Siri Ming)', d:'Fase 1 não arbitrária e Fase 2 arbitrária, com programas encadeados: treino → manutenção → teste IM → teste IMC.', prot:['PEAK-E', 'PEAK-T', 'VB-MAPP VP-MTS'], botao:'criarMold', letras:['I','P','O','E','G','T'], aba:'molduras' }
+];
+
+// ----- Biblioteca -----
+let filtroBib = '', buscaBib = '', ocupadoBib = false;
+function renderBiblioteca() {
+  _voltarAtual();
+  const sel = $('#bibDestino'), v = sel.value || APR_ATUAL || '';
+  sel.innerHTML = APRS.length ? APRS.slice().sort((a, b) => a.sigla.localeCompare(b.sigla)).map(a => `<option value="${a.id}">${esc(a.sigla)}</option>`).join('') : '<option value="">(cadastre um aprendiz)</option>';
+  if (aprPorId(v)) sel.value = v;
+  document.querySelectorAll('#filtrosBib button').forEach(b => b.classList.toggle('on', b.dataset.f === filtroBib));
+  const passa = (texto, prots, origem) => {
+    if (filtroBib === 'col' && origem !== 'col') return false;
+    if (filtroBib === 'pers' && origem !== 'pers') return false;
+    if (['ABLLS','PEAK','VB-MAPP','outros'].includes(filtroBib) && !prots.some(t => familiaProt(t) === filtroBib) && !(filtroBib === 'outros' && !prots.length)) return false;
+    return !buscaBib || (texto + ' ' + prots.join(' ')).toLowerCase().includes(buscaBib);
+  };
+  const destino = aprPorId(sel.value);
+  const qtdNoDestino = (letras) => destino ? (destino.id === APR_ATUAL ? PROGS : []).filter(p => letras.includes(p.nome[0]) && /^[A-Z]\d\d /.test(p.nome)).length : 0;
+  const itens = [];
+  COLECOES.filter(c => passa(c.t + ' ' + c.d, c.prot, 'col')).forEach(c => {
+    const n = qtdNoDestino(c.letras);
+    itens.push(`<div class="bib-item"><div class="txt"><div class="origem">Coleção do app</div><div class="nome">${esc(c.t)}</div><div class="meta">${esc(c.d)}</div><div>${protHtml(c.prot)}</div>${n ? `<div class="meta" style="margin-top:4px">${esc(destino.sigla)} já tem ${n} programas desta coleção; adicionar de novo só completa o que faltar.</div>` : ''}</div><div class="acoes"><button class="btn" data-col="${c.id}">+ Adicionar</button></div></div>`);
+  });
+  MODELOS.slice().sort((a, b) => a.nome.localeCompare(b.nome)).filter(m => passa(m.nome + ' ' + (m.area || ''), protDe(m), 'pers')).forEach(m => {
+    itens.push(`<div class="bib-item"><div class="txt"><div class="origem">Personalizado</div><div class="nome">${esc(m.nome)}</div><div class="meta">${esc(m.area || 'sem área')} · ${TIPO_NOME[m.tipo] || m.tipo} · ${m.pares.length} relações · critério ${m.critA}/${m.critN}</div><div>${protHtml(protDe(m)) || '<span class="meta">sem vínculo com protocolo</span>'}</div></div><div class="acoes"><button class="btn" data-mod="${m.id}">+ Adicionar</button><button class="tres" data-modacoes="${m.id}" aria-label="Mais ações">⋯</button></div></div>`);
+  });
+  $('#bibLista').innerHTML = itens.length ? `<div class="lista">${itens.join('')}</div>` : `<div class="vazio-area">Nada encontrado com esse filtro.${!MODELOS.length && filtroBib === 'pers' ? '<br>Para criar um personalizado: em um programa do aprendiz, toque em ⋯ → Salvar na biblioteca.' : ''}</div>`;
+  $('#bibLista').querySelectorAll('[data-col]').forEach(b => b.onclick = () => adicionarColecao(COLECOES.find(c => c.id === b.dataset.col)));
+  $('#bibLista').querySelectorAll('[data-mod]').forEach(b => b.onclick = () => adicionarModelo(MODELOS.find(m => m.id === b.dataset.mod)));
+  $('#bibLista').querySelectorAll('[data-modacoes]').forEach(b => b.onclick = (ev) => { ev.stopPropagation(); menuModelo(b, MODELOS.find(m => m.id === b.dataset.modacoes)); });
+}
+document.querySelectorAll('#filtrosBib button').forEach(b => b.onclick = () => { filtroBib = b.dataset.f; renderBiblioteca(); });
+$('#bibBusca').oninput = () => { buscaBib = $('#bibBusca').value.toLowerCase().trim(); renderBiblioteca(); };
+$('#bibDestino').onchange = renderBiblioteca;
+function destinoBib() { const a = aprPorId($('#bibDestino').value); if (!a) { alert('Cadastre um aprendiz na área geral primeiro.'); return null; } return a; }
+async function adicionarColecao(c) {
+  if (ocupadoBib) return; const a = destinoBib(); if (!a) return;
+  ocupadoBib = true; $('#bibMsg').textContent = `Adicionando "${c.t}" para ${a.sigla}...`;
+  try {
+    if (APR_ATUAL !== a.id) await abrirAprendiz(a.id, null);
+    const antes = PROGS.length;
+    await $('#' + c.botao).onclick();
+    const novos = PROGS.length - antes, total = PROGS.filter(p => c.letras.includes(p.nome[0]) && /^[A-Z]\d\d /.test(p.nome)).length;
+    $('#bibMsg').innerHTML = `<b class="ok">${esc(a.sigla)}: ${novos ? novos + ' programas adicionados' : 'a coleção já estava completa'}</b> (${total} no total). <a href="#" id="irColecao">Abrir em ${esc(a.sigla)} →</a>`;
+    $('#irColecao').onclick = (ev) => { ev.preventDefault(); if (c.id === 'F') filtroLeitura = 'F'; mostrar(c.aba); };
+  } catch (e) { $('#bibMsg').textContent = 'Não foi possível adicionar: ' + e.message; }
+  ocupadoBib = false; renderBiblioteca();
+}
+async function adicionarModelo(m) {
+  const a = destinoBib(); if (!a || !m) return;
+  const [ps] = await Promise.all([DB.todos('programas')]);
+  const doAprendiz = ps.filter(p => !p.modelo && p.aprendizId === a.id);
+  const c = JSON.parse(JSON.stringify(m)); delete c.modelo; c.id = uid(); c.aprendizId = a.id; c.origemModelo = m.id;
+  if (doAprendiz.some(p => p.nome === c.nome)) { if (!confirm(`${a.sigla} já tem um programa "${c.nome}". Adicionar outra cópia?`)) return; c.nome += ' (2)'; }
+  await salvarBruto('programas', c);
+  if (a.id === APR_ATUAL) PROGS.push(c);
+  $('#bibMsg').innerHTML = `<b class="ok">"${esc(c.nome)}" adicionado para ${esc(a.sigla)}.</b>`;
+  renderBiblioteca();
+}
+function menuModelo(btn, m) {
+  menu.innerHTML = `<button data-a="vinc">Editar vínculos com protocolos</button><button data-a="ren">Renomear / mudar área</button><button data-a="del" class="perigo-txt">Tirar da biblioteca</button>`;
+  const r = btn.getBoundingClientRect(); menu.style.display = 'block';
+  menu.style.top = (window.scrollY + r.bottom + 4) + 'px'; menu.style.left = Math.max(8, window.scrollX + r.right - menu.offsetWidth) + 'px';
+  menu.querySelectorAll('button').forEach(b => b.onclick = async () => {
+    fecharMenu(); const a = b.dataset.a;
+    if (a === 'vinc') { const s = prompt('Protocolos / currículos (separe com ;)\nex.: ABLLS-R Q8; PEAK-DT 4A; VB-MAPP Ouvinte 7', protDe(m).join('; ')); if (s === null) return; m.protocolos = lerProt(s); }
+    else if (a === 'ren') { const n = prompt('Nome do modelo:', m.nome); if (n === null) return; const ar = prompt('Área:', m.area || ''); if (ar === null) return; m.nome = n.trim() || m.nome; m.area = ar.trim(); }
+    else if (a === 'del') { if (!confirm(`Tirar "${m.nome}" da biblioteca? Os aprendizes que já receberam este programa continuam com a cópia deles.`)) return; await DB.apagar('programas', m.id); MODELOS = MODELOS.filter(x => x.id !== m.id); renderBiblioteca(); return; }
+    await salvarBruto('programas', m); renderBiblioteca();
+  });
+}
+async function salvarComoModelo(p, silencioso = false) {
+  const m = JSON.parse(JSON.stringify(p)); delete m.aprendizId; delete m.origemModelo; m.modelo = true; m.id = uid();
+  m.protocolos = protDe(p); m.criadoEm = Date.now();
+  const igual = MODELOS.find(x => x.nome === m.nome);
+  if (igual) { if (!confirm(`Já existe na biblioteca um modelo "${m.nome}". Substituir pela versão atual?`)) return; m.id = igual.id; MODELOS = MODELOS.filter(x => x !== igual); }
+  await salvarBruto('programas', m); MODELOS.push(m);
+  if (!silencioso) alert(`"${m.nome}" foi salvo na biblioteca. Agora ele pode ser adicionado a qualquer aprendiz.`);
+}
+
+// ----- Menu ⋯ dos programas do aprendiz: salvar na biblioteca -----
+const _abrirMenuApr = abrirMenuAcoes;
+abrirMenuAcoes = function (btn, id) {
+  _abrirMenuApr(btn, id);
+  const p = PROGS.find(x => x.id === id); if (!p) return;
+  const b = document.createElement('button'); b.textContent = 'Salvar na biblioteca';
+  b.onclick = async () => { fecharMenu(); await salvarComoModelo(p); };
+  menu.insertBefore(b, menu.querySelector('.perigo-txt'));
+};
+
+// ----- Editor: vínculos com protocolos e "guardar também na biblioteca" -----
+const _abrirEditorApr = abrirEditor;
+abrirEditor = function (p) { _abrirEditorApr(p); $('#pProt').value = protDe(p).join('; '); $('#pBib').checked = false; };
+const _salvarProgApr = $('#salvarProg').onclick;
+$('#salvarProg').onclick = async () => {
+  const p = edicao; if (!p) return;
+  p.protocolos = lerProt($('#pProt').value);
+  const bib = $('#pBib').checked;
+  await _salvarProgApr();
+  if (bib && $('#editor').style.display === 'none') await salvarComoModelo(p);
+};
+
+// ----- Início do aprendiz vazio -----
+const _renderInicioApr = renderInicio;
+renderInicio = function () {
+  _renderInicioApr();
+  const a = aprPorId(APR_ATUAL);
+  $('#aba-inicio .titulo-pag').textContent = a ? `${a.sigla}: o que vamos aplicar hoje?` : 'O que vamos aplicar hoje?';
+  document.querySelectorAll('#cardsInicio .area .meta').forEach(m => { if (/Como usar/.test(m.textContent)) m.textContent = 'Adicione pela biblioteca (Mais → Biblioteca de programas)'; });
+  if (a && !PROGS.length) $('#cardsInicio').insertAdjacentHTML('afterbegin', `<div class="vazio-area" style="grid-column:1/-1"><p style="margin:0 0 12px">${esc(a.sigla)} ainda não tem programas. Escolha na biblioteca o que entra na programação.</p><button class="btn" id="irBibVazio">Abrir biblioteca</button></div>`);
+  const b = $('#irBibVazio'); if (b) b.onclick = () => mostrar('biblioteca');
+};
+
+// ----- Opções e sigla por aprendiz -----
+['optFala','optToque','optSom','optPontos','optFigura'].forEach(id => $('#' + id).addEventListener('change', async () => { const a = aprPorId(APR_ATUAL); if (!a) return; a.opcoes = opcoesDoCfg(); await salvarAprs(); }));
+$('#salvarAprendiz').onclick = async () => {
+  const a = aprPorId(APR_ATUAL); if (!a) return;
+  const s = $('#aprendiz').value.trim().toUpperCase(); if (!s) return alert('Digite a sigla.');
+  if (APRS.some(x => x !== a && x.sigla.toLowerCase() === s.toLowerCase())) return alert('Já existe um aprendiz com essa sigla.');
+  a.sigla = s; CFG.aprendiz = s; await salvarAprs(); await salvarBruto('config', CFG); atualizarTopo(); alert('Sigla salva.');
+};
+$('#excluirApr').onclick = async () => {
+  const a = aprPorId(APR_ATUAL); if (!a) return;
+  const r = prompt(`Isto apaga deste aparelho TODOS os programas e sessões de ${a.sigla}. Não dá para desfazer (a não ser por uma cópia de segurança).\n\nPara confirmar, digite a sigla ${a.sigla}:`);
+  if (r === null || r.trim().toUpperCase() !== a.sigla.toUpperCase()) { if (r !== null) alert('Sigla diferente: nada foi apagado.'); return; }
+  const [ps, ss] = await Promise.all([DB.todos('programas'), DB.todos('sessoes')]);
+  for (const p of ps.filter(p => !p.modelo && p.aprendizId === a.id)) await DB.apagar('programas', p.id);
+  for (const s of ss.filter(s => s.aprendizId === a.id)) await DB.apagar('sessoes', s.id);
+  APRS = APRS.filter(x => x !== a); await salvarAprs();
+  APR_ATUAL = null; CFG.aprAtual = null; CFG.aprendiz = ''; await salvarBruto('config', CFG);
+  PROGS = []; SESS = []; atualizarTopo(); mostrar('geral');
+};
+
+// ----- Cópia de segurança: tudo do aparelho (todos os aprendizes e a biblioteca) -----
+$('#backup').textContent = 'Baixar cópia (todos os aprendizes, biblioteca e estímulos)';
+$('#backup').onclick = async () => {
+  const [e, p, s, c] = await Promise.all([DB.todos('estimulos'), DB.todos('programas'), DB.todos('sessoes'), DB.todos('config')]);
+  baixar(`controle-estimulos-copia-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify({ versao:2, estimulos:e, programas:p, sessoes:s, config:c }), 'application/json');
+};
+$('#restaurar').onchange = async (ev) => {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d.estimulos || !d.programas) throw new Error('arquivo inválido');
+    if (!confirm('Restaurar vai SUBSTITUIR tudo deste aparelho (aprendizes, biblioteca, estímulos, programas e sessões) pelo que está na cópia. Continuar?')) return;
+    for (const loja of ['estimulos','programas','sessoes','config']) await DB.limpar(loja);
+    for (const e of d.estimulos) await salvarBruto('estimulos', e);
+    for (const p of d.programas) await salvarBruto('programas', p);
+    for (const s of (d.sessoes || [])) await salvarBruto('sessoes', s);
+    const cfgs = Array.isArray(d.config) ? d.config : d.config ? [Object.assign(d.config, { id:'cfg' })] : [];
+    for (const c of cfgs) await salvarBruto('config', c);
+    APR_ATUAL = null; CFG = { id:'cfg', aprendiz:'', fala:false, toque:true, som:true, pontos:10, figura:true };
+    await carregar(); alert('Cópia restaurada.');
+  } catch (e) { alert('Não foi possível ler a cópia: ' + e.message); }
+  ev.target.value = '';
+};
+
+// ----- Carregar: prepara aprendizes e abre na área geral -----
+const _carregarApr = carregar;
+carregar = async function () {
+  APR_ATUAL = null;
+  await _carregarApr();
+  await prepararAprendizes();
+  atualizarTopo(); preencherTags(); renderEst(); renderProgs();
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('aprendiz') && APR_ATUAL) mostrar(qs.get('aprendiz'));
+  else mostrar('geral');
+};
 
 // ================= Autoteste (?autoteste=1) =================
 function autoteste() {
