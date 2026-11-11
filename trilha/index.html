@@ -292,6 +292,11 @@ const hoje = () => new Date().toISOString().slice(0, 10);
 const svgUri = (s) => 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(s)));
 function criterio(resps, A, N) { if (resps.length < N) return false; return resps.slice(-N).filter(r => r).length >= A; }
 function falar(t) { if (!('speechSynthesis' in window) || !t) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'pt-BR'; u.rate = 0.9; speechSynthesis.speak(u); }
+// sons de reforço (Web Audio): acerto nas lições com feedback e festa quando atinge o critério
+let audioCtx = null;
+function tocar(notas, dur = .12, vol = .09) { if (BD.som === false) return; try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); const t0 = audioCtx.currentTime; notas.forEach((f, i) => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0, t0 + i * dur); g.gain.linearRampToValueAtTime(vol, t0 + i * dur + .02); g.gain.exponentialRampToValueAtTime(.001, t0 + i * dur + dur * 1.8); o.connect(g); g.connect(audioCtx.destination); o.start(t0 + i * dur); o.stop(t0 + i * dur + dur * 2); }); } catch (e) {} }
+const somAcerto = () => tocar([659, 880]);
+const somFesta = () => tocar([523, 659, 784, 1047], .14, .1);
 
 // ================= Dados (só neste navegador) =================
 const CHAVE = 'trilha-rft-v1';
@@ -588,6 +593,7 @@ function listaVisivel(u) {
 // Silveira (2019): a tomada de perspectiva apareceu depois de a coordenação arbitrária chegar ao nível de relacionar relações
 function preDeiticos() { return UNIDADES[0].a.every(l => progDe(l.id).estado === 'feito'); }
 function liberada(lic) {
+  if (APR() && APR().teste) return true;
   if (lic.ui > 0 && !naFeita(lic.ui - 1)) return false;
   if (lic.u.k === 'deit' && !preDeiticos()) return false;
   const lista = listaVisivel(lic.u), i = lista.findIndex(l => l.id === lic.id);
@@ -629,7 +635,7 @@ function telaTrilha() {
   if (!APR()) { pg.innerHTML = `<h1 class="tit">Bem-vindo à Trilha RFT</h1><p class="ajuda">Cadastre o aprendiz (só a sigla) para começar.</p><button class="btn" onclick="mostrar('aprendizes')">Cadastrar aprendiz</button>`; return; }
   const prox = proximaLicao(), lados = ['', 'l1', 'l2', 'l1', '', 'r1', 'r2', 'r1'];
   pg.innerHTML = UNIDADES.map((u, ui) => {
-    const bloqU = (ui > 0 && !naFeita(ui - 1)) || (u.k === 'deit' && !preDeiticos());
+    const bloqU = !(APR() && APR().teste) && ((ui > 0 && !naFeita(ui - 1)) || (u.k === 'deit' && !preDeiticos()));
     const lista = listaVisivel(u); let k = 0;
     const nos = (fase) => lista.filter(l => l.fase === fase).map(l => {
       const p = progDe(l.id), lib = liberada(l), atual = prox && prox.id === l.id;
@@ -652,10 +658,11 @@ function lateral() {
   let seq = 0; { const d = new Date(); for (;;) { const s = d.toISOString().slice(0, 10); if (dias.includes(s)) { seq++; d.setDate(d.getDate() - 1); } else break; } }
   const feitas = a ? TODAS.filter(l => progDe(l.id).estado === 'feito').length : 0, prox = a ? proximaLicao() : null;
   el.innerHTML = `<div class="stats"><div class="stat">🔥 ${seq}<small>dias seguidos</small></div><div class="stat">⭐ ${est}<small>estrelas</small></div><div class="stat">🏁 ${feitas}<small>de ${TODAS.length}</small></div></div>
-    <div class="cx-lat"><h3>Aprendiz</h3>${BD.aprendizes.length ? `<select id="selApr">${opts}</select>` : '<p>Nenhum cadastrado.</p>'}</div>
+    <div class="cx-lat"><h3>Aprendiz</h3>${BD.aprendizes.length ? `<select id="selApr">${opts}</select>` : '<p>Nenhum cadastrado.</p>'}${a && a.teste ? '<p style="color:var(--verm);font-weight:800">Modo teste: todas as lições liberadas.</p>' : ''}<label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-weight:700;font-size:14px"><input type="checkbox" id="chkSom" ${BD.som === false ? '' : 'checked'}> Som de acerto</label></div>
     ${prox ? `<div class="cx-lat"><h3>Próxima lição</h3><p><b>${esc(prox.u.nome)}</b> · ${esc(prox.titulo)}</p><p>Critério: ${critTxt(prox)} · até ${prox.crit[2]} tentativas</p><p>${prox.tipo === 'teste' ? 'Sem feedback: não corrija nem elogie a resposta.' : prox.tipo === 'tato' ? 'Ele responde falando; você marca acertou ou errou.' : 'Com feedback e reforço a cada acerto.'}</p><button class="btn verde" id="btProx" style="width:100%">Começar</button></div>` : ''}
     <div class="cx-lat"><h3>Critérios (Siri Ming)</h3><p>Fase 1: 7 corretas em 8 seguidas (máx. 25). Só um tipo → blocos de 3 → misturado → tato → sim/não.</p><p>Fase 2: treino 6 seguidas · manutenção 6/8 · implicação mútua 5/6 · combinatória 7/8. Falhou no teste: volta ao treino e repete uma vez; falhou de novo: ensino com vários exemplos.</p></div>`;
   const s = $('#selApr'); if (s) s.onchange = () => { BD.atual = s.value; gravar(); mostrar(pagina); };
+  const cs = $('#chkSom'); if (cs) cs.onchange = () => { BD.som = cs.checked; gravar(); if (cs.checked) somAcerto(); };
   const b = $('#btProx'); if (b) b.onclick = () => iniciarLicao(prox);
 }
 function telaProgresso() {
@@ -675,9 +682,11 @@ function telaProgresso() {
 function baixar(nome, conteudo, tipo) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([conteudo], { type:tipo })); a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
 function telaAprendizes() {
   const pg = $('#pagina');
-  pg.innerHTML = `<h1 class="tit">Aprendizes</h1><div class="cx-lat"><h3>Novo aprendiz</h3><p>Use só a sigla. Os dados ficam apenas neste navegador.</p><div style="display:flex;gap:10px"><input type="text" id="novaSigla" placeholder="ex.: ABC"><button class="btn" id="addApr">Adicionar</button></div></div>
-    <table><tr><th>Sigla</th><th>Lições feitas</th><th>Sessões</th><th></th></tr>${BD.aprendizes.map(x => { const p = BD.prog[x.id] || {}; return `<tr><td><b>${esc(x.sigla)}</b>${x.id === BD.atual ? ' <span class="tag and">atual</span>' : ''}</td><td>${Object.values(p).filter(v => v.estado === 'feito').length}</td><td>${BD.sessoes.filter(s => s.apr === x.id).length}</td><td class="acoes-tab"><button data-usar="${x.id}">usar</button> <button data-del="${x.id}" style="color:var(--verm)">excluir</button></td></tr>`; }).join('')}</table>`;
+  pg.innerHTML = `<h1 class="tit">Aprendizes</h1><div class="cx-lat"><h3>Novo aprendiz</h3><p>Use só a sigla. Os dados ficam apenas neste navegador.</p><div style="display:flex;gap:10px"><input type="text" id="novaSigla" placeholder="ex.: ABC"><button class="btn" id="addApr">Adicionar</button></div></div><div class="cx-lat"><h3>Aprendiz de teste</h3><p>Para conhecer o percurso: todas as lições ficam liberadas e você começa por onde quiser. As sessões dele não se misturam com as dos aprendizes reais.</p><button class="btn sec" id="addTeste">Criar aprendiz de teste</button></div>
+    <table><tr><th>Sigla</th><th>Lições feitas</th><th>Sessões</th><th></th></tr>${BD.aprendizes.map(x => { const p = BD.prog[x.id] || {}; return `<tr><td><b>${esc(x.sigla)}</b>${x.id === BD.atual ? ' <span class="tag and">atual</span>' : ''}${x.teste ? ' <span class="tag met">teste</span>' : ''}</td><td>${Object.values(p).filter(v => v.estado === 'feito').length}</td><td>${BD.sessoes.filter(s => s.apr === x.id).length}</td><td class="acoes-tab"><button data-usar="${x.id}">usar</button> <button data-teste="${x.id}">${x.teste ? 'desligar modo teste' : 'modo teste'}</button> <button data-del="${x.id}" style="color:var(--verm)">excluir</button></td></tr>`; }).join('')}</table>`;
   $('#addApr').onclick = () => { const s = $('#novaSigla').value.trim().toUpperCase(); if (!s) return; if (BD.aprendizes.some(x => x.sigla === s)) return alert('Essa sigla já existe.'); const a = { id: uid(), sigla:s }; BD.aprendizes.push(a); BD.atual = a.id; gravar(); mostrar('trilha'); };
+  $('#addTeste').onclick = () => { let s = 'TESTE', n = 1; while (BD.aprendizes.some(x => x.sigla === s)) s = 'TESTE' + (++n); const a = { id: uid(), sigla:s, teste:true }; BD.aprendizes.push(a); BD.atual = a.id; gravar(); mostrar('trilha'); };
+  pg.querySelectorAll('[data-teste]').forEach(b => b.onclick = () => { const x = BD.aprendizes.find(a => a.id === b.dataset.teste); x.teste = !x.teste; gravar(); mostrar('aprendizes'); });
   pg.querySelectorAll('[data-usar]').forEach(b => b.onclick = () => { BD.atual = b.dataset.usar; gravar(); mostrar('trilha'); });
   pg.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const x = BD.aprendizes.find(a => a.id === b.dataset.del); const r = prompt(`Isto apaga o progresso e as sessões de ${x.sigla}. Digite a sigla para confirmar:`); if (!r || r.trim().toUpperCase() !== x.sigla) return; BD.aprendizes = BD.aprendizes.filter(a => a !== x); delete BD.prog[x.id]; BD.sessoes = BD.sessoes.filter(s => s.apr !== x.id); if (BD.atual === x.id) BD.atual = BD.aprendizes[0]?.id || null; gravar(); mostrar('aprendizes'); });
 }
@@ -734,7 +743,7 @@ function responder(i, tatoOk) {
     const frases = ['Muito bem!', 'Isso!', 'Arrasou!', 'Boa!', 'Perfeito!'];
     const b = $('#licao .l-base'); b.className = 'l-base ' + (certo ? 'ok' : 'no');
     b.innerHTML = `<div class="l-base-in"><div class="fb-txt">${certo ? '✔ ' + frases[Math.floor(Math.random() * frases.length)] : '✖ Olha a certa'}</div><button class="btn ${certo ? 'verde' : ''}" id="cont">Continuar</button></div>`;
-    if (certo) { const a = APR(); BD.estrelas[a.id] = (BD.estrelas[a.id] || 0) + 1; }
+    if (certo) { const a = APR(); BD.estrelas[a.id] = (BD.estrelas[a.id] || 0) + 1; somAcerto(); }
     const seguir = () => { if (!L) return; acabou ? finalizar(false, atingiu) : avancar(); };
     $('#cont').onclick = seguir; L.auto = setTimeout(seguir, certo ? 1300 : 2400);
   } else setTimeout(() => { if (!L) return; acabou ? finalizar(false, atingiu) : avancar(); }, 450);
@@ -746,7 +755,7 @@ function finalizar(interrompida, atingiu = false) {
   const sess = { id: uid(), apr:a.id, lic:lic.id, titulo:lic.titulo, unidade:lic.u.nome, tipo:lic.tipo, inicio:L.inicio, fim:Date.now(), resps:L.resps, acertos:ac, total:L.resps.length, pct: L.resps.length ? Math.round(100 * ac / L.resps.length) : 0, atingiu: !!atingiu, crit:critTxt(lic) };
   BD.sessoes.push(sess); BD.dias[a.id] = [...new Set([...(BD.dias[a.id] || []), hoje()])];
   const msg = interrompida ? 'Lição interrompida.' : registrarResultado(lic, sess);
-  if (atingiu) BD.estrelas[a.id] = (BD.estrelas[a.id] || 0) + 5;
+  if (atingiu) { BD.estrelas[a.id] = (BD.estrelas[a.id] || 0) + 5; somFesta(); }
   gravar();
   if (interrompida) return;
   $('#licao').innerHTML = `<div class="l-meio"><div class="fim"><div class="grande">${atingiu ? '🏆' : '💪'}</div><h2>${atingiu ? 'Lição concluída!' : 'Fim da lição'}</h2><p class="ajuda" style="font-size:16px">${esc(msg)}</p>
