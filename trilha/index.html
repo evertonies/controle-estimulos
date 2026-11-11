@@ -92,6 +92,9 @@
   .fig { display:block; height:auto; }
   .par { display:flex; gap:14px; align-items:flex-end; }
   .par .cx { height:120px; }
+  .pilha { display:flex; flex-wrap:wrap-reverse; gap:2px; width:118px; height:120px; justify-content:center; align-content:flex-start; }
+  .pilha img { width:34px; height:34px; }
+  .ops .op { min-width:150px; }
   .seta { color:var(--roxo); font-size:28px; font-weight:900; align-self:center; }
   .marca { outline:4px solid var(--laranja); outline-offset:4px; border-radius:10px; }
   .sb { height:120px; width:auto; }
@@ -405,8 +408,14 @@ const U2 = {
   relm: () => { const [o1, o2] = sortear(CONT, 2); const [i, j] = sortear([0, 1, 2, 3, 4], 2).sort((a, b) => b - a); return mk('Onde vai?', par(o2, o2, ESC[j], ESC[i]), [par(o2, o2, ESC[i], ESC[j])], { amostra: par(o1, o1, ESC[1], ESC[4]), tipo:'Emparelhamento relacional' }); },
   ouvM: () => { const o = sortear(CONT)[0]; return mk('Mostre o MAIOR', cx(fig(o, ESC[4])), [cx(fig(o, ESC[0]))], { tipo:'Ouvinte' }); },
   ouvm: () => { const o = sortear(CONT)[0]; return mk('Mostre o MENOR', cx(fig(o, ESC[0])), [cx(fig(o, ESC[4]))], { tipo:'Ouvinte' }); },
-  contM: () => { const o = sortear(CONT)[0]; return mk('Mostre um MAIOR que este', cx(fig(o, ESC[sortear([3, 4])[0]])), [cx(fig(o, ESC[sortear([0, 1])[0]]))], { amostra: cx(fig(o, ESC[2])), tipo:'Contínuo (amostra do meio)' }); },
-  contm: () => { const o = sortear(CONT)[0]; return mk('Mostre um MENOR que este', cx(fig(o, ESC[sortear([0, 1])[0]])), [cx(fig(o, ESC[sortear([3, 4])[0]]))], { amostra: cx(fig(o, ESC[2])), tipo:'Contínuo (amostra do meio)' }); },
+  // contínuo com 3 itens (Ming, vol. 2): amostra igual a um deles; um é mais e o outro é menos que ela
+  c3: () => { const o = sortear(CONT)[0], [i, j, k] = sortear([0, 1, 2, 3, 4], 3).sort((a, b) => a - b), q = sortear(['MESMO', 'MAIOR', 'MENOR'])[0];
+    const certo = q === 'MESMO' ? j : q === 'MAIOR' ? k : i, it = (x) => cx(fig(o, ESC[x]));
+    return mk(q === 'MESMO' ? 'Qual é o MESMO que este?' : `Qual é ${q} que este?`, it(certo), [i, j, k].filter(x => x !== certo).map(it), { amostra: it(j), tipo:'Contínuo: mesmo, maior e menor' }); },
+  most3: () => { const o = sortear(CONT)[0], idx = sortear([0, 1, 2, 3, 4], 3).sort((a, b) => a - b), mx = Math.random() < .5, certo = mx ? idx[2] : idx[0], it = (x) => cx(fig(o, ESC[x]));
+    return mk(mx ? 'Qual é o MAIOR de todos?' : 'Qual é o MENOR de todos?', it(certo), idx.filter(x => x !== certo).map(it), { tipo:'O maior e o menor de todos (3)' }); },
+  most5: () => { const o = sortear(CONT)[0], mx = Math.random() < .5, certo = mx ? 4 : 0, it = (x) => cx(fig(o, ESC[x]));
+    return mk(mx ? 'Qual é o MAIOR de todos?' : 'Qual é o MENOR de todos?', it(certo), [0, 1, 2, 3, 4].filter(x => x !== certo).map(it), { tipo:'O maior e o menor de todos (5)' }); },
   tato: () => { const o = sortear(CONT)[0], maior = Math.random() < .5; return tato('O marcado é MAIOR ou MENOR que o outro?', par(o, o, ESC[2], maior ? ESC[4] : ESC[0], true), { tipo:'Tato', resposta: maior ? 'maior' : 'menor' }); },
   sn: () => { const o = sortear(CONT)[0], maior = Math.random() < .5; return simnao('O marcado é MAIOR que o outro?', par(o, o, ESC[2], maior ? ESC[4] : ESC[0], true), maior); },
   gen: () => { const n1 = 1 + Math.floor(Math.random() * 2), n2 = 4 + Math.floor(Math.random() * 2), mais = Math.random() < .5, pilha = (n) => `<div class="par" style="flex-wrap:wrap;max-width:170px;justify-content:center">${Array.from({ length:n }, () => `<img src="${FIG.BALA}" style="width:44px" alt="">`).join('')}</div>`; return mk(mais ? 'Qual tem MAIS balas?' : 'Qual tem MENOS balas?', pilha(mais ? n2 : n1), [pilha(mais ? n1 : n2)], { tipo:'Generalização' }); },
@@ -414,13 +423,30 @@ const U2 = {
 };
 // ----- Unidade 3 · Oposição (extremos de contínuos) -----
 const OPOSTOS = [['grande', 'pequeno', (n) => cx(fig('BOLA', n ? ESC[0] : ESC[4])), cx(fig('BOLA', ESC[2]))], ['cheio', 'vazio', (n) => cx(copo(n ? 0 : 1)), cx(copo(.5))], ['aberto', 'fechado', (n) => cx(fig(n ? 'FECHADO' : 'ABERTO')), null], ['dia', 'noite', (n) => cx(fig(n ? 'LUA' : 'SOL')), null], ['quente', 'frio', (n) => cx(fig(n ? 'NEVE' : 'FOGO')), null], ['feliz', 'triste', (n) => cx(fig(n ? 'TRISTE' : 'FELIZ')), null], ['em cima', 'embaixo', (n) => cx(fig(n ? 'BAIXO' : 'CIMA')), null]];
+// ----- Contínuos de 5 estágios (Ming, vol. 2): tamanho, cheio–vazio e quantidade -----
+const pilhaN = (n) => `<div class="pilha">${Array.from({ length:n }, () => `<img src="${FIG.BALA}" alt="">`).join('')}</div>`;
+function continuo() {
+  const tipo = sortear(['tam', 'tam', 'cheio', 'qtd'])[0];
+  if (tipo === 'tam') { const o = sortear(CONT)[0]; return { est:(i) => cx(fig(o, ESC[i])), ext:['grande', 'pequeno'], maisMenos:['MAIOR', 'MENOR'], rev:true }; }
+  if (tipo === 'cheio') { const niv = [1, .75, .5, .25, 0]; return { est:(i) => cx(copo(niv[i])), ext:['cheio', 'vazio'], rev:false }; }
+  const q = [9, 7, 5, 3, 1]; return { est:(i) => pilhaN(q[i]), ext:['muitas balas', 'poucas balas'], rev:false };
+}
+// índices: 0 e 4 = extremos, 2 = meio. Com rev, o 0 do tamanho é o menor; os extremos continuam sendo 0 e 4.
+const duo2 = (a, b) => `<div class="par">${a}${b}</div>`;
 const U3 = {
-  relO: () => { const [a, b] = sortear(OPOSTOS, 2); return mk('Onde vai?', `<div class="par">${b[2](0)}${b[2](1)}</div>`, [`<div class="par">${b[2](0)}${b[2](0)}</div>`], { amostra: `<div class="par">${a[2](0)}${a[2](1)}</div>`, tipo:'Emparelhamento relacional' }); },
-  relN: () => { const [a, b] = sortear(OPOSTOS, 2); return mk('Onde vai?', `<div class="par">${b[2](1)}${b[2](1)}</div>`, [`<div class="par">${b[2](0)}${b[2](1)}</div>`], { amostra: `<div class="par">${a[2](0)}${a[2](0)}</div>`, tipo:'Emparelhamento relacional' }); },
-  ouvO: () => { const o = sortear(OPOSTOS.filter(x => x[3]))[0], lado = Math.random() < .5 ? 0 : 1; return mk('Mostre o OPOSTO deste', o[2](1 - lado), [o[3]], { amostra: o[2](lado), tipo:'Ouvinte (extremos do contínuo)' }); },
-  ouvO2: () => { const [o, p] = sortear(OPOSTOS, 2), lado = Math.random() < .5 ? 0 : 1; return mk('Mostre o OPOSTO deste', o[2](1 - lado), [o[3] || p[2](0)], { amostra: o[2](lado), tipo:'Ouvinte' }); },
-  tato: () => { const o = sortear(OPOSTOS)[0], lado = Math.random() < .5 ? 0 : 1; return tato(`Este é ${o[lado]}. Qual é o oposto de ${o[lado]}?`, o[2](lado), { tipo:'Tato', resposta: o[1 - lado] }); },
-  sn: () => { const [o, p] = sortear(OPOSTOS, 2), sim = Math.random() < .5; return simnao('Estes são OPOSTOS?', `<div class="par">${o[2](0)}${sim ? o[2](1) : o[2](0)}</div>`, sim); },
+  // seleção de pares: um par IGUAL, um par OPOSTO (extremos) e um par só DIFERENTE (extremo + meio)
+  parO: () => { const c = continuo(), k = sortear([0, 4])[0]; return mk('Qual par é OPOSTO?', duo2(c.est(0), c.est(4)), [duo2(c.est(k), c.est(k)), duo2(c.est(k), c.est(2))], { tipo:'Pares: igual, oposto ou diferente' }); },
+  parS: () => { const c = continuo(), k = sortear([0, 4])[0]; return mk('Qual par é IGUAL?', duo2(c.est(k), c.est(k)), [duo2(c.est(0), c.est(4)), duo2(c.est(k), c.est(2))], { tipo:'Pares: igual, oposto ou diferente' }); },
+  // emparelhamento com 3 itens do contínuo (os dois extremos e o meio); amostra igual a um extremo
+  arrO: () => { const c = continuo(), k = sortear([0, 4])[0]; return mk('Qual é o OPOSTO deste?', c.est(4 - k), [c.est(2), c.est(k)], { amostra:c.est(k), tipo:'Contínuo: extremos e meio' }); },
+  arrS: () => { const c = continuo(), k = sortear([0, 4])[0]; return mk('Qual é o MESMO que este?', c.est(k), [c.est(2), c.est(4 - k)], { amostra:c.est(k), tipo:'Contínuo: extremos e meio' }); },
+  // contínuo inteiro (5 itens, mais exemplos no meio)
+  arr5O: () => { const c = continuo(), k = sortear([0, 4])[0]; return mk('Qual é o OPOSTO deste?', c.est(4 - k), [1, 2, 3, k].map(c.est), { amostra:c.est(k), tipo:'Contínuo inteiro (5)' }); },
+  arr5S: () => { const c = continuo(), k = sortear([0, 4])[0]; return mk('Qual é o MESMO que este?', c.est(k), [1, 2, 3, 4 - k].map(c.est), { amostra:c.est(k), tipo:'Contínuo inteiro (5)' }); },
+  tato: () => { const c = continuo(), op = Math.random() < .5, k = sortear([0, 4])[0]; return tato('Estes são IGUAIS ou OPOSTOS?', op ? duo2(c.est(0), c.est(4)) : duo2(c.est(k), c.est(k)), { tipo:'Tato', resposta: op ? 'opostos' : 'iguais' }); },
+  sn: () => { const c = continuo(), op = Math.random() < .5, k = sortear([0, 4])[0], q = Math.random() < .5; const cena = op ? duo2(c.est(0), c.est(4)) : duo2(c.est(k), c.est(k)); return q ? simnao('Estes são OPOSTOS?', cena, op) : simnao('Estes são IGUAIS?', cena, !op); },
+  // generalização: opostos que não são contínuos de tamanho/quantidade (dia–noite, quente–frio...)
+  gen: () => { const [o, p] = sortear(OPOSTOS.slice(2), 2), lado = Math.random() < .5 ? 0 : 1; return mk('Qual é o OPOSTO deste?', o[2](1 - lado), [o[2](lado), p[2](sortear([0, 1])[0])], { amostra:o[2](lado), tipo:'Generalização: outros opostos' }); },
   arb: { rel: 'é o OPOSTO de', perg: (x) => `Qual é o OPOSTO de ${x}?` }
 };
 // ----- Unidade 4 · Espacial -----
@@ -563,17 +589,17 @@ const NA = (id, titulo, classes, ordem, crit = [7, 8, 25], tipo = 'treino') => (
 const UNIDADES = [
   { k:'coord', nome:'Igual e diferente', cor:'--u1', c2:'#4536b8', icone:'🟰', na:[
     NA('1-1', 'Relacional: só pares iguais', ['relI'], 'unico'), NA('1-2', 'Relacional: só pares diferentes', ['relD'], 'unico'), NA('1-3', 'Relacional: blocos de 3', ['relI', 'relD'], 'blocos3'), NA('1-4', 'Relacional: misturado', ['relI', 'relD'], 'rotacao'),
-    NA('1-5', 'Ouvinte: só IGUAL', ['ouvI'], 'unico'), NA('1-6', 'Ouvinte: só DIFERENTE', ['ouvD'], 'unico'), NA('1-7', 'Ouvinte: blocos de 3', ['ouvI', 'ouvD'], 'blocos3'), NA('1-8', 'Ouvinte: misturado', ['ouvI', 'ouvD'], 'rotacao'),
+    NA('1-6', 'Ouvinte: só DIFERENTE', ['ouvD'], 'unico'), NA('1-5', 'Ouvinte: só IGUAL', ['ouvI'], 'unico'), NA('1-7', 'Ouvinte: blocos de 3', ['ouvI', 'ouvD'], 'blocos3'), NA('1-8', 'Ouvinte: misturado', ['ouvI', 'ouvD'], 'rotacao'),
     NA('1-9', 'Tato: iguais ou diferentes?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('1-10', 'Sim ou não', ['sn'], 'rotacao'), NA('1-11', 'Generalização: objetos novos', ['ouvIn', 'ouvDn'], 'rotacao', [7, 8, 8], 'teste'),
     NA('1-12', 'Jogo: quem gosta da mesma comida?', ['jogo'], 'rotacao')], gen: { ouvIn: () => U1.ouvI(OBJ_NOVOS), ouvDn: () => U1.ouvD(OBJ_NOVOS) }, U:U1 },
   { k:'comp', nome:'Comparação', cor:'--u2', c2:'#b33a27', icone:'⚖️', na:[
     NA('2-1', 'Relacional: o primeiro é maior', ['relM'], 'unico'), NA('2-2', 'Relacional: o primeiro é menor', ['relm'], 'unico'), NA('2-3', 'Relacional: misturado', ['relM', 'relm'], 'rotacao'),
     NA('2-4', 'Ouvinte: só MAIOR', ['ouvM'], 'unico'), NA('2-5', 'Ouvinte: só MENOR', ['ouvm'], 'unico'), NA('2-6', 'Ouvinte: blocos de 3', ['ouvM', 'ouvm'], 'blocos3'), NA('2-7', 'Ouvinte: misturado', ['ouvM', 'ouvm'], 'rotacao'),
-    NA('2-8', 'Contínuo: maior / menor que este', ['contM', 'contm'], 'rotacao'), NA('2-9', 'Tato: maior ou menor?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('2-10', 'Sim ou não', ['sn'], 'rotacao'), NA('2-11', 'Generalização: mais e menos balas', ['gen'], 'rotacao', [7, 8, 8], 'teste')], U:U2 },
+    NA('2-8', 'Contínuo de 3: o mesmo, maior ou menor que este', ['c3'], 'rotacao'), NA('2-8b', 'O maior e o menor de todos (3 itens)', ['most3'], 'rotacao'), NA('2-8c', 'O maior e o menor de todos (5 itens)', ['most5'], 'rotacao'), NA('2-9', 'Tato: maior ou menor?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('2-10', 'Sim ou não', ['sn'], 'rotacao'), NA('2-11', 'Generalização: mais e menos balas', ['gen'], 'rotacao', [7, 8, 8], 'teste')], U:U2 },
   { k:'opos', nome:'Oposição', cor:'--u3', c2:'#0b7d8f', icone:'↔️', na:[
-    NA('3-1', 'Relacional: pares opostos', ['relO'], 'unico'), NA('3-2', 'Relacional: opostos e não opostos', ['relO', 'relN'], 'rotacao'),
-    NA('3-3', 'Ouvinte: oposto nos contínuos', ['ouvO'], 'unico'), NA('3-4', 'Ouvinte: oposto misturado', ['ouvO', 'ouvO2'], 'rotacao'),
-    NA('3-5', 'Tato: qual é o oposto?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('3-6', 'Sim ou não', ['sn'], 'rotacao')], U:U3 },
+    NA('3-1', 'Pares: só OPOSTO (3 pares)', ['parO'], 'unico'), NA('3-2', 'Pares: IGUAL e OPOSTO', ['parS', 'parO'], 'blocos3'),
+    NA('3-3', 'Contínuo de 3: só OPOSTO', ['arrO'], 'unico'), NA('3-4', 'Contínuo de 3: MESMO e OPOSTO em blocos', ['arrS', 'arrO'], 'blocos3'), NA('3-4b', 'Contínuo de 3: misturado', ['arrS', 'arrO'], 'rotacao'), NA('3-4c', 'Contínuo inteiro (5): misturado', ['arr5S', 'arr5O'], 'rotacao'),
+    NA('3-5', 'Tato: iguais ou opostos?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('3-6', 'Sim ou não', ['sn'], 'rotacao'), NA('3-7', 'Generalização: outros opostos', ['gen'], 'rotacao', [7, 8, 8], 'teste')], U:U3 },
   { k:'esp', nome:'Espacial', cor:'--u4', c2:'#c97c05', icone:'📦', na:[
     NA('4-1', 'Relacional: em cima e embaixo', ['relC', 'relB'], 'blocos3'), NA('4-2', 'Ouvinte: só EM CIMA', ['ouvC'], 'unico'), NA('4-3', 'Ouvinte: só EMBAIXO', ['ouvB'], 'unico'), NA('4-4', 'Ouvinte: em cima e embaixo', ['ouvC', 'ouvB'], 'rotacao'),
     NA('4-5', 'Ouvinte: na frente e atrás', ['ouvF'], 'rotacao'), NA('4-6', 'Tato: onde está?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('4-7', 'Sim ou não', ['sn'], 'rotacao'), NA('4-8', 'Jogo: quem mora onde?', ['jogo'], 'rotacao')], U:U4 },
@@ -774,7 +800,7 @@ function telaAprendizes() {
 }
 function telaGuia() {
   $('#pagina').innerHTML = `<h1 class="tit">Como funciona</h1>
-  <details class="guia-txt" open><summary>A ordem das molduras</summary><p class="ajuda">Igual e diferente → comparação → oposição (usando os extremos dos mesmos contínuos da comparação) → espacial → hierarquia → temporal → dêiticos. Cada moldura é um percurso separado (como cursos); a ordem acima aparece como recomendação no topo de cada percurso. "Relacionar relações" fica antes das inversões, com figuras primeiro e depois pelas regras. Referência principal: Ming, Stewart e McElwee, <i>Using Relational Frame Theory to Promote Language Development</i>, vol. 1 e 2. Hierarquia e dêiticos não estão nesses volumes: foram montados a partir de outros autores (abaixo), no mesmo formato de treino e teste.</p></details>
+  <details class="guia-txt" open><summary>A ordem das molduras</summary><p class="ajuda">Igual e diferente → comparação → oposição (com os mesmos contínuos de 5 estágios da comparação: tamanho, cheio–vazio e quantidade; começa com os dois extremos e o meio, mistura "o mesmo" e "o oposto" e cresce para o contínuo inteiro, como no apêndice 3 do vol. 2) → espacial → hierarquia → temporal → dêiticos. Cada moldura é um percurso separado (como cursos); a ordem acima aparece como recomendação no topo de cada percurso. "Relacionar relações" fica antes das inversões, com figuras primeiro e depois pelas regras. Referência principal: Ming, Stewart e McElwee, <i>Using Relational Frame Theory to Promote Language Development</i>, vol. 1 e 2. Hierarquia e dêiticos não estão nesses volumes: foram montados a partir de outros autores (abaixo), no mesmo formato de treino e teste.</p></details>
   <details class="guia-txt"><summary>Hierarquia</summary><p class="ajuda">Ensinada vendo o que está dentro de quê, com recipientes transparentes (pote dentro da caixa), e com as dicas "está dentro / contém / pertence / é um tipo de". Depois vêm grupos (animais, frutas, roupas), a pergunta invertida ("todo animal é gato?", que é o ponto da assimetria da hierarquia) e, na fase arbitrária, "BOP contém ZAG, ZAG contém LUM": LUM está dentro de BOP, mas BOP não está dentro de LUM; e o que vale para o grupo vale para quem está dentro dele (transformação de função). Base: Slattery e Stewart; Gil, Luciano, Ruiz e Valdivia-Salas; revisão sobre categorização hierárquica na <i>Revista Perspectivas</i> (2021).</p></details>
   <details class="guia-txt"><summary>Dêiticos (tomada de perspectiva)</summary><p class="ajuda">Relações eu–você, aqui–ali e agora–antes, em três níveis do protocolo de McHugh, Barnes-Holmes e Barnes-Holmes (2004): simples ("eu tenho X e você tem Y; o que eu tenho?"), invertido ("se eu fosse você e você fosse eu...") e duplamente invertido (as duas inversões se anulam). Primeiro com figuras de apoio (eu = quem pergunta, você = o aprendiz), depois sem figuras, e por fim com outra pessoa perguntando (generalização, como em Gilroy et al., 2015). Critério: 8 de 10 (80%), como na tese de Carolina Silveira de Almeida (UFSCar, 2019). Da mesma tese vêm o pré-requisito (recomendado fazer antes a fase arbitrária de igual e diferente; a criança com autismo só mostrou tomada de perspectiva depois de a coordenação chegar ao nível de relacionar relações) e a lição de perspectiva com propriedades ("você é baixo, o papai é alto; se o papai fosse você, ele seria...?"). Cuidado: revisões recentes (Hempkin, Sivaraman e Barnes-Holmes, 2024) acham poucos estudos com autistas e evidência ainda limitada de que esse treino mude a tomada de perspectiva no dia a dia; vale medir também fora do app.</p></details>
   <details class="guia-txt" open><summary>Fase 1 · não arbitrária</summary><p class="ajuda">A relação está nas próprias figuras. Sequência: emparelhamento relacional (pares que mostram a mesma relação) → ouvinte → tato → sim/não. Em cada uma: só um tipo → blocos de 3 → misturado. Critério: 7 corretas em 8 seguidas, até 25 tentativas, com feedback e reforço. Na comparação, os contínuos têm 5 tamanhos e a pergunta "maior que este" usa a amostra do meio. No temporal, ele vê os itens aparecerem um depois do outro. Os jogos de transição (quem gosta da mesma comida, quem mora onde) fazem a ponte para a fase 2.</p></details>
