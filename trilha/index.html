@@ -136,12 +136,32 @@
   .pes { display:flex; flex-direction:column; align-items:center; gap:6px; }
   .pes b { font-size:16px; color:var(--roxo); text-transform:uppercase; letter-spacing:.5px; }
   .cad { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  /* molduras como cursos, mascote, relacionar relações */
+  .boas { display:flex; gap:18px; align-items:center; margin:6px 0 20px; }
+  .cursos { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:14px; }
+  .curso { border:2px solid var(--borda); border-bottom-width:5px; background:#fff; border-radius:18px; padding:16px; cursor:pointer; display:flex; flex-direction:column; gap:8px; text-align:left; font-family:inherit; color:var(--texto); }
+  .curso:hover { border-color:#c9c2f5; } .curso.on { border-color:var(--cor); }
+  .curso .c-ic { width:48px; height:48px; border-radius:14px; background:var(--cor); display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .curso b { font-size:16px; line-height:1.25; } .curso small { color:var(--suave); font-weight:700; }
+  .c-bar { height:10px; background:var(--cinza); border-radius:99px; overflow:hidden; } .c-bar i { display:block; height:100%; background:var(--cor); }
+  .recs { background:#fff; border:2px dashed var(--borda); border-radius:14px; padding:10px 14px; margin:-2px 0 6px; font-size:13px; font-weight:700; color:var(--suave); display:flex; flex-direction:column; gap:4px; }
+  .recs .ok { color:var(--verde2); }
+  .mascote-lat { display:flex; gap:12px; align-items:center; } .mascote-lat p { margin:0; font-size:13px; }
+  .logo .mascote { vertical-align:middle; margin-right:6px; }
+  .duo { display:flex; gap:10px; align-items:flex-end; justify-content:center; }
+  .regra.col { flex-direction:column; align-items:stretch; gap:6px; font-size:19px; }
+  .lin-regra { display:flex; align-items:center; gap:12px; justify-content:center; } .lin-regra .sb { height:46px; }
+  .dica { margin-top:6px; color:var(--suave); font-weight:800; font-size:15px; }
+  .fim .mascote { animation:pula .8s ease-in-out 2; }
+  .fase-sep + .trilha { padding-top:46px; }
+  @keyframes pula { 50% { transform:translateY(-14px); } }
 </style>
 </head>
 <body>
 <div class="app">
   <aside id="menu">
     <div class="logo">Trilha RFT<small>Molduras relacionais · Siri Ming</small></div>
+    <button data-pg="molduras"><span class="ic">🧩</span>Molduras</button>
     <button data-pg="trilha" class="on"><span class="ic">🧭</span>Trilha</button>
     <button data-pg="progresso"><span class="ic">📊</span>Progresso</button>
     <button data-pg="aprendizes"><span class="ic">👤</span>Aprendizes</button>
@@ -298,6 +318,34 @@ function tocar(notas, dur = .12, vol = .09) { if (BD.som === false) return; try 
 const somAcerto = () => tocar([659, 880]);
 const somFesta = () => tocar([523, 659, 784, 1047], .14, .1);
 
+// ================= Mascote: Elo, o elefante =================
+// Personagem original. A alusão fica no ratinho companheiro, no docinho redondo e no lenço cor de açafrão,
+// sem traços de divindade (sem coroa, sem vários braços, sem símbolos religiosos).
+// Aparece só no menu, na escolha de molduras, na lateral e na tela final: nunca junto dos estímulos da lição.
+function MASCOTE(tam = 120, festa = false) {
+  const pele = '#9fb4d8', sombra = '#7f96bf', orelha = '#f2b8c6';
+  const tromba = festa
+    ? `<path d="M100 116 C100 142 114 154 128 150 C142 146 148 128 152 110" fill="none" stroke="${sombra}" stroke-width="22" stroke-linecap="round"/><path d="M100 116 C100 142 114 154 128 150 C142 146 148 128 152 110" fill="none" stroke="${pele}" stroke-width="16" stroke-linecap="round"/><circle cx="152" cy="100" r="11" fill="#f4a62a"/><circle cx="149" cy="96" r="2" fill="#fff6d8"/><circle cx="156" cy="102" r="1.8" fill="#fff6d8"/>`
+    : `<path d="M100 116 C100 144 98 160 112 166 C126 170 134 158 130 146" fill="none" stroke="${sombra}" stroke-width="22" stroke-linecap="round"/><path d="M100 116 C100 144 98 160 112 166 C126 170 134 158 130 146" fill="none" stroke="${pele}" stroke-width="16" stroke-linecap="round"/><circle cx="128" cy="140" r="10" fill="#f4a62a"/><circle cx="125" cy="136" r="2" fill="#fff6d8"/><circle cx="131" cy="142" r="1.8" fill="#fff6d8"/>`;
+  const confete = festa ? `<g><rect x="22" y="22" width="8" height="8" rx="2" fill="#f29d1a" transform="rotate(20 26 26)"/><rect x="168" y="30" width="8" height="8" rx="2" fill="#1fa971" transform="rotate(-15 172 34)"/><circle cx="40" cy="58" r="4" fill="#5b4bd6"/><circle cx="176" cy="66" r="4" fill="#e0533d"/><path d="M150 18 l4 9 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#ffd23f"/></g>` : '';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">${confete}
+    <ellipse cx="100" cy="186" rx="62" ry="8" fill="#00000012"/>
+    <ellipse cx="50" cy="92" rx="38" ry="44" fill="${sombra}"/><ellipse cx="54" cy="94" rx="27" ry="33" fill="${orelha}"/>
+    <ellipse cx="150" cy="92" rx="38" ry="44" fill="${sombra}"/><ellipse cx="146" cy="94" rx="27" ry="33" fill="${orelha}"/>
+    <path d="M62 150 Q100 176 138 150 L132 172 Q100 186 68 172 Z" fill="#f29d1a"/><path d="M98 160 l10 20 -18 0z" fill="#e0861a"/>
+    <circle cx="100" cy="96" r="50" fill="${pele}"/>
+    <path d="M70 66 Q100 50 130 66" fill="none" stroke="#b8c8e6" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="82" cy="94" rx="9" ry="11" fill="#fff"/><ellipse cx="118" cy="94" rx="9" ry="11" fill="#fff"/>
+    <circle cx="84" cy="97" r="5.5" fill="#2b2f44"/><circle cx="116" cy="97" r="5.5" fill="#2b2f44"/><circle cx="86" cy="94" r="2" fill="#fff"/><circle cx="118" cy="94" r="2" fill="#fff"/>
+    <path d="M74 80 q8 -6 16 -1" fill="none" stroke="#5d6f94" stroke-width="3" stroke-linecap="round"/><path d="M110 79 q8 -5 16 1" fill="none" stroke="#5d6f94" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="72" cy="114" rx="8" ry="5" fill="#f2a5b8" opacity=".7"/><ellipse cx="128" cy="114" rx="8" ry="5" fill="#f2a5b8" opacity=".7"/>
+    <path d="M86 120 q-8 12 -2 20" fill="none" stroke="#fffaf0" stroke-width="6" stroke-linecap="round"/>
+    ${tromba}
+    <g transform="translate(150 150)"><path d="M18 22 q14 4 12 -10" fill="none" stroke="#9a8f86" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="6" cy="18" rx="14" ry="11" fill="#b8aea6"/><circle cx="-6" cy="8" r="9" fill="#c8bfb8"/><circle cx="-12" cy="0" r="5" fill="#c8bfb8"/><circle cx="-12" cy="0" r="3" fill="#f2b8c6"/><circle cx="-1" cy="0" r="5" fill="#c8bfb8"/><circle cx="-1" cy="0" r="3" fill="#f2b8c6"/><circle cx="-10" cy="8" r="1.6" fill="#2b2f44"/><circle cx="-15" cy="11" r="1.6" fill="#e0738f"/></g>
+  </svg>`;
+  return `<img class="mascote" src="${svgUri(svg)}" alt="Elo, o elefante" style="width:${tam}px;height:${tam}px">`;
+}
+
 // ================= Dados (só neste navegador) =================
 const CHAVE = 'trilha-rft-v1';
 let BD = { aprendizes:[], atual:null, prog:{}, sessoes:[], dias:{}, estrelas:{} };
@@ -331,6 +379,10 @@ const tato = (perg, amostra, extra = {}) => Object.assign({ perg, amostra, tato:
 const simnao = (perg, amostra, sim) => ({ perg, amostra, ops:[txt('SIM'), txt('NÃO')], c: sim ? 0 : 1 });
 
 const OBJ = ['CARRO', 'BOLA', 'CASA', 'GATO', 'MAÇÃ', 'LÁPIS', 'COPO', 'LIVRO', 'CHAVE', 'RELÓGIO', 'SAPATO', 'MOCHILA'];
+// gênero de cada figura, para a fala sair certa ("a bola", "o carro") sem "o(a)"
+const FEM = new Set(['BOLA', 'CASA', 'MAÇÃ', 'CHAVE', 'MOCHILA', 'TESOURA', 'GARRAFA', 'COLHER', 'PIPA', 'PIZZA', 'PIPOCA', 'BANANA', 'UVA', 'LARANJA', 'PERA', 'VACA', 'BOTA', 'LUVA', 'MENINA', 'MULHER', 'CADEIRA', 'CAIXA', 'GALINHA']);
+const art = (n) => FEM.has(n) ? 'a' : 'o', Art = (n) => FEM.has(n) ? 'A' : 'O', da = (n) => FEM.has(n) ? 'da' : 'do', um = (n) => FEM.has(n) ? 'uma' : 'um';
+const com = (n) => `${art(n)} ${n.toLowerCase()}`;
 const OBJ_NOVOS = ['TESOURA', 'CELULAR', 'GARRAFA', 'COLHER', 'PIPA', 'VASO', 'GUARDA'].filter(x => FIG[x]);
 const ESC = [0.42, 0.56, 0.7, 0.85, 1.0];
 const CONT = ['BOLA', 'MAÇÃ', 'CARRO', 'CASA', 'PEIXE', 'ÁRVORE', 'PIZZA', 'URSO'];
@@ -390,7 +442,7 @@ const U5 = {
   ouvD: () => { const [a, b] = sortear(OBJ, 2); return mk('O que apareceu DEPOIS?', cx(fig(b)), [cx(fig(a))], { anim:[cx(fig(a)), cx(fig(b))], tipo:'Ouvinte (ele vê acontecer)' }); },
   ouv3: () => { const [a, b, c] = sortear(OBJ, 3), p = Math.random() < .5; return mk(p ? 'O que apareceu PRIMEIRO?' : 'O que apareceu POR ÚLTIMO?', cx(fig(p ? a : c)), [cx(fig(b)), cx(fig(p ? c : a))], { anim:[cx(fig(a)), cx(fig(b)), cx(fig(c))], tipo:'Ouvinte (três eventos)' }); },
   tato: () => { const [a, b] = sortear(OBJ, 2), antes = Math.random() < .5; return tato(antes ? 'O que apareceu ANTES?' : 'O que apareceu DEPOIS?', '', { anim:[cx(fig(a)), cx(fig(b))], tipo:'Tato', resposta: (antes ? a : b).toLowerCase() }); },
-  sn: () => { const [a, b] = sortear(OBJ, 2), q = Math.random() < .5; return Object.assign(simnao(`${q ? 'O(a) ' + a.toLowerCase() : 'O(a) ' + b.toLowerCase()} apareceu ANTES?`, '', q), { anim:[cx(fig(a)), cx(fig(b))] }); },
+  sn: () => { const [a, b] = sortear(OBJ, 2), q = Math.random() < .5; return Object.assign(simnao(`${q ? Art(a) + ' ' + a.toLowerCase() : Art(b) + ' ' + b.toLowerCase()} apareceu ANTES?`, '', q), { anim:[cx(fig(a)), cx(fig(b))] }); },
   arb: { rel: 'acontece ANTES de', inversa: 'acontece DEPOIS de', perg: (x) => `O que acontece ANTES de ${x}?` }
 };
 
@@ -403,12 +455,12 @@ const UH = {
   relH: () => { const [a, b] = sortear(OBJ, 2); return mk('Onde vai?', caixaT(mini(b)), [`<div class="par">${caixaT('')}${cx(mini(b))}</div>`], { amostra: pote(mini(a)), tipo:'Emparelhamento relacional' }); },
   relF: () => { const [a, b] = sortear(OBJ, 2); return mk('Onde vai?', `<div class="par">${caixaT('')}${cx(mini(b))}</div>`, [caixaT(mini(b))], { amostra: `<div class="par">${pote('')}${cx(mini(a))}</div>`, tipo:'Emparelhamento relacional' }); },
   ouvDentro: () => { const [a, b] = sortear(OBJ, 2); return mk('O que está DENTRO do pote?', cx(fig(a, .8)), [cx(fig(b, .8))], { amostra: `<div class="par">${pote(mini(a))}${cx(mini(b))}</div>`, tipo:'Ouvinte' }); },
-  ouvContem: () => { const [a, b] = sortear(OBJ, 2); return mk(`Qual pote CONTÉM o(a) ${a.toLowerCase()}?`, pote(mini(a)), [pote(mini(b))], { tipo:'Ouvinte' }); },
+  ouvContem: () => { const [a, b] = sortear(OBJ, 2); return mk(`Qual pote CONTÉM ${com(a)}?`, pote(mini(a)), [pote(mini(b))], { tipo:'Ouvinte' }); },
   trans: () => { const [a] = sortear(OBJ, 1), q = sortear([0, 1, 2, 3])[0], cena = caixaT(pote(mini(a, .42), 'pote'), 'caixa');
-    return [simnao(`O(a) ${a.toLowerCase()} está DENTRO da caixa?`, cena, true), simnao('A caixa está DENTRO do pote?', cena, false), simnao('O pote está DENTRO da caixa?', cena, true), simnao(`A caixa está DENTRO do(a) ${a.toLowerCase()}?`, cena, false)][q]; },
+    return [simnao(`${Art(a)} ${a.toLowerCase()} está DENTRO da caixa?`, cena, true), simnao('A caixa está DENTRO do pote?', cena, false), simnao('O pote está DENTRO da caixa?', cena, true), simnao(`A caixa está DENTRO ${da(a)} ${a.toLowerCase()}?`, cena, false)][q]; },
   cat: () => { const gs = Object.keys(GRUPOS), [g, h] = sortear(gs, 2), [x] = sortear(GRUPOS[g]), [y] = sortear(GRUPOS[h]); const nome = { animais:'ANIMAL', frutas:'FRUTA', roupas:'ROUPA' }[g]; return mk(`Qual é um tipo de ${nome}?`, cx(fig(x, .8)), [cx(fig(y, .8))], { tipo:'Grupos' }); },
   grupo: () => { const gs = Object.keys(GRUPOS), [g, h] = sortear(gs, 2), [x, ...outros] = sortear(GRUPOS[g], 3), ys = sortear(GRUPOS[h], 2); return mk('Em qual caixa ele PERTENCE?', caixaT(outros.map(o => mini(o, .42)).join(''), g), [caixaT(ys.map(o => mini(o, .42)).join(''), h)], { amostra: cx(fig(x, .8)), tipo:'Grupos' }); },
-  tato: () => { const [a] = sortear(OBJ, 1); return Math.random() < .5 ? tato('O que está DENTRO da caixa?', caixaT(pote(mini(a, .42))), { tipo:'Tato', resposta:`o pote, e dentro dele o(a) ${a.toLowerCase()}` }) : (() => { const g = sortear(Object.keys(GRUPOS))[0], x = sortear(GRUPOS[g])[0]; return tato('Ele é um tipo de quê? A que grupo pertence?', cx(fig(x)), { tipo:'Tato', resposta:{ animais:'animal', frutas:'fruta', roupas:'roupa' }[g] }); })(); },
+  tato: () => { const [a] = sortear(OBJ, 1); return Math.random() < .5 ? tato('O que está DENTRO da caixa?', caixaT(pote(mini(a, .42))), { tipo:'Tato', resposta:`o pote, e dentro dele ${com(a)}` }) : (() => { const g = sortear(Object.keys(GRUPOS))[0], x = sortear(GRUPOS[g])[0]; return tato('Ele é um tipo de quê? A que grupo pertence?', cx(fig(x)), { tipo:'Tato', resposta:{ animais:'animal', frutas:'fruta', roupas:'roupa' }[g] }); })(); },
   sn: () => { const g = sortear(Object.keys(GRUPOS))[0], x = sortear(GRUPOS[g])[0], nome = { animais:'animal', frutas:'fruta', roupas:'roupa' }[g], q = Math.random();
     return q < .4 ? simnao(`Este é um tipo de ${nome}?`, cx(fig(x)), true) : q < .7 ? simnao(`Este é um tipo de ${nome === 'animal' ? 'fruta' : 'animal'}?`, cx(fig(x)), false) : simnao(`Todo ${nome} é ${x.toLowerCase()}?`, cx(fig(x)), false); },
   arb: {}
@@ -429,10 +481,10 @@ function deit(tipo, inv, comFig) {
   // com figuras: a situação aparece na cena e o "se..." num cartão; sem figuras: tudo vai falado/escrito na pergunta
   const montar = (situacao, se, pergunta) => ({ perg: (comFig ? '' : situacao + ' ') + (inv && !comFig ? se + ' ' + pergunta[0].toLowerCase() + pergunta.slice(1) : pergunta), regra: inv && comFig ? cartaoSe(se) : '' });
   if (tipo === 'iy') { const [x, y] = sortear(ITENS_D, 2), eu = Math.random() < .5, certo = inv ? (eu ? y : x) : (eu ? x : y);
-    const m = montar(`Eu tenho ${x.toLowerCase()} e você tem ${y.toLowerCase()}.`, SE_IY, `O que ${eu ? 'EU' : 'VOCÊ'} ${inv ? 'teria' : 'tem'}?`);
+    const m = montar(`Eu tenho ${um(x)} ${x.toLowerCase()} e você tem ${um(y)} ${y.toLowerCase()}.`, SE_IY, `O que ${eu ? 'EU' : 'VOCÊ'} ${inv ? 'teria' : (eu ? 'tenho' : 'tem')}?`);
     return mk(m.perg, cx(fig(certo, .8)), [cx(fig(certo === x ? y : x, .8))], { amostra: comFig ? cenaIY(x, y) : '', regra: m.regra, resposta: certo.toLowerCase(), tipo: inv ? 'Invertido: eu–você' : 'Simples: eu–você' }); }
   if (tipo === 'ht') { const [c1, c2] = sortear(Object.keys(COR), 2), eu = Math.random() < .5, certo = inv ? (eu ? c2 : c1) : (eu ? c1 : c2);
-    const m = montar(`Eu estou aqui na cadeira ${c1} e você está ali na cadeira ${c2}.`, SE_HT, `Onde ${eu ? 'EU' : 'VOCÊ'} ${inv ? 'estaria' : 'está'}?`);
+    const m = montar(`Eu estou aqui na cadeira ${c1} e você está ali na cadeira ${c2}.`, SE_HT, `Onde ${eu ? 'EU' : 'VOCÊ'} ${inv ? 'estaria' : (eu ? 'estou' : 'está')}?`);
     return mk(m.perg, cadeira(certo), [cadeira(certo === c1 ? c2 : c1)], { amostra: comFig ? cenaHT(c1, c2) : '', regra: m.regra, resposta: 'cadeira ' + certo, tipo: inv ? 'Invertido: aqui–ali' : 'Simples: aqui–ali' }); }
   const [f1, f2] = sortear(COMIDAS_D, 2), hoje = Math.random() < .5, certo = inv ? (hoje ? f1 : f2) : (hoje ? f2 : f1);
   const m = montar(`Ontem eu comi ${f1.toLowerCase()} e hoje eu como ${f2.toLowerCase()}.`, SE_NT, `O que eu ${hoje ? (inv ? 'comeria HOJE' : 'como HOJE') : (inv ? 'teria comido ONTEM' : 'comi ONTEM')}?`);
@@ -444,9 +496,15 @@ function deit(tipo, inv, comFig) {
 }
 const UD = {
   quem: () => { const eu = Math.random() < .5; return mk(eu ? 'Mostre EU (quem está falando com você)' : 'Mostre VOCÊ', cx(fig(eu ? quemEu : quemVoce, .8)), [cx(fig(eu ? quemVoce : quemEu, .8))], { tipo:'Eu e você' }); },
+  // relacionar relações, passo 1: a relação está nas figuras (dois iguais × dois diferentes)
+  rrFig: () => { const igual = Math.random() < .5, [a, b, c, d, e] = sortear(OBJ, 5), duo = (x, y) => `<div class="duo">${mini(x, .55)}${mini(y, .55)}</div>`;
+    return mk('Qual par é do MESMO JEITO que este?', igual ? duo(c, c) : duo(c, d), [igual ? duo(d, e) : duo(e, e)], { amostra: duo(a, igual ? a : b), dica: igual ? 'Os dois de cima são iguais.' : 'Os dois de cima são diferentes.', tipo:'Relacionar relações com figuras' }); },
+  // passo 2: a relação só existe pela regra (cada regra numa linha, com os símbolos)
   relRel: () => { const [A, B] = CONJ[0], [L, K] = CONJ[1], [X, Y] = CONJ[2], igual = Math.random() < .5;
-    const regras = `<div class="regra">${A} é IGUAL a ${B} · ${L} é DIFERENTE de ${K} · ${X} ${igual ? 'é IGUAL a' : 'é DIFERENTE de'} ${Y}</div>`;
-    return mk(`O par ${X}–${Y} é do mesmo jeito que qual par?`, txt(igual ? `${A}–${B}` : `${L}–${K}`), [txt(igual ? `${L}–${K}` : `${A}–${B}`)], { regra: regras, tipo:'Relacionar relações (nível 4)' }); },
+    const linha = (p, rel, q) => `<div class="lin-regra">${simb(p, 46)}<span>${p} é <b>${rel}</b> ${rel === 'IGUAL' ? 'a' : 'de'} ${q}</span>${simb(q, 46)}</div>`;
+    const regras = `<div class="regra col">${linha(A, 'IGUAL', B)}${linha(L, 'DIFERENTE', K)}${linha(X, igual ? 'IGUAL' : 'DIFERENTE', Y)}</div>`;
+    const duo = (p, q) => `<div class="duo">${simb(p, 70)}${simb(q, 70)}</div>`;
+    return mk(`Pelas regras: ${X} e ${Y} são do mesmo jeito que qual par?`, igual ? duo(A, B) : duo(L, K), [igual ? duo(L, K) : duo(A, B)], { regra: regras, tipo:'Relacionar relações pelas regras' }); },
   iyS: () => deit('iy', false, true), htS: () => deit('ht', false, true), ntS: () => deit('nt', false, true),
   iyR: () => deit('iy', true, true), htR: () => deit('ht', true, true), ntR: () => deit('nt', true, true), dupla: () => dupla(true),
   iySx: () => deit('iy', false, false), htSx: () => deit('ht', false, false), ntSx: () => deit('nt', false, false),
@@ -526,8 +584,10 @@ const UNIDADES = [
     NA('6-1', 'Ouvinte: só ANTES', ['ouvA'], 'unico'), NA('6-2', 'Ouvinte: só DEPOIS', ['ouvD'], 'unico'), NA('6-3', 'Ouvinte: antes e depois', ['ouvA', 'ouvD'], 'rotacao'), NA('6-4', 'Ouvinte: três eventos', ['ouv3'], 'rotacao'),
     NA('6-5', 'Tato: o que veio antes?', ['tato'], 'rotacao', [7, 8, 16], 'tato'), NA('6-6', 'Sim ou não', ['sn'], 'rotacao')], U:U5 },
   { k:'deit', nome:'Dêiticos (eu–você, aqui–ali, agora–antes)', cor:'--u7', c2:'#9d174d', icone:'👥', semA:true, fases:['Com apoio visual (figuras)', 'Sem apoio visual'], na:[
-    NA('7-1', 'Quem sou EU, quem é VOCÊ', ['quem'], 'rotacao', [8, 10, 20]), NA('7-2', 'Relacionar relações (pré-requisito, Silveira)', ['relRel'], 'rotacao', [8, 10, 20]),
+    NA('7-1', 'Quem sou EU, quem é VOCÊ', ['quem'], 'rotacao', [8, 10, 20]),
     NA('7-3', 'Simples: EU e VOCÊ', ['iyS'], 'rotacao', [8, 10, 20]), NA('7-4', 'Simples: AQUI e ALI', ['htS'], 'rotacao', [8, 10, 20]), NA('7-5', 'Simples: AGORA e ANTES', ['ntS'], 'rotacao', [8, 10, 20]), NA('7-6', 'Teste: simples misturado', ['iyS', 'htS', 'ntS'], 'rotacao', [8, 10, 10], 'teste'),
+    // antes de inverter a perspectiva: relacionar relações (Silveira, 2019), primeiro com figuras e depois com símbolos e regras
+    NA('7-2', 'Pares do mesmo jeito (com figuras)', ['rrFig'], 'rotacao', [8, 10, 20]), NA('7-2b', 'Pares do mesmo jeito (pelas regras)', ['relRel'], 'rotacao', [8, 10, 20]),
     NA('7-7', 'Invertido: "se eu fosse você"', ['iyR', 'htR', 'ntR'], 'rotacao', [8, 10, 20]), NA('7-8', 'Teste: invertido', ['iyR', 'htR', 'ntR'], 'rotacao', [8, 10, 10], 'teste'),
     NA('7-9', 'Duplamente invertido', ['dupla'], 'rotacao', [8, 10, 20]), NA('7-10', 'Teste: duplamente invertido', ['dupla'], 'rotacao', [8, 10, 10], 'teste'),
     NA('7-11', 'Perspectiva com propriedades (Silveira)', ['prop'], 'rotacao', [8, 10, 20])], U:UD,
@@ -594,8 +654,7 @@ function listaVisivel(u) {
 function preDeiticos() { return UNIDADES[0].a.every(l => progDe(l.id).estado === 'feito'); }
 function liberada(lic) {
   if (APR() && APR().teste) return true;
-  if (lic.ui > 0 && !naFeita(lic.ui - 1)) return false;
-  if (lic.u.k === 'deit' && !preDeiticos()) return false;
+  // cada moldura é um percurso próprio: a ordem entre molduras vira recomendação (ver recomendacao)
   const lista = listaVisivel(lic.u), i = lista.findIndex(l => l.id === lic.id);
   if (i <= 0) return true;
   return progDe(lista[i - 1].id).estado === 'feito';
@@ -626,16 +685,36 @@ function registrarResultado(lic, sess) {
 
 // ================= Telas =================
 let pagina = 'trilha';
-function mostrar(pg) { pagina = pg; document.querySelectorAll('#menu button').forEach(b => b.classList.toggle('on', b.dataset.pg === pg)); ({ trilha:telaTrilha, progresso:telaProgresso, aprendizes:telaAprendizes, guia:telaGuia })[pg](); lateral(); window.scrollTo(0, 0); }
+function mostrar(pg) { pagina = pg; document.querySelectorAll('#menu button').forEach(b => b.classList.toggle('on', b.dataset.pg === pg)); ({ molduras:telaMolduras, trilha:telaTrilha, progresso:telaProgresso, aprendizes:telaAprendizes, guia:telaGuia })[pg](); lateral(); window.scrollTo(0, 0); }
 document.querySelectorAll('#menu button').forEach(b => b.onclick = () => mostrar(b.dataset.pg));
 const critTxt = (l) => l.tipo === 'teste' ? `${l.crit[0]}/${l.crit[1]} sem feedback` : l.crit[0] === l.crit[1] ? `${l.crit[0]} seguidas` : `${l.crit[0]}/${l.crit[1]} seguidas`;
-function proximaLicao() { for (const u of UNIDADES) for (const l of listaVisivel(u)) if (progDe(l.id).estado !== 'feito' && liberada(l)) return l; return null; }
+// ----- Molduras como percursos separados -----
+const cursoAtual = () => { const a = APR(); BD.curso = BD.curso || {}; return a && BD.curso[a.id] != null ? BD.curso[a.id] : 0; };
+const escolherCurso = (ui) => { BD.curso = BD.curso || {}; BD.curso[APR().id] = ui; gravar(); mostrar('trilha'); };
+const feitasDe = (u) => listaVisivel(u).filter(l => progDe(l.id).estado === 'feito').length;
+function recomendacao(ui) {
+  const u = UNIDADES[ui], recs = [];
+  if (ui > 0 && u.k !== 'deit') recs.push([`Ordem da Siri Ming: fazer antes a fase 1 de ${UNIDADES[ui - 1].nome}`, naFeita(ui - 1)]);
+  if (u.k === 'deit') { recs.push(['Silveira (2019): fazer antes a fase 2 (arbitrária) de Igual e diferente', preDeiticos()]); recs.push(['Ter a fase 1 de Temporal (antes e depois)', naFeita(UNIDADES.findIndex(x => x.k === 'temp'))]); }
+  return recs;
+}
+function proximaLicao(ui = cursoAtual()) { for (const l of listaVisivel(UNIDADES[ui])) if (progDe(l.id).estado !== 'feito' && liberada(l)) return l; return null; }
+function telaMolduras() {
+  const pg = $('#pagina');
+  if (!APR()) { pg.innerHTML = `<h1 class="tit">Molduras</h1><p class="ajuda">Cadastre o aprendiz (só a sigla) para começar.</p><button class="btn" onclick="mostrar('aprendizes')">Cadastrar aprendiz</button>`; return; }
+  const atual = cursoAtual();
+  pg.innerHTML = `<div class="boas">${MASCOTE(110)}<div><h1 class="tit" style="margin:0">Qual moldura vamos treinar?</h1><p class="ajuda">Cada moldura tem o seu próprio percurso, como cursos separados. A ordem da Siri Ming aparece como recomendação.</p></div></div>
+    <div class="cursos">${UNIDADES.map((u, ui) => { const tot = listaVisivel(u).length, f = feitasDe(u), recs = recomendacao(ui), falta = recs.filter(r => !r[1]).length;
+      return `<button class="curso ${ui === atual ? 'on' : ''}" data-curso="${ui}" style="--cor:var(${u.cor})"><span class="c-ic">${u.icone}</span><b>${esc(u.nome)}</b><span class="c-bar"><i style="width:${Math.round(100 * f / tot)}%"></i></span><small>${f} de ${tot} lições${falta ? ' · ' + falta + ' recomendação pendente' : ''}</small></button>`; }).join('')}</div>`;
+  pg.querySelectorAll('[data-curso]').forEach(b => b.onclick = () => escolherCurso(+b.dataset.curso));
+}
 function telaTrilha() {
   const pg = $('#pagina');
   if (!APR()) { pg.innerHTML = `<h1 class="tit">Bem-vindo à Trilha RFT</h1><p class="ajuda">Cadastre o aprendiz (só a sigla) para começar.</p><button class="btn" onclick="mostrar('aprendizes')">Cadastrar aprendiz</button>`; return; }
-  const prox = proximaLicao(), lados = ['', 'l1', 'l2', 'l1', '', 'r1', 'r2', 'r1'];
+  const prox = proximaLicao(), lados = ['', 'l1', 'l2', 'l1', '', 'r1', 'r2', 'r1'], cur = cursoAtual();
   pg.innerHTML = UNIDADES.map((u, ui) => {
-    const bloqU = !(APR() && APR().teste) && ((ui > 0 && !naFeita(ui - 1)) || (u.k === 'deit' && !preDeiticos()));
+    if (ui !== cur) return '';
+    const bloqU = false, recs = recomendacao(ui), tot = listaVisivel(u).length;
     const lista = listaVisivel(u); let k = 0;
     const nos = (fase) => lista.filter(l => l.fase === fase).map(l => {
       const p = progDe(l.id), lib = liberada(l), atual = prox && prox.id === l.id;
@@ -643,12 +722,15 @@ function telaTrilha() {
       const ic = !lib ? '🔒' : p.estado === 'feito' ? '★' : l.met ? '🔁' : l.tipo === 'teste' ? '🎯' : l.tipo === 'tato' ? '🗣️' : l.fase === 'A' ? '📜' : '▶';
       return `<div class="no-wrap ${lados[k++ % lados.length]}">${atual ? '<div class="balao">COMEÇAR</div>' : ''}<button class="no ${cls} ${atual ? 'atual' : ''}" data-lic="${l.id}" style="--cor:var(${u.cor});--cor2:${u.c2}" title="${esc(l.titulo)}">${ic}</button><div class="no-rot">${esc(l.titulo)}<span class="crit">${critTxt(l)}${p.estado === 'refazer' ? ' · refazer' : ''}${p.falhas ? ` · falhas no teste: ${p.falhas}` : ''}</span></div></div>`;
     }).join('');
-    return `<div class="unidade" style="background:var(${u.cor});${bloqU ? 'filter:grayscale(.7);opacity:.7' : ''}"><div><span>UNIDADE ${ui + 1}${bloqU ? (u.k === 'deit' && !preDeiticos() ? ' · abre depois da fase arbitrária de igual e diferente e da fase 1 do temporal' : ' · bloqueada até terminar a fase não arbitrária anterior') : ''}</span><b>${u.icone} ${esc(u.nome)}</b></div><button class="guia" data-guia="${ui}">📘 Guia</button></div>
+    const f = feitasDe(u);
+    return `<div class="unidade" style="background:var(${u.cor})"><div><span>MOLDURA ${ui + 1} DE ${UNIDADES.length} · ${f} de ${tot} lições</span><b>${u.icone} ${esc(u.nome)}</b></div><div style="display:flex;gap:8px"><button class="guia" data-trocar>⇄ Trocar moldura</button><button class="guia" data-guia="${ui}">📘 Guia</button></div></div>
+      ${recs.length ? `<div class="recs">${recs.map(r => `<div class="${r[1] ? 'ok' : ''}">${r[1] ? '✓' : '○'} ${esc(r[0])}</div>`).join('')}</div>` : ''}
       <div class="fase-sep">${u.fases ? u.fases[0] : 'Fase 1 · não arbitrária'}</div><div class="trilha">${nos('NA')}</div>
       <div class="fase-sep">${u.fases ? u.fases[1] : 'Fase 2 · arbitrária (regras)'}</div><div class="trilha">${nos('A')}</div>`;
   }).join('');
   pg.querySelectorAll('[data-lic]').forEach(b => b.onclick = () => { const l = TODAS.find(x => x.id === b.dataset.lic) || listaVisivel(UNIDADES[+b.dataset.lic[0] - 1]).find(x => x.id === b.dataset.lic); if (!liberada(l)) return; iniciarLicao(l); });
   pg.querySelectorAll('[data-guia]').forEach(b => b.onclick = () => { mostrar('guia'); });
+  pg.querySelectorAll('[data-trocar]').forEach(b => b.onclick = () => mostrar('molduras'));
   const at = pg.querySelector('.no.atual'); if (at) setTimeout(() => at.scrollIntoView({ block:'center', behavior:'smooth' }), 60);
 }
 function lateral() {
@@ -656,8 +738,8 @@ function lateral() {
   const opts = BD.aprendizes.map(x => `<option value="${x.id}" ${x.id === BD.atual ? 'selected' : ''}>${esc(x.sigla)}</option>`).join('');
   const dias = a ? (BD.dias[a.id] || []) : [], est = a ? (BD.estrelas[a.id] || 0) : 0;
   let seq = 0; { const d = new Date(); for (;;) { const s = d.toISOString().slice(0, 10); if (dias.includes(s)) { seq++; d.setDate(d.getDate() - 1); } else break; } }
-  const feitas = a ? TODAS.filter(l => progDe(l.id).estado === 'feito').length : 0, prox = a ? proximaLicao() : null;
-  el.innerHTML = `<div class="stats"><div class="stat">🔥 ${seq}<small>dias seguidos</small></div><div class="stat">⭐ ${est}<small>estrelas</small></div><div class="stat">🏁 ${feitas}<small>de ${TODAS.length}</small></div></div>
+  const uC = UNIDADES[a ? cursoAtual() : 0], feitas = a ? feitasDe(uC) : 0, totC = listaVisivel(uC).length, prox = a ? proximaLicao() : null;
+  el.innerHTML = `<div class="stats"><div class="stat">🔥 ${seq}<small>dias seguidos</small></div><div class="stat">⭐ ${est}<small>estrelas</small></div><div class="stat">${uC.icone} ${feitas}<small>de ${totC}</small></div></div><div class="cx-lat mascote-lat">${MASCOTE(78)}<p><b>Elo</b> acompanha a trilha. Ele fica fora das lições, para não virar parte dos estímulos.</p></div>
     <div class="cx-lat"><h3>Aprendiz</h3>${BD.aprendizes.length ? `<select id="selApr">${opts}</select>` : '<p>Nenhum cadastrado.</p>'}${a && a.teste ? '<p style="color:var(--verm);font-weight:800">Modo teste: todas as lições liberadas.</p>' : ''}<label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-weight:700;font-size:14px"><input type="checkbox" id="chkSom" ${BD.som === false ? '' : 'checked'}> Som de acerto</label></div>
     ${prox ? `<div class="cx-lat"><h3>Próxima lição</h3><p><b>${esc(prox.u.nome)}</b> · ${esc(prox.titulo)}</p><p>Critério: ${critTxt(prox)} · até ${prox.crit[2]} tentativas</p><p>${prox.tipo === 'teste' ? 'Sem feedback: não corrija nem elogie a resposta.' : prox.tipo === 'tato' ? 'Ele responde falando; você marca acertou ou errou.' : 'Com feedback e reforço a cada acerto.'}</p><button class="btn verde" id="btProx" style="width:100%">Começar</button></div>` : ''}
     <div class="cx-lat"><h3>Critérios (Siri Ming)</h3><p>Fase 1: 7 corretas em 8 seguidas (máx. 25). Só um tipo → blocos de 3 → misturado → tato → sim/não.</p><p>Fase 2: treino 6 seguidas · manutenção 6/8 · implicação mútua 5/6 · combinatória 7/8. Falhou no teste: volta ao treino e repete uma vez; falhou de novo: ensino com vários exemplos.</p></div>`;
@@ -692,9 +774,9 @@ function telaAprendizes() {
 }
 function telaGuia() {
   $('#pagina').innerHTML = `<h1 class="tit">Como funciona</h1>
-  <details class="guia-txt" open><summary>A ordem das molduras</summary><p class="ajuda">Igual e diferente → comparação → oposição (usando os extremos dos mesmos contínuos da comparação) → espacial → hierarquia → temporal → dêiticos. Cada unidade abre quando a fase não arbitrária da anterior termina. Referência principal: Ming, Stewart e McElwee, <i>Using Relational Frame Theory to Promote Language Development</i>, vol. 1 e 2. Hierarquia e dêiticos não estão nesses volumes: foram montados a partir de outros autores (abaixo), no mesmo formato de treino e teste.</p></details>
+  <details class="guia-txt" open><summary>A ordem das molduras</summary><p class="ajuda">Igual e diferente → comparação → oposição (usando os extremos dos mesmos contínuos da comparação) → espacial → hierarquia → temporal → dêiticos. Cada moldura é um percurso separado (como cursos); a ordem acima aparece como recomendação no topo de cada percurso. "Relacionar relações" fica antes das inversões, com figuras primeiro e depois pelas regras. Referência principal: Ming, Stewart e McElwee, <i>Using Relational Frame Theory to Promote Language Development</i>, vol. 1 e 2. Hierarquia e dêiticos não estão nesses volumes: foram montados a partir de outros autores (abaixo), no mesmo formato de treino e teste.</p></details>
   <details class="guia-txt"><summary>Hierarquia</summary><p class="ajuda">Ensinada vendo o que está dentro de quê, com recipientes transparentes (pote dentro da caixa), e com as dicas "está dentro / contém / pertence / é um tipo de". Depois vêm grupos (animais, frutas, roupas), a pergunta invertida ("todo animal é gato?", que é o ponto da assimetria da hierarquia) e, na fase arbitrária, "BOP contém ZAG, ZAG contém LUM": LUM está dentro de BOP, mas BOP não está dentro de LUM; e o que vale para o grupo vale para quem está dentro dele (transformação de função). Base: Slattery e Stewart; Gil, Luciano, Ruiz e Valdivia-Salas; revisão sobre categorização hierárquica na <i>Revista Perspectivas</i> (2021).</p></details>
-  <details class="guia-txt"><summary>Dêiticos (tomada de perspectiva)</summary><p class="ajuda">Relações eu–você, aqui–ali e agora–antes, em três níveis do protocolo de McHugh, Barnes-Holmes e Barnes-Holmes (2004): simples ("eu tenho X e você tem Y; o que eu tenho?"), invertido ("se eu fosse você e você fosse eu...") e duplamente invertido (as duas inversões se anulam). Primeiro com figuras de apoio (eu = quem pergunta, você = o aprendiz), depois sem figuras, e por fim com outra pessoa perguntando (generalização, como em Gilroy et al., 2015). Critério: 8 de 10 (80%), como na tese de Carolina Silveira de Almeida (UFSCar, 2019). Da mesma tese vêm o pré-requisito (a unidade só abre depois da fase arbitrária de igual e diferente; a criança com autismo só mostrou tomada de perspectiva depois de a coordenação chegar ao nível de relacionar relações) e a lição de perspectiva com propriedades ("você é baixo, o papai é alto; se o papai fosse você, ele seria...?"). Cuidado: revisões recentes (Hempkin, Sivaraman e Barnes-Holmes, 2024) acham poucos estudos com autistas e evidência ainda limitada de que esse treino mude a tomada de perspectiva no dia a dia; vale medir também fora do app.</p></details>
+  <details class="guia-txt"><summary>Dêiticos (tomada de perspectiva)</summary><p class="ajuda">Relações eu–você, aqui–ali e agora–antes, em três níveis do protocolo de McHugh, Barnes-Holmes e Barnes-Holmes (2004): simples ("eu tenho X e você tem Y; o que eu tenho?"), invertido ("se eu fosse você e você fosse eu...") e duplamente invertido (as duas inversões se anulam). Primeiro com figuras de apoio (eu = quem pergunta, você = o aprendiz), depois sem figuras, e por fim com outra pessoa perguntando (generalização, como em Gilroy et al., 2015). Critério: 8 de 10 (80%), como na tese de Carolina Silveira de Almeida (UFSCar, 2019). Da mesma tese vêm o pré-requisito (recomendado fazer antes a fase arbitrária de igual e diferente; a criança com autismo só mostrou tomada de perspectiva depois de a coordenação chegar ao nível de relacionar relações) e a lição de perspectiva com propriedades ("você é baixo, o papai é alto; se o papai fosse você, ele seria...?"). Cuidado: revisões recentes (Hempkin, Sivaraman e Barnes-Holmes, 2024) acham poucos estudos com autistas e evidência ainda limitada de que esse treino mude a tomada de perspectiva no dia a dia; vale medir também fora do app.</p></details>
   <details class="guia-txt" open><summary>Fase 1 · não arbitrária</summary><p class="ajuda">A relação está nas próprias figuras. Sequência: emparelhamento relacional (pares que mostram a mesma relação) → ouvinte → tato → sim/não. Em cada uma: só um tipo → blocos de 3 → misturado. Critério: 7 corretas em 8 seguidas, até 25 tentativas, com feedback e reforço. Na comparação, os contínuos têm 5 tamanhos e a pergunta "maior que este" usa a amostra do meio. No temporal, ele vê os itens aparecerem um depois do outro. Os jogos de transição (quem gosta da mesma comida, quem mora onde) fazem a ponte para a fase 2.</p></details>
   <details class="guia-txt" open><summary>Fase 2 · arbitrária</summary><p class="ajuda">A relação só existe pela regra, com símbolos sem sentido (BOP, ZAG, LUM...). Treino com a regra de cada relação (6 seguidas) → manutenção sem regra (6/8, sem feedback) → teste de implicação mútua (5/6) → revisão misturada (11/12) → teste de implicação combinatória (7/8) → transformação de função. Falhou num teste: as lições de treino voltam para "refazer" e o teste pode ser repetido uma vez. Falhou de novo: aparece a lição de ensino com vários exemplos (MET) e o teste seguinte usa um conjunto novo de símbolos.</p></details>
   <details class="guia-txt"><summary>Durante a lição</summary><p class="ajuda">🔊 lê a pergunta. Nas lições com feedback, a resposta certa fica verde e a errada mostra a certa. Nos testes, não há correção. Nas lições de tato, ele responde falando e você marca "Acertou" ou "Errou" (a resposta esperada aparece para você). A barra no alto mostra quanto falta para o critério.</p></details>
@@ -715,7 +797,7 @@ function desenharTentativa() {
   const t = L.tent[L.i], lic = L.lic, fb = lic.tipo !== 'teste';
   const topo = `<div class="l-topo"><button class="fechar" id="fx" title="Sair">✕</button><div class="barra"><span style="width:${Math.round(100 * progressoBarra())}%"></span></div><div class="l-cont">${L.resps.length + 1}/${lic.crit[2]}</div></div>`;
   const pergHtml = `<div class="l-perg">${esc(t.perg)} <button class="falar" id="fl" title="Ouvir">🔊</button></div>`;
-  const corpo = `<div class="l-meio"><div class="l-tipo">${esc(lic.u.nome)} · ${esc(t.tipo || lic.titulo)}${fb ? '' : ' · sem feedback'}</div>${pergHtml}${t.regra || ''}${t.amostra ? `<div class="amostra">${t.amostra}</div>` : ''}<div class="ops">${t.ops.map((o, i) => `<button class="op" data-i="${i}">${o}</button>`).join('')}</div></div>`;
+  const corpo = `<div class="l-meio"><div class="l-tipo">${esc(lic.u.nome)} · ${esc(t.tipo || lic.titulo)}${fb ? '' : ' · sem feedback'}</div>${pergHtml}${t.regra || ''}${t.amostra ? `<div class="amostra">${t.amostra}</div>` : ''}${t.dica && fb ? `<div class="dica">${esc(t.dica)}</div>` : ''}<div class="ops">${t.ops.map((o, i) => `<button class="op" data-i="${i}">${o}</button>`).join('')}</div></div>`;
   const base = t.tato ? `<div class="l-base"><div class="l-base-in"><div class="terap"><small>Terapeuta · resposta esperada: <b>${esc(t.resposta || '')}</b></small></div><div class="terap"><button class="btn sec" id="tErr">✗ Errou</button><button class="btn verde" id="tAc">✓ Acertou</button></div></div></div>` : `<div class="l-base"><div class="l-base-in"><span class="ajuda">${fb ? 'Toque na resposta' : 'Teste: sem feedback'}</span><span></span></div></div>`;
   $('#licao').innerHTML = topo + corpo + base;
   $('#fx').onclick = () => { if (!L.resps.length || confirm('Sair da lição? O que foi feito fica salvo.')) fecharLicao(); };
@@ -758,14 +840,15 @@ function finalizar(interrompida, atingiu = false) {
   if (atingiu) { BD.estrelas[a.id] = (BD.estrelas[a.id] || 0) + 5; somFesta(); }
   gravar();
   if (interrompida) return;
-  $('#licao').innerHTML = `<div class="l-meio"><div class="fim"><div class="grande">${atingiu ? '🏆' : '💪'}</div><h2>${atingiu ? 'Lição concluída!' : 'Fim da lição'}</h2><p class="ajuda" style="font-size:16px">${esc(msg)}</p>
+  $('#licao').innerHTML = `<div class="l-meio"><div class="fim"><div class="grande">${MASCOTE(150, atingiu)}</div><h2>${atingiu ? 'Lição concluída!' : 'Fim da lição'}</h2><p class="ajuda" style="font-size:16px">${esc(msg)}</p>
     <div class="cards"><div>${ac}/${L.resps.length}<small>acertos</small></div><div>${critTxt(lic)}<small>critério</small></div><div>${atingiu ? '+5 ⭐' : '–'}<small>bônus</small></div></div>
     <div class="pontos">${L.resps.map(r => `<i class="${r ? '' : 'n'}"></i>`).join('')}</div><p style="margin-top:26px"><button class="btn verde" id="voltar">Continuar</button></p></div></div>`;
   $('#voltar').onclick = () => fecharLicao(false);
 }
 document.addEventListener('keydown', (e) => { if (!L) return; if (e.key === 'Enter' && $('#cont')) $('#cont').click(); const n = +e.key; if (n >= 1 && n <= 4) { const b = document.querySelectorAll('#licao .op')[n - 1]; if (b) b.click(); } });
 
-mostrar('trilha');
+document.querySelector('.logo').insertAdjacentHTML('afterbegin', MASCOTE(44));
+mostrar(APR() ? 'trilha' : 'molduras');
 </script>
 </body>
 </html>
